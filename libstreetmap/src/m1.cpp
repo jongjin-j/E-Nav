@@ -58,6 +58,59 @@ void closeMap() {
     
 }
 
+double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
+    
+}
+
 double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
+    
+}
+
+double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
+    
+}
+
+int findClosestIntersection(LatLon my_position){
+    
+}
+
+std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx intersection_id){
+    
+}
+
+std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersection_id){
+    
+}
+
+std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersection_id){
+    
+}
+
+std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
+    
+}
+
+std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids){
+    
+}
+
+std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix){
+    
+    
+}
+
+double findStreetLength(StreetIdx street_id){
+    
+}
+
+LatLonBounds findStreetBoundingBox(StreetIdx street_id){
+    
+}
+
+POIIdx findClosestPOI(LatLon my_position, std::string POIname){
+    
+}
+
+double findFeatureArea(FeatureIdx feature_id){
     
 }

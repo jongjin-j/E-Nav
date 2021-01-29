@@ -57,3 +57,7 @@ void closeMap() {
     //Clean-up your map related data structures here
     
 }
+
+double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
+    
+}

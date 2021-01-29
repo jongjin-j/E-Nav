@@ -83,7 +83,7 @@ int findClosestIntersection(LatLon my_position){
 }
 
 std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx intersection_id){
-    
+    return intersection_street_segments[intersection_id];
 }
 
 std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersection_id){

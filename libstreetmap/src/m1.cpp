@@ -87,6 +87,11 @@ std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx i
 }
 
 std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersection_id){
+    //take in intersection_id
+    //declare a string vector
+    //find associated street names with intersection_id
+    //push back as you find them (store in the vector))
+    //return the vector
     
 }
 

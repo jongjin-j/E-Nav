@@ -71,15 +71,18 @@ double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
 }
 
 double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
-    
+    //segment could be curved
+    //use numCurvePoints
 }
 
 double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
-    
+    //return distance/speed
 }
 
 int findClosestIntersection(LatLon my_position){
-    
+    //find the street segment you're in
+    //compute distance to: IntersectionIdx to and IntersectionIdx from
+    //return the shorter
 }
 
 std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx intersection_id){
@@ -89,9 +92,11 @@ std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx i
 std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersection_id){
     //take in intersection_id
     //declare a string vector
-    //find associated street names with intersection_id
-    //push back as you find them (store in the vector))
+    //find street segments associated with the intersection; store in a string vector with pushback
+    //find the street names of the segments; print using loop
     //return the vector
+    
+    //might want to find ways to reduce O(n) 
     
 }
 
@@ -100,7 +105,10 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
 }
 
 std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
-    
+    //define an int array; we'll store the street intersections here
+    //with the street id, find all its street segments (ie StreetSegmentInfo.streetID == street_id)
+    //find the intersection points of these segments
+    //store as you go, return the vector
 }
 
 std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids){
@@ -113,7 +121,10 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
 }
 
 double findStreetLength(StreetIdx street_id){
-    
+    //declare  a double var 'length'
+    //for street_id == StreetSegmentInfo.streetID; (all segments of the street)
+    //add each segment length to 'length' --how will we find the segment's length?
+    //return length
 }
 
 LatLonBounds findStreetBoundingBox(StreetIdx street_id){

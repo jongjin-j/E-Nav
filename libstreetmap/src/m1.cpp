@@ -71,23 +71,8 @@ double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
 }
 
 double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
-<<<<<<< HEAD
     //segment could be curved
     //use numCurvePoints
-}
-
-double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
-    //return distance/speed
-}
-
-int findClosestIntersection(LatLon my_position){
-    //find the street segment you're in
-    //compute distance to: IntersectionIdx to and IntersectionIdx from
-    //return the shorter
-=======
-    //street_segment_id.StreetSegmentInfo.from, to
-    //subtract the two intersection points
-    //return magnitude
 }
 
 double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
@@ -104,7 +89,14 @@ int findClosestIntersection(LatLon my_position){
     //if(currentDistance < previousDistance) use currentDistance
     //else keep previousDistance
     //return final intersection
->>>>>>> Modified m1.cpp by adding pseudo codes for the first four functions
+    
+    //find the street segment you're in
+    //compute distance to: IntersectionIdx to and IntersectionIdx from
+    //return the shorter
+    //OR
+    //street_segment_id.StreetSegmentInfo.from, to
+    //subtract the two intersection points
+    //return magnitude
 }
 
 std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx intersection_id){

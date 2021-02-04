@@ -67,10 +67,11 @@ void closeMap() {
 }
 
 double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
-    
+    //return sqrt of LatDiff^2 + LonDiff^2 of the two points
 }
 
 double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
+<<<<<<< HEAD
     //segment could be curved
     //use numCurvePoints
 }
@@ -83,6 +84,27 @@ int findClosestIntersection(LatLon my_position){
     //find the street segment you're in
     //compute distance to: IntersectionIdx to and IntersectionIdx from
     //return the shorter
+=======
+    //street_segment_id.StreetSegmentInfo.from, to
+    //subtract the two intersection points
+    //return magnitude
+}
+
+double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
+    //findStreetSegmentLength
+    //divide by StreetSegmentInfo.speedLimit to obtain time
+    //return time
+}
+
+int findClosestIntersection(LatLon my_position){
+    //my_position.latitude(): return latitude
+    //my_position.longitude(): return longitude
+    //for loop through intersections
+    //run findDistanceBetweenTwoPoints(intersection_point, my_position)
+    //if(currentDistance < previousDistance) use currentDistance
+    //else keep previousDistance
+    //return final intersection
+>>>>>>> Modified m1.cpp by adding pseudo codes for the first four functions
 }
 
 std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx intersection_id){

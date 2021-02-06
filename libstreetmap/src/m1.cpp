@@ -81,8 +81,7 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
     //return the sum of the lengths
     
     double totalStreetSegmentLength = 0, firstSegmentLength = 0, lastSegmentLength = 0;
-    StreetSegmentInfo street_segment;
-    street_segment = getStreetSegmentInfo(street_segment_id);
+    StreetSegmentInfo street_segment = getStreetSegmentInfo(street_segment_id);
     
     if(street_segment.numCurvePoints == 0){
         LatLon posFrom = getIntersectionPosition(street_segment.from);
@@ -101,11 +100,13 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
         LatLon posFrom = getIntersectionPosition(street_segment.from);
         std::pair <LatLon, LatLon> firstSegment (posFrom, segmentCurvePoints[0]);
         firstSegmentLength = findDistanceBetweenTwoPoints(firstSegment);
+        totalStreetSegmentLength += firstSegmentLength;
     
         //distance between last curvePoint and to point(numCurvePoints - 1)
         LatLon posTo = getIntersectionPosition(street_segment.to);
         std::pair <LatLon, LatLon> lastSegment (segmentCurvePoints[street_segment.numCurvePoints - 1], posTo);
         lastSegmentLength = findDistanceBetweenTwoPoints(lastSegment);
+        totalStreetSegmentLength += lastSegmentLength;
     
         //distance of each street segment excluding the first and the last street segment
         for(int i = 0; i < street_segment.numCurvePoints; i++){
@@ -121,6 +122,12 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
     //findStreetSegmentLength
     //divide by StreetSegmentInfo.speedLimit to obtain time
     //return time
+    
+    double streetSegmentLength = findStreetSegmentLength(street_segment_id);
+    StreetSegmentInfo street_segment = getStreetSegmentInfo(street_segment_id);
+    double travelTime = streetSegmentLength / (street_segment.speedLimit);
+    
+    return travelTime;
 }
 
 int findClosestIntersection(LatLon my_position){

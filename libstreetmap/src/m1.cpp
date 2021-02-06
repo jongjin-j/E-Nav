@@ -91,7 +91,8 @@ int findClosestIntersection(LatLon my_position){
     
     
     for (int i = 0; i<getNumIntersections(); i++){
-        double dist = findDistanceBetweenTwoPoints(std::pair<getIntersectionPosition(i), my_position>);
+        std::pair <LatLon, LatLon> positionPair (getIntersectionPosition(i), my_position);
+        double dist = findDistanceBetweenTwoPoints(positionPair);
         
         if (i == 0 || dist < minDist){
             minDist = dist;
@@ -122,7 +123,6 @@ std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersect
     //return the vector
     
     //might want to find ways to reduce O(n) 
-    
 }
 
 std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersection_id){

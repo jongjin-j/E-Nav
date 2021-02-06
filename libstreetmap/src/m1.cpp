@@ -21,6 +21,7 @@
 #include <iostream>
 #include "m1.h"
 #include "StreetsDatabaseAPI.h"
+#include <math.h>
 
 
 // loadMap will be called with the name of the file that stores the "layer-2"
@@ -68,6 +69,10 @@ void closeMap() {
 
 double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
     //return sqrt of LatDiff^2 + LonDiff^2 of the two points
+    double latitudeDiff = points.first.latitude() - points.second.latitude();
+    double longitudeDiff = points.first.longitude() - points.second.longitude();
+    double diffSquared = pow(latitudeDiff , 2) + pow(longitudeDiff, 2);
+    return sqrt(diffSquared);
 }
 
 double findStreetSegmentLength(StreetSegmentIdx street_segment_id){

@@ -144,6 +144,7 @@ double findStreetLength(StreetIdx street_id){
     //for street_id == StreetSegmentInfo.streetID; (all segments of the street)
     //add each segment length to 'length' --how will we find the segment's length?
     //return length
+    
 }
 
 LatLonBounds findStreetBoundingBox(StreetIdx street_id){
@@ -151,7 +152,34 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
 }
 
 POIIdx findClosestPOI(LatLon my_position, std::string POIname){
+    // Returns the nearest point of interest of the given name to the given position
+    // Speed Requirement --> none 
     
+    // make a vector consisting of the all the poi locations
+    // compare using a for loop to return the shortest one
+    
+    double shortestDistance;
+    double newDistance;
+    POIIdx closestPOIIdx;
+        
+    for(int i = 0; i < getNumPointsOfInterest(); i++){  //loop through POI
+        if(getPOIName(i) == POIname){                   //if poi name matches,
+            
+            std::pair <LatLon, LatLon> PositionPOIPair (my_position, getPOIPosition(i));
+
+            newDistance = findDistanceBetweenTwoPoints(PositionPOIPair);   //pair of my_position and getPOIPosition
+            if(i==0){
+                shortestDistance == newDistance;
+                closestPOIIdx = i;
+            }
+            else if(shortestDistance > newDistance){
+                shortestDistance == newDistance;
+                closestPOIIdx = i;
+            }
+        }
+    }
+    
+    return closestPOIIdx;  
 }
 
 double findFeatureArea(FeatureIdx feature_id){

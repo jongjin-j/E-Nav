@@ -87,6 +87,21 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
 }
 
 int findClosestIntersection(LatLon my_position){
+    int minDist, minIndex;
+    
+    
+    for (int i = 0; i<getNumIntersections(); i++){
+        std::pair <LatLon, LatLon> positionPair (getIntersectionPosition(i), my_position);
+        double dist = findDistanceBetweenTwoPoints(positionPair);
+        
+        if (i == 0 || dist < minDist){
+            minDist = dist;
+            minIndex = i;
+        }
+    }
+    
+    return minIndex;
+    
     //my_position.latitude(): return latitude
     //my_position.longitude(): return longitude
     //for loop through intersections
@@ -94,14 +109,6 @@ int findClosestIntersection(LatLon my_position){
     //if(currentDistance < previousDistance) use currentDistance
     //else keep previousDistance
     //return final intersection
-    
-    //find the street segment you're in
-    //compute distance to: IntersectionIdx to and IntersectionIdx from
-    //return the shorter
-    //OR
-    //street_segment_id.StreetSegmentInfo.from, to
-    //subtract the two intersection points
-    //return magnitude
 }
 
 std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx intersection_id){
@@ -116,7 +123,6 @@ std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersect
     //return the vector
     
     //might want to find ways to reduce O(n) 
-    
 }
 
 std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersection_id){

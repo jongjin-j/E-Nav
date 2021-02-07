@@ -223,11 +223,7 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
         }
     }
     
-    for(std::vector<int>::iterator it = adjacentIntersections.begin(); it != adjacentIntersections.end(); it++){
-        if(adjacentIntersections[*it] == adjacentIntersections[*it + 1]){
-            adjacentIntersections.erase(adjacentIntersections.begin() + *it + 1);
-        }
-    }
+    
     
     return adjacentIntersections;
 }

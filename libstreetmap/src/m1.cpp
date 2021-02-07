@@ -176,18 +176,16 @@ std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersect
     int ss_num = getNumIntersectionStreetSegment(intersection_id);
     bool duplicate = false;
     
-    //loop through the segment IDs
+    //loop through the segment IDs and get segment information, use them to find street name
     for (int i = 0; i < ss_num; i++){
         int ss_id = (intersection_street_segments[intersection_id])[i];
         
-        //get segment information with the IDs 
         StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_id);
         
-        //use the streetID to get the street name
         std::string streetName = getStreetName(ss_info.streetID);
         
         //iterate through streetNames vector and find any duplicates
-        for(std::vector<std::string>::iterator it = streetNames.begin(); it != streetNames.end();){
+        for(std::vector<std::string>::iterator it = streetNames.begin(); it != streetNames.end(); it++){
             if (*it == streetName)
                 duplicate = true;
         }           
@@ -200,14 +198,6 @@ std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersect
     }
     
     return streetNames;
-    
-    //take in intersection_id
-    //declare a string vector
-    //find street segments associated with the intersection; store in a string vector with pushback
-    //find the street names of the segments; print using loop
-    //return the vector
-    
-    //might want to find ways to reduce O(n) 
 }
 
 std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersection_id){
@@ -237,10 +227,26 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
 }
 
 std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
-    //define an int array; we'll store the street intersections here
-    //with the street id, find all its street segments (ie StreetSegmentInfo.streetID == street_id)
-    //find the intersection points of these segments
-    //store as you go, return the vector
+    //vector to store intersections of a street
+    std::vector<IntersectionIdx> streetIntersections; 
+    bool firstIntersection = true;
+    
+    //loop through all the street segments to find segments on the given street
+    for (int ss_idx = 0; ss_idx < getNumStreetSegments(); ss_idx++){
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_idx);
+        
+        //push intersections into streetIntersections vector
+        if (ss_info.streetID == street_id){
+            if (firstIntersection){
+                streetIntersections.push_back(ss_info.from);
+                firstIntersection = false;
+            }
+            
+            streetIntersections.push_back(ss_info.to);
+        }
+    }
+    
+    return streetIntersections;
 }
 
 std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids){

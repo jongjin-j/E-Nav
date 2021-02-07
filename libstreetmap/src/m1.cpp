@@ -273,7 +273,7 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     }
     
     //erase all blank spaces and change street_prefix into lowercase
-    street_prefix.erase(std::remove(streetName.begin(), street_prefix.end(), ' '), street_prefix.end());
+    street_prefix.erase(std::remove(streetName.begin(), street_prefix.end(), ' '), street_prefix.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
     std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower);
     
     //loop through the streets and find match

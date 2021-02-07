@@ -223,7 +223,7 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
         }
     }
     
-    
+    //have to remove duplicates
     
     return adjacentIntersections;
 }

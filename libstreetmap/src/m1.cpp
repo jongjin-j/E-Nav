@@ -23,6 +23,7 @@
 #include "StreetsDatabaseAPI.h"
 #include <math.h>
 
+#define PI 3.14159265
 
 // loadMap will be called with the name of the file that stores the "layer-2"
 // map data accessed through StreetsDatabaseAPI: the street and intersection 
@@ -37,6 +38,7 @@
 // ".streets" to ".osm" in the map_streets_database_filename to get the proper
 // name.
 std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
+std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;
 
 bool loadMap(std::string map_streets_database_filename) {
     bool load_successful = false; //Indicates whether the map has loaded 
@@ -55,6 +57,12 @@ bool loadMap(std::string map_streets_database_filename) {
             intersection_street_segments[intersection].push_back(ss_id);
         }
     }
+    
+    for(int i = 0; i < getNumStreetSegments(); i++){
+        StreetSegmentInfo temp_segment = getStreetSegmentInfo(i);
+        int temp_street_id = temp_segment.streetID;
+        streetID_street_segments[temp_street_id].push_back(i);
+    }
 
     load_successful = true; //Make sure this is updated to reflect whether
                             //loading the map succeeded or failed
@@ -68,10 +76,17 @@ void closeMap() {
 }
 
 double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
-    //return sqrt of LatDiff^2 + LonDiff^2 of the two points
-    double latitudeDiff = points.first.latitude() - points.second.latitude();
-    double longitudeDiff = points.first.longitude() - points.second.longitude();
-    double diffSquared = pow(latitudeDiff , 2) + pow(longitudeDiff, 2);
+    //return sqrt of x_difference^2 + y_difference^2 of the two points
+    
+    double latitudeAverage = (points.first.latitude() + points.second.latitude()) / 2;
+    double x_coordinate_1 = kEarthRadiusInMeters * points.first.longitude() * cos(latitudeAverage * PI / 180);
+    double y_coordinate_1 = kEarthRadiusInMeters * points.first.latitude();
+    double x_coordinate_2 = kEarthRadiusInMeters * points.second.longitude() * cos(latitudeAverage * PI / 180);
+    double y_coordinate_2 = kEarthRadiusInMeters * points.second.latitude();
+    
+    double x_diff = x_coordinate_2 - x_coordinate_1;
+    double y_diff = y_coordinate_2 - y_coordinate_1;
+    double diffSquared = pow(x_diff , 2) + pow(y_diff, 2);
     return sqrt(diffSquared);
 }
 
@@ -133,11 +148,12 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
 int findClosestIntersection(LatLon my_position){
     int minDist, minIndex;
     
-    
+    //loop through all intersections and find the distance from my position
     for (int i = 0; i<getNumIntersections(); i++){
         std::pair <LatLon, LatLon> positionPair (getIntersectionPosition(i), my_position);
         double dist = findDistanceBetweenTwoPoints(positionPair);
         
+        //save the minimum distance and the corresponding intersection index
         if (i == 0 || dist < minDist){
             minDist = dist;
             minIndex = i;
@@ -156,26 +172,32 @@ int findClosestIntersection(LatLon my_position){
 }
 
 std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx intersection_id){
+    //use intersection_street_segments vector created at load
     return intersection_street_segments[intersection_id];
 }
 
 std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersection_id){
+    //vector to store names of the streets
     std::vector<std::string> streetNames;
     
     int ss_num = getNumIntersectionStreetSegment(intersection_id);
     bool duplicate = false;
     
+    //loop through the segment IDs and get segment information, use them to find street name
     for (int i = 0; i < ss_num; i++){
         int ss_id = (intersection_street_segments[intersection_id])[i];
         
         StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_id);
+        
         std::string streetName = getStreetName(ss_info.streetID);
         
-        for(std::vector<std::string>::iterator it = streetNames.begin(); it != streetNames.end();){
+        //iterate through streetNames vector and find any duplicates
+        for(std::vector<std::string>::iterator it = streetNames.begin(); it != streetNames.end(); it++){
             if (*it == streetName)
                 duplicate = true;
         }           
         
+        //if there are duplicates, do not push, if not, push into streetNames vector
         if (!duplicate)
             streetNames.push_back(streetName);
             
@@ -183,25 +205,55 @@ std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersect
     }
     
     return streetNames;
-    
-    //take in intersection_id
-    //declare a string vector
-    //find street segments associated with the intersection; store in a string vector with pushback
-    //find the street names of the segments; print using loop
-    //return the vector
-    
-    //might want to find ways to reduce O(n) 
 }
 
 std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersection_id){
+    //use function findStreetSegmentsOfIntersection
+    //run a for loop to check its boolean oneWay
+    //  if oneWay == false, return the adjacent intersection
+    //  else oneWay == true
+    //      if intersection == from, return adjacent intersection
+    //      else if intersection == to, ignore
     
+    std::vector<IntersectionIdx> adjacentIntersections;
+    std::vector<StreetSegmentIdx> adjacentStreetSegments = findStreetSegmentsOfIntersection(intersection_id);
+    
+    for(std::vector<int>::iterator it = adjacentStreetSegments.begin(); it != adjacentStreetSegments.end(); it++){
+        StreetSegmentInfo street_segment = getStreetSegmentInfo(intersection_id);
+        if(street_segment.oneWay == false){
+            //return the adjacent point
+        }
+        else{
+            if(street_segment.from == intersection_id){
+                adjacentIntersections.push_back(street_segment.to);
+            }
+        }
+    }
+    
+    return adjacentIntersections;
 }
 
 std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
-    //define an int array; we'll store the street intersections here
-    //with the street id, find all its street segments (ie StreetSegmentInfo.streetID == street_id)
-    //find the intersection points of these segments
-    //store as you go, return the vector
+    //vector to store intersections of a street
+    std::vector<IntersectionIdx> streetIntersections; 
+    bool firstIntersection = true;
+    
+    //loop through all the street segments to find segments on the given street
+    for (int ss_idx = 0; ss_idx < getNumStreetSegments(); ss_idx++){
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_idx);
+        
+        //push intersections into streetIntersections vector
+        if (ss_info.streetID == street_id){
+            if (firstIntersection){
+                streetIntersections.push_back(ss_info.from);
+                firstIntersection = false;
+            }
+            
+            streetIntersections.push_back(ss_info.to);
+        }
+    }
+    
+    return streetIntersections;
 }
 
 std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids){

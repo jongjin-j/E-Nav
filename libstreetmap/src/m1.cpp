@@ -426,21 +426,18 @@ double findFeatureArea(FeatureIdx feature_id){
     double featureArea = 0;
     double xDiff = 0;
     double yDiff = 0;
-    
-    //int     getNumFeaturePoints(FeatureIdx featureIdx);
-    //LatLon  getFeaturePoint(FeatureIdx featureIdx, int pointNum);
             
     for(int i = 0; i<getNumFeaturePoints(feature_id);i++){
         
-        //adding = getFeaturePoint(feature_id,i+1).latitude()-getFeaturePoint(feature_id,i).latitude();
         xDiff = (getFeaturePoint(feature_id,i).longitude() + getFeaturePoint(feature_id,i+1).longitude()); //correct x coord with 
-        yDiff = (getFeaturePoint(feature_id,i).latitude() - getFeaturePoint(feature_id,i+1).latitude());
+        yDiff = (getFeaturePoint(feature_id,i+1).latitude() - getFeaturePoint(feature_id,i).latitude());
         
-        //featureArea = featureArea + 
+        featureArea = featureArea + (xDiff*yDiff)/2;
                 
     }
-    
+    return featureArea;
     //return 0 if not a closed polygon
+    
     
     
     

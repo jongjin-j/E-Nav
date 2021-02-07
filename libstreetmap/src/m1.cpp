@@ -50,6 +50,9 @@ bool loadMap(std::string map_streets_database_filename) {
     //
     // Load your map related data structures here.
     //
+    
+    load_successful = loadStreetsDatabaseBIN(map_streets_database_filename);
+    
     intersection_street_segments.resize(getNumIntersections());
     
     for(int intersection = 0; intersection < getNumIntersections(); ++intersection){
@@ -75,7 +78,7 @@ bool loadMap(std::string map_streets_database_filename) {
 
 void closeMap() {
     //Clean-up your map related data structures here
-    
+    closeStreetDatabase();
 }
 
 double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){

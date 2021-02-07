@@ -454,7 +454,7 @@ double findFeatureArea(FeatureIdx feature_id){
             double x_average = 0.5 * (next_point_x + current_point_x);
             double y_diff = next_point_y - current_point_y;
 
-            if(next_point_y > current_point_y){
+            if(next_point_y < current_point_y){
                 totalArea += x_average * y_diff;
             }
             else{

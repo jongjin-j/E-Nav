@@ -268,6 +268,9 @@ std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, 
     std::vector<IntersectionIdx> secondStreet = findIntersectionsOfStreet(street_ids.second);
     std::vector<IntersectionIdx> overlap;
     
+    std::sort(firstStreet.begin(), firstStreet.end());
+    std::sort(secondStreet.begin(), secondStreet.end());
+    
     std::set_intersection (firstStreet.begin(), firstStreet.end(), secondStreet.begin(), secondStreet.end(), std::back_inserter(overlap));
     
     return overlap;

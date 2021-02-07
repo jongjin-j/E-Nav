@@ -418,8 +418,8 @@ POIIdx findClosestPOI(LatLon my_position, std::string POIname){
 double findFeatureArea(FeatureIdx feature_id){
     //convert into xy coordinates
     //compute area by computing the larger area then subtracting the smaller
-    double featureArea;
-    double y2, y1;
+    double featureArea = 0;
+    double y2, y1; //y = latitude
     double x2, x1; //x = longitude * cos(latitude.average)
     
     //int     getNumFeaturePoints(FeatureIdx featureIdx);
@@ -427,11 +427,15 @@ double findFeatureArea(FeatureIdx feature_id){
     
     
     (y2-y1) * (x2+x1) / 2;  //keep adding this, until y2-y1 is negative; when negative, start subtracting
+        
+    for(int i = 0; i<getNumFeaturePoints(feature_id);i++){
+        
+        //adding = getFeaturePoint(feature_id,i+1).latitude()-getFeaturePoint(feature_id,i).latitude();
+        getFeaturePoint(feature_id,i).longitude();
+                
+    }
     
-    int featurePoints = getNumFeaturePoints(feature_id);
-    
-    //while lopp
-    
+    //return 0 if not a closed polygon
     
     
     

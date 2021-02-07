@@ -191,7 +191,7 @@ std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersect
     
     //loop through the segment IDs and get segment information, use them to find street name
     for (int i = 0; i < ss_num; i++){
-        int ss_id = (intersection_street_segments[intersection_id])[i];
+        int ss_id = intersection_street_segments[intersection_id][i];
         
         StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_id);
         

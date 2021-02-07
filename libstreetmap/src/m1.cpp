@@ -45,7 +45,7 @@ bool loadMap(std::string map_streets_database_filename) {
                                   //successfully
 
     std::cout << "loadMap: " << map_streets_database_filename << std::endl;
-
+    
     //
     // Load your map related data structures here.
     //
@@ -291,7 +291,10 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
 // street).
 // Speed Requirement --> none 
        
-    double xMin, xMax, yMin, yMax;
+    double latMin = 0;
+    double latMax = 0;
+    double longMin = 0;
+    double longMax = 0;
     
     for(int i = 0; i<getNumStreetSegments(); i++){
         bool firstSegment = true;
@@ -306,36 +309,36 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
             //yMax takes the larger longitude of from/to, yMin takes the smaller.
             if (firstSegment){
                 if(getIntersectionPosition(getStreetSegmentInfo(i).from).latitude() > getIntersectionPosition(getStreetSegmentInfo(i).to).latitude()){
-                    xMax = getIntersectionPosition(getStreetSegmentInfo(i).from).latitude();
-                    xMin = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
+                    latMax = getIntersectionPosition(getStreetSegmentInfo(i).from).latitude();
+                    latMin = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
                 }
                 else{
-                    xMax = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
-                    xMin = getIntersectionPosition(getStreetSegmentInfo(i).from).latitude();
+                    latMax = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
+                    latMin = getIntersectionPosition(getStreetSegmentInfo(i).from).latitude();
                 }
                 if(getIntersectionPosition(getStreetSegmentInfo(i).from).longitude() > getIntersectionPosition(getStreetSegmentInfo(i).to).longitude()){
-                    yMax = getIntersectionPosition(getStreetSegmentInfo(i).from).longitude();
-                    yMax = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
+                    longMax = getIntersectionPosition(getStreetSegmentInfo(i).from).longitude();
+                    longMax = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
                 }
                 else{
-                    yMax = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
-                    yMax = getIntersectionPosition(getStreetSegmentInfo(i).from).longitude();
+                    longMax = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
+                    longMax = getIntersectionPosition(getStreetSegmentInfo(i).from).longitude();
                 }
             }
             
             else{
                 
-                if(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude() > xMax){      //if the next segment's latitude larger than xMax, replace
-                    xMax = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
+                if(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude() > latMax){      //if the next segment's latitude larger than xMax, replace
+                    latMax = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
                 }
-                if(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude() < xMin){      //if the next segment's latitude smaller than xMin, replace
-                    xMin = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
+                if(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude() < latMin){      //if the next segment's latitude smaller than xMin, replace
+                    latMin = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
                 }
-                if(getIntersectionPosition(getStreetSegmentInfo(i).to).longitude() > yMax){     //if the next segment's longitude larger than yMax, replace
-                    yMax = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
+                if(getIntersectionPosition(getStreetSegmentInfo(i).to).longitude() > longMax){     //if the next segment's longitude larger than yMax, replace
+                    longMax = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
                 }
-                if(getIntersectionPosition(getStreetSegmentInfo(i).to).longitude() < yMin){     //if the next segment's lontigude smaller than yMin, replace
-                    yMin = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
+                if(getIntersectionPosition(getStreetSegmentInfo(i).to).longitude() < longMin){     //if the next segment's lontigude smaller than yMin, replace
+                    longMin = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
                 }
                 
             }
@@ -346,16 +349,17 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
     
     //now all 4 values contain the end bounds of the street
     
-    
     //now construct a latlonbounds object comprising of them and return.
-    /*LatLon streetBounds;
 
-    endBounds.max
-    endBounds.min
+
+    LatLon minimum(latMin, longMin);
+    LatLon maximum(latMax, longMax);
     
-    struct LatLonBounds 
-    LatLon min;
-    LatLon max;*/
+    LatLonBounds streetBounds;
+    streetBounds.max = maximum;
+    streetBounds.min = minimum;
+    
+    return streetBounds;
     
 }
 
@@ -391,6 +395,21 @@ POIIdx findClosestPOI(LatLon my_position, std::string POIname){
 }
 
 double findFeatureArea(FeatureIdx feature_id){
+    //convert into xy coordinates
+    //compute area by computing the larger area then subtracting the smaller
+    double featureArea;
+    double y2, y1;
+    double x2, x1; //x = longitude * cos(latitude.average)
+    
+    //int     getNumFeaturePoints(FeatureIdx featureIdx);
+    //LatLon  getFeaturePoint(FeatureIdx featureIdx, int pointNum);
+    
+    
+    (y2-y1) * (x2+x1) / 2;  //keep adding this, until y2-y1 is negative; when negative, start subtracting
+    
+    int featurePoints = getNumFeaturePoints(feature_id);
+    
+    //while lopp
     
     
     

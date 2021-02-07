@@ -272,7 +272,26 @@ std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, 
 }
 
 std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix){
+    std::vector<StreetIdx> matchingStreetIds;
+    std::string streetName;
     
+    //erase all blank spaces and change street_prefix into lowercase
+    street_prefix.erase(std::remove(streetName.begin(), street_prefix.end(), ' '), street_prefix.end());
+    std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower);
+    
+    //loop through the streets and find match
+    for (StreetIdx i = 0; i < getNumStreets(); i++){
+        streetName = getStreetName(i);
+        
+        //erase all the blanks and change to street name to lower case
+        streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end());
+        std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower);
+        
+         if((street_prefix.compare(0, street_prefix.size(), streetName)) == 0)
+             matchingStreetIds.push_back(i);
+    }
+    
+    return matchingStreetIds;
 }
 
 double findStreetLength(StreetIdx street_id){

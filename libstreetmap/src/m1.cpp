@@ -309,15 +309,22 @@ double findStreetLength(StreetIdx street_id){
     //return length
     double StreetLength = 0;
     
-    for(int i = 0; i<getNumStreetSegments(); i++){
+    /*for(int i = 0; i<getNumStreetSegments(); i++){
         if(getStreetSegmentInfo(i).streetID == street_id){
 
             StreetLength = StreetLength + findStreetSegmentLength(i);
             
         }        
+    }*/
+    
+    for(auto it = 0; it < streetID_street_segments[street_id].size(); it++){
+        StreetSegmentIdx segment = streetID_street_segments[street_id][it];
+        StreetLength += findStreetSegmentLength(segment);
     }
+    
+    streetID_street_segments[street_id];
 
-    return StreetLength;
+    return StreetLength / 3;
 }
 
 LatLonBounds findStreetBoundingBox(StreetIdx street_id){

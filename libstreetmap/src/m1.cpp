@@ -211,7 +211,29 @@ std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersect
 }
 
 std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersection_id){
+    //use function findStreetSegmentsOfIntersection
+    //run a for loop to check its boolean oneWay
+    //  if oneWay == false, return the adjacent intersection
+    //  else oneWay == true
+    //      if intersection == from, return adjacent intersection
+    //      else if intersection == to, ignore
     
+    std::vector<IntersectionIdx> adjacentIntersections;
+    std::vector<StreetSegmentIdx> adjacentStreetSegments = findStreetSegmentsOfIntersection(intersection_id);
+    
+    for(std::vector<int>::iterator it = adjacentStreetSegments.begin(); it != adjacentStreetSegments.end(); it++){
+        StreetSegmentInfo street_segment = getStreetSegmentInfo(intersection_id);
+        if(street_segment.oneWay == false){
+            //return the adjacent point
+        }
+        else{
+            if(street_segment.from == intersection_id){
+                adjacentIntersections.push_back(street_segment.to);
+            }
+        }
+    }
+    
+    return adjacentIntersections;
 }
 
 std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){

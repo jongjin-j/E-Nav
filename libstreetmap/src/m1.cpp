@@ -81,8 +81,7 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
     //return the sum of the lengths
     
     double totalStreetSegmentLength = 0, firstSegmentLength = 0, lastSegmentLength = 0;
-    StreetSegmentInfo street_segment;
-    street_segment = getStreetSegmentInfo(street_segment_id);
+    StreetSegmentInfo street_segment = getStreetSegmentInfo(street_segment_id);
     
     if(street_segment.numCurvePoints == 0){
         LatLon posFrom = getIntersectionPosition(street_segment.from);
@@ -101,11 +100,13 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
         LatLon posFrom = getIntersectionPosition(street_segment.from);
         std::pair <LatLon, LatLon> firstSegment (posFrom, segmentCurvePoints[0]);
         firstSegmentLength = findDistanceBetweenTwoPoints(firstSegment);
+        totalStreetSegmentLength += firstSegmentLength;
     
         //distance between last curvePoint and to point(numCurvePoints - 1)
         LatLon posTo = getIntersectionPosition(street_segment.to);
         std::pair <LatLon, LatLon> lastSegment (segmentCurvePoints[street_segment.numCurvePoints - 1], posTo);
         lastSegmentLength = findDistanceBetweenTwoPoints(lastSegment);
+        totalStreetSegmentLength += lastSegmentLength;
     
         //distance of each street segment excluding the first and the last street segment
         for(int i = 0; i < street_segment.numCurvePoints; i++){
@@ -121,6 +122,12 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
     //findStreetSegmentLength
     //divide by StreetSegmentInfo.speedLimit to obtain time
     //return time
+    
+    double streetSegmentLength = findStreetSegmentLength(street_segment_id);
+    StreetSegmentInfo street_segment = getStreetSegmentInfo(street_segment_id);
+    double travelTime = streetSegmentLength / (street_segment.speedLimit);
+    
+    return travelTime;
 }
 
 int findClosestIntersection(LatLon my_position){
@@ -153,6 +160,30 @@ std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx i
 }
 
 std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersection_id){
+    std::vector<std::string> streetNames;
+    
+    int ss_num = getNumIntersectionStreetSegment(intersection_id);
+    bool duplicate = false;
+    
+    for (int i = 0; i < ss_num; i++){
+        int ss_id = (intersection_street_segments[intersection_id])[i];
+        
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_id);
+        std::string streetName = getStreetName(ss_info.streetID);
+        
+        for(std::vector<std::string>::iterator it = streetNames.begin(); it != streetNames.end();){
+            if (*it == streetName)
+                duplicate = true;
+        }           
+        
+        if (!duplicate)
+            streetNames.push_back(streetName);
+            
+        duplicate = false;
+    }
+    
+    return streetNames;
+    
     //take in intersection_id
     //declare a string vector
     //find street segments associated with the intersection; store in a string vector with pushback

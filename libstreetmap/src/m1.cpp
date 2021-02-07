@@ -344,11 +344,11 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
                 }
                 if(getIntersectionPosition(getStreetSegmentInfo(i).from).longitude() > getIntersectionPosition(getStreetSegmentInfo(i).to).longitude()){
                     longMax = getIntersectionPosition(getStreetSegmentInfo(i).from).longitude();
-                    longMax = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
+                    longMin = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
                 }
                 else{
                     longMax = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
-                    longMax = getIntersectionPosition(getStreetSegmentInfo(i).from).longitude();
+                    longMin = getIntersectionPosition(getStreetSegmentInfo(i).from).longitude();
                 }
             }
             

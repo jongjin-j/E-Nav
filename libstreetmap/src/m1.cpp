@@ -453,13 +453,30 @@ double findFeatureArea(FeatureIdx feature_id){
             double next_point_y = kEarthRadiusInMeters * next_point.latitude() * kDegreeToRadian;
             double x_average = 0.5 * (next_point_x + current_point_x);
             double y_diff = next_point_y - current_point_y;
+            double area = abs(x_average * y_diff);
 
-            if(next_point_y < current_point_y){
-                totalArea += x_average * y_diff;
+            if(next_point_y > current_point_y){
+                totalArea += area;
             }
             else{
-                totalArea -= x_average * y_diff;
+                totalArea -= area;
             }
+        }
+        
+        double latitude_Average = 0.5 * kDegreeToRadian * (firstPoint.latitude() + lastPoint.latitude());
+        double first_point_x = kEarthRadiusInMeters * firstPoint.longitude() * kDegreeToRadian* cos(latitude_Average);
+        double first_point_y = kEarthRadiusInMeters * firstPoint.latitude() * kDegreeToRadian;
+        double last_point_x = kEarthRadiusInMeters * lastPoint.longitude() * kDegreeToRadian* cos(latitude_Average);
+        double last_point_y = kEarthRadiusInMeters * lastPoint.latitude() * kDegreeToRadian;
+        double x_average = 0.5 * (first_point_x + last_point_x);
+        double y_diff = first_point_y - last_point_y;
+        double area = abs(x_average * y_diff);
+        
+        if(first_point_y > last_point_y){
+            totalArea += area;
+        }
+        else{
+            totalArea -= area;
         }
     }
     

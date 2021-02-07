@@ -265,13 +265,15 @@ std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
 std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids){
     //create vectors for each street, use function findIntersectionsOfStreet
     //use set_intersection of the two vectors
+    //assuming the vector is sorted from findIntersectionsOfStreet
 
     std::vector<IntersectionIdx> firstStreet = findIntersectionsOfStreet(street_ids.first);
     std::vector<IntersectionIdx> secondStreet = findIntersectionsOfStreet(street_ids.second);
     std::vector<IntersectionIdx> overlap;
     
-    //std::set_intersection (firstStreet.begin(), firstStreet.end(), secondStreet.begin(), secondStreet.end(), std::back_inserter(overlap));
+    std::set_intersection (firstStreet.begin(), firstStreet.end(), secondStreet.begin(), secondStreet.end(), std::back_inserter(overlap));
     
+    return overlap;
 }
 
 std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix){

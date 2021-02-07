@@ -183,11 +183,22 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
 }
 
 double findStreetLength(StreetIdx street_id){
-    //declare  a double var 'length'
+    //speed requirement high
+    
     //for street_id == StreetSegmentInfo.streetID; (all segments of the street)
     //add each segment length to 'length' --how will we find the segment's length?
     //return length
+    double StreetLength = 0;
     
+    for(int i = 0; i<getNumStreetSegments(); i++){
+        if(getStreetSegmentInfo(i).streetID == street_id){
+
+            StreetLength = StreetLength + findStreetSegmentLength(i);
+            
+        }        
+    }
+
+    return StreetLength;
 }
 
 LatLonBounds findStreetBoundingBox(StreetIdx street_id){
@@ -201,9 +212,9 @@ POIIdx findClosestPOI(LatLon my_position, std::string POIname){
     // make a vector consisting of the all the poi locations
     // compare using a for loop to return the shortest one
     
-    double shortestDistance;
-    double newDistance;
-    POIIdx closestPOIIdx;
+    double shortestDistance = 0;
+    double newDistance = 0;
+    POIIdx closestPOIIdx = 0;
         
     for(int i = 0; i < getNumPointsOfInterest(); i++){  //loop through POI
         if(getPOIName(i) == POIname){                   //if poi name matches,

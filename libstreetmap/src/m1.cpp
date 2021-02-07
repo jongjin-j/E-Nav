@@ -241,22 +241,22 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
 
 std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
     //vector to store intersections of a street
-    std::vector<IntersectionIdx> streetIntersections; 
-    bool firstIntersection = true;
+    std::vector <IntersectionIdx> streetIntersections; 
     
-    //loop through all the street segments to find segments on the given street
-    for (int ss_idx = 0; ss_idx < getNumStreetSegments(); ss_idx++){
-        StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_idx);
+    for (std::vector<int>::iterator it = (streetID_street_segments[street_id]).begin(); it != (streetID_street_segments[street_id]).end(); it++){
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(*it);
         
-        //push intersections into streetIntersections vector
-        if (ss_info.streetID == street_id){
-            if (firstIntersection){
-                streetIntersections.push_back(ss_info.from);
-                firstIntersection = false;
-            }
-            
-            streetIntersections.push_back(ss_info.to);
-        }
+        streetIntersections.push_back(ss_info.from);
+        streetIntersections.push_back(ss_info.to);
+    }
+    
+    std::sort (streetIntersections.begin(), streetIntersections.end());
+    
+    for (std::vector<int>::iterator it = streetIntersections.begin(); it != streetIntersections.end();){
+        if (*it == *(it+1))
+            it = streetIntersections.erase(it);
+        else
+            it++;
     }
     
     return streetIntersections;

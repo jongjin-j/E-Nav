@@ -484,5 +484,5 @@ double findFeatureArea(FeatureIdx feature_id){
         return 0;
     }
     
-    return totalArea;
+    return abs(totalArea);
 }

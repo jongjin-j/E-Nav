@@ -59,6 +59,8 @@ bool loadMap(std::string map_streets_database_filename) {
         }
     }
     
+    streetID_street_segments.resize(getNumStreets());
+    
     for(int i = 0; i < getNumStreetSegments(); i++){
         StreetSegmentInfo temp_segment = getStreetSegmentInfo(i);
         int temp_street_id = temp_segment.streetID;

@@ -21,6 +21,7 @@
 #include <iostream>
 #include "m1.h"
 #include "StreetsDatabaseAPI.h"
+#include <string.h>
 #include <math.h>
 #include <algorithm> 
 
@@ -187,7 +188,6 @@ std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersect
     std::vector<std::string> streetNames;
     
     int ss_num = getNumIntersectionStreetSegment(intersection_id);
-    bool duplicate = false;
     
     //loop through the segment IDs and get segment information, use them to find street name
     for (int i = 0; i < ss_num; i++){
@@ -197,17 +197,7 @@ std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersect
         
         std::string streetName = getStreetName(ss_info.streetID);
         
-        //iterate through streetNames vector and find any duplicates
-        for(std::vector<std::string>::iterator it = streetNames.begin(); it != streetNames.end(); it++){
-            if (*it == streetName)
-                duplicate = true;
-        }           
-        
-        //if there are duplicates, do not push, if not, push into streetNames vector
-        if (!duplicate)
-            streetNames.push_back(streetName);
-            
-        duplicate = false;
+        streetNames.push_back(streetName);
     }
     
     return streetNames;
@@ -282,7 +272,6 @@ std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, 
 }
 
 std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix){
-    
     
 }
 

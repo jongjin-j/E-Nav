@@ -23,7 +23,9 @@
 #include "StreetsDatabaseAPI.h"
 #include <string.h>
 #include <math.h>
-#include <algorithm> 
+#include <algorithm>
+#include <locale> 
+#include <unordered_set>
 
 #define PI 3.14159265
 
@@ -222,6 +224,14 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
             }
         }
     }
+    
+    std::unordered_set<int> s;
+    for(auto i : adjacentIntersections){
+        s.insert(i);
+    }
+    adjacentIntersections.assign(s.begin(), s.end());
+    
+    std::copy(s.begin(), s.end(), adjacentIntersections.begin());
     
     return adjacentIntersections;
 }

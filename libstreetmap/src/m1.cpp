@@ -22,6 +22,7 @@
 #include "m1.h"
 #include "StreetsDatabaseAPI.h"
 #include <math.h>
+#include <algorithm> 
 
 #define PI 3.14159265
 
@@ -57,6 +58,8 @@ bool loadMap(std::string map_streets_database_filename) {
             intersection_street_segments[intersection].push_back(ss_id);
         }
     }
+    
+    streetID_street_segments.resize(getNumStreets());
     
     for(int i = 0; i < getNumStreetSegments(); i++){
         StreetSegmentInfo temp_segment = getStreetSegmentInfo(i);
@@ -221,7 +224,12 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
     for(std::vector<int>::iterator it = adjacentStreetSegments.begin(); it != adjacentStreetSegments.end(); it++){
         StreetSegmentInfo street_segment = getStreetSegmentInfo(intersection_id);
         if(street_segment.oneWay == false){
-            //return the adjacent point
+            if(street_segment.from == intersection_id){
+                adjacentIntersections.push_back(street_segment.to);
+            }
+            else{
+                adjacentIntersections.push_back(street_segment.from);
+            }
         }
         else{
             if(street_segment.from == intersection_id){
@@ -235,29 +243,39 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
 
 std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
     //vector to store intersections of a street
-    std::vector<IntersectionIdx> streetIntersections; 
-    bool firstIntersection = true;
+    std::vector <IntersectionIdx> streetIntersections; 
     
-    //loop through all the street segments to find segments on the given street
-    for (int ss_idx = 0; ss_idx < getNumStreetSegments(); ss_idx++){
-        StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_idx);
+    for (std::vector<int>::iterator it = (streetID_street_segments[street_id]).begin(); it != (streetID_street_segments[street_id]).end(); it++){
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(*it);
         
-        //push intersections into streetIntersections vector
-        if (ss_info.streetID == street_id){
-            if (firstIntersection){
-                streetIntersections.push_back(ss_info.from);
-                firstIntersection = false;
-            }
-            
-            streetIntersections.push_back(ss_info.to);
-        }
+        streetIntersections.push_back(ss_info.from);
+        streetIntersections.push_back(ss_info.to);
+    }
+    
+    std::sort (streetIntersections.begin(), streetIntersections.end());
+    
+    for (std::vector<int>::iterator it = streetIntersections.begin(); it != streetIntersections.end();){
+        if (*it == *(it+1))
+            it = streetIntersections.erase(it);
+        else
+            it++;
     }
     
     return streetIntersections;
 }
 
 std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids){
+    //create vectors for each street, use function findIntersectionsOfStreet
+    //use set_intersection of the two vectors
+    //assuming the vector is sorted from findIntersectionsOfStreet
+
+    std::vector<IntersectionIdx> firstStreet = findIntersectionsOfStreet(street_ids.first);
+    std::vector<IntersectionIdx> secondStreet = findIntersectionsOfStreet(street_ids.second);
+    std::vector<IntersectionIdx> overlap;
     
+    std::set_intersection (firstStreet.begin(), firstStreet.end(), secondStreet.begin(), secondStreet.end(), std::back_inserter(overlap));
+    
+    return overlap;
 }
 
 std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix){

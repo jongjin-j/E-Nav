@@ -275,6 +275,11 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     std::vector<StreetIdx> matchingStreetIds;
     std::string streetName;
     
+    //if prefix is empty
+    if (street_prefix == ""){
+        return matchingStreetIds;
+    }
+    
     //erase all blank spaces and change street_prefix into lowercase
     street_prefix.erase(std::remove(streetName.begin(), street_prefix.end(), ' '), street_prefix.end());
     std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower);

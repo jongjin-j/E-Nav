@@ -23,9 +23,14 @@
 #include "StreetsDatabaseAPI.h"
 #include <string.h>
 #include <math.h>
+<<<<<<< HEAD
 #include <algorithm>
 #include <locale> 
 #include <unordered_set>
+=======
+#include <algorithm> 
+#include <list>
+>>>>>>> Modified m1.cpp by editing findIntersectionsOfStreet by deleting duplicates faster
 
 #define PI 3.14159265
 
@@ -247,14 +252,14 @@ std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
         streetIntersections.push_back(ss_info.to);
     }
     
-    std::sort (streetIntersections.begin(), streetIntersections.end());
     
-    for (std::vector<int>::iterator it = streetIntersections.begin(); it != streetIntersections.end()-1;){
-        if (*it == *(it+1))
-            it = streetIntersections.erase(it);
-        else
-            it++;
+    std::unordered_set<int> s;
+    for (auto i : streetIntersections){
+        s.insert(i);
     }
+    streetIntersections.assign(s.begin(), s.end());
+    
+    std::copy(s.begin(), s.end(), streetIntersections.begin());
     
     return streetIntersections;
 }

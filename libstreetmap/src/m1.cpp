@@ -23,6 +23,7 @@
 #include "StreetsDatabaseAPI.h"
 #include <math.h>
 
+#define PI 3.14159265
 
 // loadMap will be called with the name of the file that stores the "layer-2"
 // map data accessed through StreetsDatabaseAPI: the street and intersection 
@@ -68,10 +69,17 @@ void closeMap() {
 }
 
 double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
-    //return sqrt of LatDiff^2 + LonDiff^2 of the two points
-    double latitudeDiff = points.first.latitude() - points.second.latitude();
-    double longitudeDiff = points.first.longitude() - points.second.longitude();
-    double diffSquared = pow(latitudeDiff , 2) + pow(longitudeDiff, 2);
+    //return sqrt of x_difference^2 + y_difference^2 of the two points
+    
+    double latitudeAverage = (points.first.latitude() + points.second.latitude()) / 2;
+    double x_coordinate_1 = kEarthRadiusInMeters * points.first.longitude() * cos(latitudeAverage * PI / 180);
+    double y_coordinate_1 = kEarthRadiusInMeters * points.first.latitude();
+    double x_coordinate_2 = kEarthRadiusInMeters * points.second.longitude() * cos(latitudeAverage * PI / 180);
+    double y_coordinate_2 = kEarthRadiusInMeters * points.second.latitude();
+    
+    double x_diff = x_coordinate_2 - x_coordinate_1;
+    double y_diff = y_coordinate_2 - y_coordinate_1;
+    double diffSquared = pow(x_diff , 2) + pow(y_diff, 2);
     return sqrt(diffSquared);
 }
 

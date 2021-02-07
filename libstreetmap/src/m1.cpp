@@ -93,8 +93,8 @@ double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points){
     
     double x_diff = x_coordinate_2 - x_coordinate_1;
     double y_diff = y_coordinate_2 - y_coordinate_1;
-    double diffSquared = pow(x_diff , 2) + pow(y_diff, 2);
-    return sqrt(diffSquared);
+    double diffSquared = pow (x_diff , 2) + pow (y_diff, 2);
+    return sqrt (diffSquared);
 }
 
 double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
@@ -102,7 +102,7 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
     //run for loop with getStreetSegmentCurvePoint by incrementing by 1 every loop
     //return the sum of the lengths
     
-    double totalStreetSegmentLength = 0, firstSegmentLength = 0, lastSegmentLength = 0;
+    double totalStreetSegmentLength = 0, firstSegmentLength = 0, lastSegmentLength = 0, curveSegmentLength = 0;
     StreetSegmentInfo street_segment = getStreetSegmentInfo(street_segment_id);
     
     if(street_segment.numCurvePoints == 0){
@@ -113,28 +113,28 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id){
     }
     
     else{
-        LatLon segmentCurvePoints[street_segment.numCurvePoints];
-        for(int curvePointNo = 0; curvePointNo < street_segment.numCurvePoints; curvePointNo++){
-            segmentCurvePoints[curvePointNo] = getStreetSegmentCurvePoint(street_segment_id, curvePointNo);
+        int curvePoints = street_segment.numCurvePoints;
+        LatLon segmentCurvePoints[curvePoints];
+        for(int i = 0; i < curvePoints; i++){
+            segmentCurvePoints[i] = getStreetSegmentCurvePoint(street_segment_id, i);
         }
         
         //distance between from point and first curvePoint(0)
         LatLon posFrom = getIntersectionPosition(street_segment.from);
         std::pair <LatLon, LatLon> firstSegment (posFrom, segmentCurvePoints[0]);
         firstSegmentLength = findDistanceBetweenTwoPoints(firstSegment);
-        totalStreetSegmentLength += firstSegmentLength;
     
         //distance between last curvePoint and to point(numCurvePoints - 1)
         LatLon posTo = getIntersectionPosition(street_segment.to);
         std::pair <LatLon, LatLon> lastSegment (segmentCurvePoints[street_segment.numCurvePoints - 1], posTo);
         lastSegmentLength = findDistanceBetweenTwoPoints(lastSegment);
-        totalStreetSegmentLength += lastSegmentLength;
     
         //distance of each street segment excluding the first and the last street segment
-        for(int i = 0; i < street_segment.numCurvePoints; i++){
+        for(int i = 0; i < curvePoints - 1; i++){
             std::pair<LatLon, LatLon> tempSegment (segmentCurvePoints[i], segmentCurvePoints[i + 1]);
-            totalStreetSegmentLength += findDistanceBetweenTwoPoints(tempSegment);
+            curveSegmentLength += findDistanceBetweenTwoPoints(tempSegment);
         }
+        totalStreetSegmentLength = firstSegmentLength + lastSegmentLength + curveSegmentLength;
     }
     
     return totalStreetSegmentLength;

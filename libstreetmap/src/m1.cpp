@@ -223,6 +223,8 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
         }
     }
     
+    
+    
     return adjacentIntersections;
 }
 

@@ -156,7 +156,7 @@ int findClosestIntersection(LatLon my_position){
     int minDist, minIndex;
     
     //loop through all intersections and find the distance from my position
-    for (int i = 0; i<getNumIntersections(); i++){
+    for (int i = 0; i < getNumIntersections(); i++){
         std::pair <LatLon, LatLon> positionPair (getIntersectionPosition(i), my_position);
         double dist = findDistanceBetweenTwoPoints(positionPair);
         
@@ -168,14 +168,6 @@ int findClosestIntersection(LatLon my_position){
     }
     
     return minIndex;
-    
-    //my_position.latitude(): return latitude
-    //my_position.longitude(): return longitude
-    //for loop through intersections
-    //run findDistanceBetweenTwoPoints(intersection_point, my_position)
-    //if(currentDistance < previousDistance) use currentDistance
-    //else keep previousDistance
-    //return final intersection
 }
 
 std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx intersection_id){
@@ -289,11 +281,11 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
         streetName = getStreetName(i);
         
         //erase all the blanks and change to street name to lower case
-        streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end());
+        streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
         std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower);
         
-         if((street_prefix.compare(0, street_prefix.size(), streetName)) == 0)
-             matchingStreetIds.push_back(i);
+        if((street_prefix.compare(0, street_prefix.size(), streetName)) == 0)
+            matchingStreetIds.push_back(i);
     }
     
     return matchingStreetIds;

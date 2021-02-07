@@ -141,11 +141,12 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id){
 int findClosestIntersection(LatLon my_position){
     int minDist, minIndex;
     
-    
+    //loop through all intersections and find the distance from my position
     for (int i = 0; i<getNumIntersections(); i++){
         std::pair <LatLon, LatLon> positionPair (getIntersectionPosition(i), my_position);
         double dist = findDistanceBetweenTwoPoints(positionPair);
         
+        //save the minimum distance and the corresponding intersection index
         if (i == 0 || dist < minDist){
             minDist = dist;
             minIndex = i;
@@ -164,26 +165,34 @@ int findClosestIntersection(LatLon my_position){
 }
 
 std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx intersection_id){
+    //use intersection_street_segments vector created at load
     return intersection_street_segments[intersection_id];
 }
 
 std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersection_id){
+    //vector to store names of the streets
     std::vector<std::string> streetNames;
     
     int ss_num = getNumIntersectionStreetSegment(intersection_id);
     bool duplicate = false;
     
+    //loop through the segment IDs
     for (int i = 0; i < ss_num; i++){
         int ss_id = (intersection_street_segments[intersection_id])[i];
         
+        //get segment information with the IDs 
         StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_id);
+        
+        //use the streetID to get the street name
         std::string streetName = getStreetName(ss_info.streetID);
         
+        //iterate through streetNames vector and find any duplicates
         for(std::vector<std::string>::iterator it = streetNames.begin(); it != streetNames.end();){
             if (*it == streetName)
                 duplicate = true;
         }           
         
+        //if there are duplicates, do not push, if not, push into streetNames vector
         if (!duplicate)
             streetNames.push_back(streetName);
             

@@ -323,9 +323,9 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
     double latMax = 0;
     double longMin = 0;
     double longMax = 0;
+    bool firstSegment = true;
     
     for(int i = 0; i<getNumStreetSegments(); i++){
-        bool firstSegment = true;
         if(getStreetSegmentInfo(i).streetID == street_id){
             
             //store the latitudes and longitudes of the segments
@@ -339,18 +339,25 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
                 if(getIntersectionPosition(getStreetSegmentInfo(i).from).latitude() > getIntersectionPosition(getStreetSegmentInfo(i).to).latitude()){
                     latMax = getIntersectionPosition(getStreetSegmentInfo(i).from).latitude();
                     latMin = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
+                    firstSegment = false;
                 }
                 else{
                     latMax = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
                     latMin = getIntersectionPosition(getStreetSegmentInfo(i).from).latitude();
+                     firstSegment = false;
+
                 }
                 if(getIntersectionPosition(getStreetSegmentInfo(i).from).longitude() > getIntersectionPosition(getStreetSegmentInfo(i).to).longitude()){
                     longMax = getIntersectionPosition(getStreetSegmentInfo(i).from).longitude();
                     longMin = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
+                    firstSegment = false;
+
                 }
                 else{
                     longMax = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
                     longMin = getIntersectionPosition(getStreetSegmentInfo(i).from).longitude();
+                    firstSegment = false;
+
                 }
             }
             
@@ -372,7 +379,6 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
             }
             
         }
-        firstSegment = false;   //set boolean to false after first segment
     }
     
     //now all 4 values contain the end bounds of the street

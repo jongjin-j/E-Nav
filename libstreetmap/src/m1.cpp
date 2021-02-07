@@ -221,7 +221,12 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
     for(std::vector<int>::iterator it = adjacentStreetSegments.begin(); it != adjacentStreetSegments.end(); it++){
         StreetSegmentInfo street_segment = getStreetSegmentInfo(intersection_id);
         if(street_segment.oneWay == false){
-            //return the adjacent point
+            if(street_segment.from == intersection_id){
+                adjacentIntersections.push_back(street_segment.to);
+            }
+            else{
+                adjacentIntersections.push_back(street_segment.from);
+            }
         }
         else{
             if(street_segment.from == intersection_id){

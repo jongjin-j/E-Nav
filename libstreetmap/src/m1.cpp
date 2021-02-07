@@ -324,8 +324,6 @@ double findStreetLength(StreetIdx street_id){
         StreetSegmentIdx segment = streetID_street_segments[street_id][it];
         StreetLength += findStreetSegmentLength(segment);
     }
-    
-    streetID_street_segments[street_id];
 
     return StreetLength / 3;
 }
@@ -341,9 +339,60 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
     double latMax = 0;
     double longMin = 0;
     double longMax = 0;
-    bool firstSegment = true;
+    //bool firstSegment = true;
     
-    for(int i = 0; i<getNumStreetSegments(); i++){
+    StreetSegmentIdx firstSegmentIdx = streetID_street_segments[street_id][0];
+    StreetSegmentInfo first_segment = getStreetSegmentInfo(firstSegmentIdx);
+    
+    if(getIntersectionPosition(first_segment.from).latitude() > getIntersectionPosition(first_segment.to).latitude()){
+        latMin = getIntersectionPosition(first_segment.to).latitude();
+        latMax = getIntersectionPosition(first_segment.from).latitude();
+    }
+    else{
+        latMin = getIntersectionPosition(first_segment.from).latitude();
+        latMax = getIntersectionPosition(first_segment.to).latitude();
+    }
+    if(getIntersectionPosition(first_segment.from).longitude() > getIntersectionPosition(first_segment.to).longitude()){
+        longMin = getIntersectionPosition(first_segment.to).longitude();
+        longMax = getIntersectionPosition(first_segment.from).longitude();
+    }
+    else{
+        longMin = getIntersectionPosition(first_segment.from).longitude();
+        longMax = getIntersectionPosition(first_segment.to).longitude();
+    }
+    
+    for(int i = 1; i < streetID_street_segments[street_id][i]; i++){
+        StreetSegmentIdx tempSegmentIdx = streetID_street_segments[street_id][i];
+        StreetSegmentInfo temp_segment = getStreetSegmentInfo(tempSegmentIdx);
+        
+        if(getIntersectionPosition(temp_segment.from).latitude() < latMin){
+            latMin = getIntersectionPosition(temp_segment.from).latitude();
+        }
+        if(getIntersectionPosition(temp_segment.from).latitude() > latMax){
+            latMax = getIntersectionPosition(temp_segment.from).latitude();
+        }
+        if(getIntersectionPosition(temp_segment.to).latitude() < latMin){
+            latMin = getIntersectionPosition(temp_segment.to).latitude();
+        }
+        if(getIntersectionPosition(temp_segment.to).latitude() > latMax){
+            latMax = getIntersectionPosition(temp_segment.to).latitude();
+        }
+        
+        if(getIntersectionPosition(temp_segment.from).longitude() < longMin){
+            latMin = getIntersectionPosition(temp_segment.from).longitude();
+        }
+        if(getIntersectionPosition(temp_segment.from).longitude() > longMax){
+            latMax = getIntersectionPosition(temp_segment.from).longitude();
+        }
+        if(getIntersectionPosition(temp_segment.to).longitude() < longMin){
+            latMin = getIntersectionPosition(temp_segment.to).longitude();
+        }
+        if(getIntersectionPosition(temp_segment.to).longitude() > longMax){
+            latMax = getIntersectionPosition(temp_segment.to).longitude();
+        }
+    }
+    
+    /*for(int i = 0; i<getNumStreetSegments(); i++){
         if(getStreetSegmentInfo(i).streetID == street_id){
             
             //store the latitudes and longitudes of the segments
@@ -397,7 +446,7 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
             }
             
         }
-    }
+    }*/
     
     //now all 4 values contain the end bounds of the street
     

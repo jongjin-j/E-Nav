@@ -432,19 +432,19 @@ double findFeatureArea(FeatureIdx feature_id){
     //convert into xy coordinates
     //compute area by computing the larger area then subtracting the smaller
     double featureArea = 0;
-    double y2, y1; //y = latitude
-    double x2, x1; //x = longitude * cos(latitude.average)
+    double xDiff = 0;
+    double yDiff = 0;
     
     //int     getNumFeaturePoints(FeatureIdx featureIdx);
     //LatLon  getFeaturePoint(FeatureIdx featureIdx, int pointNum);
-    
-    
-    (y2-y1) * (x2+x1) / 2;  //keep adding this, until y2-y1 is negative; when negative, start subtracting
-        
+            
     for(int i = 0; i<getNumFeaturePoints(feature_id);i++){
         
         //adding = getFeaturePoint(feature_id,i+1).latitude()-getFeaturePoint(feature_id,i).latitude();
-        getFeaturePoint(feature_id,i).longitude();
+        xDiff = (getFeaturePoint(feature_id,i).longitude() + getFeaturePoint(feature_id,i+1).longitude()); //correct x coord with 
+        yDiff = (getFeaturePoint(feature_id,i).latitude() - getFeaturePoint(feature_id,i+1).latitude());
+        
+        //featureArea = featureArea + 
                 
     }
     

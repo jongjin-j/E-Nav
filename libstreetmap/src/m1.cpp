@@ -233,6 +233,77 @@ double findStreetLength(StreetIdx street_id){
 }
 
 LatLonBounds findStreetBoundingBox(StreetIdx street_id){
+// Return the smallest axis-aligned rectangle that contains all the 
+// intersections and curve points of the given street (i.e. the min,max 
+// lattitude and longitude bounds that can just contain all points of the 
+// street).
+// Speed Requirement --> none 
+       
+    double xMin, xMax, yMin, yMax;
+    
+    for(int i = 0; i<getNumStreetSegments(); i++){
+        bool firstSegment = true;
+        if(getStreetSegmentInfo(i).streetID == street_id){
+            
+            //store the latitudes and longitudes of the segments
+            //compute if the latlon of the next segments are larger or smaller
+            //if smaller, skip; if larger, swap values
+            
+            //for the first segment:
+            //xMax takes the larger latitude of from/to, xMin takes the smaller.
+            //yMax takes the larger longitude of from/to, yMin takes the smaller.
+            if (firstSegment){
+                if(getIntersectionPosition(getStreetSegmentInfo(i).from).latitude() > getIntersectionPosition(getStreetSegmentInfo(i).to).latitude()){
+                    xMax = getIntersectionPosition(getStreetSegmentInfo(i).from).latitude();
+                    xMin = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
+                }
+                else{
+                    xMax = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
+                    xMin = getIntersectionPosition(getStreetSegmentInfo(i).from).latitude();
+                }
+                if(getIntersectionPosition(getStreetSegmentInfo(i).from).longitude() > getIntersectionPosition(getStreetSegmentInfo(i).to).longitude()){
+                    yMax = getIntersectionPosition(getStreetSegmentInfo(i).from).longitude();
+                    yMax = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
+                }
+                else{
+                    yMax = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
+                    yMax = getIntersectionPosition(getStreetSegmentInfo(i).from).longitude();
+                }
+            }
+            
+            else{
+                
+                if(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude() > xMax){      //if the next segment's latitude larger than xMax, replace
+                    xMax = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
+                }
+                if(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude() < xMin){      //if the next segment's latitude smaller than xMin, replace
+                    xMin = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
+                }
+                if(getIntersectionPosition(getStreetSegmentInfo(i).to).longitude() > yMax){     //if the next segment's longitude larger than yMax, replace
+                    yMax = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
+                }
+                if(getIntersectionPosition(getStreetSegmentInfo(i).to).longitude() < yMin){     //if the next segment's lontigude smaller than yMin, replace
+                    yMin = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
+                }
+                
+            }
+            
+        }
+        firstSegment = false;   //set boolean to false after first segment
+    }
+    
+    //now all 4 values contain the end bounds of the street
+    
+    
+    //now construct a latlonbounds object comprising of them and return.
+    /*LatLon streetBounds;
+
+    endBounds.max
+    endBounds.min
+    
+    struct LatLonBounds 
+    LatLon min;
+    LatLon max;*/
     
 }
 
@@ -253,12 +324,12 @@ POIIdx findClosestPOI(LatLon my_position, std::string POIname){
             std::pair <LatLon, LatLon> PositionPOIPair (my_position, getPOIPosition(i));
 
             newDistance = findDistanceBetweenTwoPoints(PositionPOIPair);   //pair of my_position and getPOIPosition
-            if(i==0){
-                shortestDistance == newDistance;
+            if(shortestDistance == 0){
+                shortestDistance = newDistance;
                 closestPOIIdx = i;
             }
             else if(shortestDistance > newDistance){
-                shortestDistance == newDistance;
+                shortestDistance = newDistance;
                 closestPOIIdx = i;
             }
         }
@@ -268,5 +339,8 @@ POIIdx findClosestPOI(LatLon my_position, std::string POIname){
 }
 
 double findFeatureArea(FeatureIdx feature_id){
+    
+    
+    
     
 }

@@ -437,21 +437,35 @@ POIIdx findClosestPOI(LatLon my_position, std::string POIname){
 }
 
 double findFeatureArea(FeatureIdx feature_id){
-    //convert into xy coordinates
-    //compute area by computing the larger area then subtracting the smaller
-    double featureArea = 0;
-    double xDiff = 0;
-    double yDiff = 0;
-            
-    for(int i = 0; i<getNumFeaturePoints(feature_id);i++){
-        
-        xDiff = (getFeaturePoint(feature_id,i).longitude() + getFeaturePoint(feature_id,i+1).longitude()); //correct x coord with 
-        yDiff = (getFeaturePoint(feature_id,i+1).latitude() - getFeaturePoint(feature_id,i).latitude());
-        
-        featureArea = featureArea + (xDiff*yDiff)/2;
-                
-    }
-    return featureArea;
-    //return 0 if not a closed polygon
+    //convert into x,y coordinates
+    LatLon firstPoint = getFeaturePoint(feature_id, 0);
+    LatLon lastPoint = getFeaturePoint(feature_id, getNumFeaturePoints(feature_id) - 1);
+    double totalArea = 0;
+    
+    if(firstPoint == lastPoint){
+        for(int i = 0; i < getNumFeaturePoints(feature_id) - 1; i++){
+            LatLon current_point = getFeaturePoint(feature_id, i);
+            LatLon next_point = getFeaturePoint(feature_id, i + 1);
+            double latitudeAverage = 0.5 * kDegreeToRadian * (current_point.latitude() + next_point.latitude());
+            double current_point_x = kEarthRadiusInMeters * current_point.longitude() * kDegreeToRadian* cos(latitudeAverage);
+            double current_point_y = kEarthRadiusInMeters * current_point.latitude() * kDegreeToRadian;
+            double next_point_x = kEarthRadiusInMeters * next_point.longitude() * kDegreeToRadian * cos(latitudeAverage);
+            double next_point_y = kEarthRadiusInMeters * next_point.latitude() * kDegreeToRadian;
+            double x_average = 0.5 * (next_point_x + current_point_x);
+            double y_diff = next_point_y - current_point_y;
 
+            if(next_point_y > current_point_y){
+                totalArea += x_average * y_diff;
+            }
+            else{
+                totalArea -= x_average * y_diff;
+            }
+        }
+    }
+    
+    else{
+        return 0;
+    }
+    
+    return totalArea;
 }

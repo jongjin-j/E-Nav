@@ -223,8 +223,6 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
         }
     }
     
-    //have to remove duplicates
-    
     return adjacentIntersections;
 }
 
@@ -241,8 +239,8 @@ std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
     
     std::sort (streetIntersections.begin(), streetIntersections.end());
     
-    for (std::vector<int>::iterator it = streetIntersections.begin()+1; it != streetIntersections.end();){
-        if (*it == *(it-1))
+    for (std::vector<int>::iterator it = streetIntersections.begin(); it != streetIntersections.end()-1;){
+        if (*it == *(it+1))
             it = streetIntersections.erase(it);
         else
             it++;

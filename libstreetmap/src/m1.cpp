@@ -443,8 +443,5 @@ double findFeatureArea(FeatureIdx feature_id){
     }
     return featureArea;
     //return 0 if not a closed polygon
-    
-    
-    
-    
+
 }

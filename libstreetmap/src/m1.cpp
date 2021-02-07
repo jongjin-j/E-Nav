@@ -207,7 +207,7 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
     std::vector<StreetSegmentIdx> adjacentStreetSegments = findStreetSegmentsOfIntersection(intersection_id);
     
     for(std::vector<int>::iterator it = adjacentStreetSegments.begin(); it != adjacentStreetSegments.end(); it++){
-        StreetSegmentInfo street_segment = getStreetSegmentInfo(intersection_id);
+        StreetSegmentInfo street_segment = getStreetSegmentInfo(*it);
         if(street_segment.oneWay == false){
             if(street_segment.from == intersection_id){
                 adjacentIntersections.push_back(street_segment.to);
@@ -220,6 +220,12 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
             if(street_segment.from == intersection_id){
                 adjacentIntersections.push_back(street_segment.to);
             }
+        }
+    }
+    
+    for(std::vector<int>::iterator it = adjacentIntersections.begin(); it != adjacentIntersections.end(); it++){
+        if(adjacentIntersections[*it] == adjacentIntersections[*it + 1]){
+            adjacentIntersections.erase(adjacentIntersections.begin() + *it + 1);
         }
     }
     

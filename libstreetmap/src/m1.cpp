@@ -160,6 +160,30 @@ std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx i
 }
 
 std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersection_id){
+    std::vector<std::string> streetNames;
+    
+    int ss_num = getNumIntersectionStreetSegment(intersection_id);
+    bool duplicate = false;
+    
+    for (int i = 0; i < ss_num; i++){
+        int ss_id = (intersection_street_segments[intersection_id])[i];
+        
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_id);
+        std::string streetName = getStreetName(ss_info.streetID);
+        
+        for(std::vector<std::string>::iterator it = streetNames.begin(); it != streetNames.end();){
+            if (*it == streetName)
+                duplicate = true;
+        }           
+        
+        if (!duplicate)
+            streetNames.push_back(streetName);
+            
+        duplicate = false;
+    }
+    
+    return streetNames;
+    
     //take in intersection_id
     //declare a string vector
     //find street segments associated with the intersection; store in a string vector with pushback

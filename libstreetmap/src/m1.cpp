@@ -331,7 +331,7 @@ double findStreetLength(StreetIdx street_id){
 LatLonBounds findStreetBoundingBox(StreetIdx street_id){
 // Return the smallest axis-aligned rectangle that contains all the 
 // intersections and curve points of the given street (i.e. the min,max 
-// lattitude and longitude bounds that can just contain all points of the 
+// latitude and longitude bounds that can just contain all points of the 
 // street).
 // Speed Requirement --> none 
        
@@ -339,60 +339,45 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
     double latMax = 0;
     double longMin = 0;
     double longMax = 0;
-    //bool firstSegment = true;
-    
-    StreetSegmentIdx firstSegmentIdx = streetID_street_segments[street_id][0];
-    StreetSegmentInfo first_segment = getStreetSegmentInfo(firstSegmentIdx);
-    
-    if(getIntersectionPosition(first_segment.from).latitude() > getIntersectionPosition(first_segment.to).latitude()){
-        latMin = getIntersectionPosition(first_segment.to).latitude();
-        latMax = getIntersectionPosition(first_segment.from).latitude();
-    }
-    else{
-        latMin = getIntersectionPosition(first_segment.from).latitude();
-        latMax = getIntersectionPosition(first_segment.to).latitude();
-    }
-    if(getIntersectionPosition(first_segment.from).longitude() > getIntersectionPosition(first_segment.to).longitude()){
-        longMin = getIntersectionPosition(first_segment.to).longitude();
-        longMax = getIntersectionPosition(first_segment.from).longitude();
-    }
-    else{
-        longMin = getIntersectionPosition(first_segment.from).longitude();
-        longMax = getIntersectionPosition(first_segment.to).longitude();
-    }
-    
-    for(int i = 1; i < streetID_street_segments[street_id][i]; i++){
-        StreetSegmentIdx tempSegmentIdx = streetID_street_segments[street_id][i];
+    bool firstSegment = true;
+   
+    /*for(auto it = streetID_street_segments[street_id].begin(); it != streetID_street_segments[street_id].end(); it++){
+        StreetSegmentIdx tempSegmentIdx = streetID_street_segments[street_id][*it];
         StreetSegmentInfo temp_segment = getStreetSegmentInfo(tempSegmentIdx);
         
-        if(getIntersectionPosition(temp_segment.from).latitude() < latMin){
-            latMin = getIntersectionPosition(temp_segment.from).latitude();
+        double latTemp_from = getIntersectionPosition(temp_segment.from).latitude();
+        double lonTemp_from = getIntersectionPosition(temp_segment.from).longitude();
+        double latTemp_to = getIntersectionPosition(temp_segment.to).latitude();
+        double lonTemp_to = getIntersectionPosition(temp_segment.to).longitude();
+        
+        if(latTemp_from < latMin){
+            latMin = latTemp_from;
         }
-        if(getIntersectionPosition(temp_segment.from).latitude() > latMax){
-            latMax = getIntersectionPosition(temp_segment.from).latitude();
+        if(latTemp_from > latMax){
+            latMax = latTemp_from;
         }
-        if(getIntersectionPosition(temp_segment.to).latitude() < latMin){
-            latMin = getIntersectionPosition(temp_segment.to).latitude();
+        if(latTemp_to < latMin){
+            latMin = latTemp_to;
         }
-        if(getIntersectionPosition(temp_segment.to).latitude() > latMax){
-            latMax = getIntersectionPosition(temp_segment.to).latitude();
+        if(latTemp_to > latMax){
+            latMax = latTemp_to;
         }
         
-        if(getIntersectionPosition(temp_segment.from).longitude() < longMin){
-            latMin = getIntersectionPosition(temp_segment.from).longitude();
+        if(lonTemp_from < longMin){
+            longMin = lonTemp_from;
         }
-        if(getIntersectionPosition(temp_segment.from).longitude() > longMax){
-            latMax = getIntersectionPosition(temp_segment.from).longitude();
+        if(lonTemp_from > longMax){
+            longMax = lonTemp_from;
         }
-        if(getIntersectionPosition(temp_segment.to).longitude() < longMin){
-            latMin = getIntersectionPosition(temp_segment.to).longitude();
+        if(lonTemp_to < longMin){
+            longMin = lonTemp_to;
         }
-        if(getIntersectionPosition(temp_segment.to).longitude() > longMax){
-            latMax = getIntersectionPosition(temp_segment.to).longitude();
+        if(lonTemp_to > longMax){
+            longMax = lonTemp_to;
         }
-    }
+    }*/
     
-    /*for(int i = 0; i<getNumStreetSegments(); i++){
+    for(int i = 0; i<getNumStreetSegments(); i++){
         if(getStreetSegmentInfo(i).streetID == street_id){
             
             //store the latitudes and longitudes of the segments
@@ -446,7 +431,7 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id){
             }
             
         }
-    }*/
+    }
     
     //now all 4 values contain the end bounds of the street
     

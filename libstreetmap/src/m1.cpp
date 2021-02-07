@@ -23,14 +23,9 @@
 #include "StreetsDatabaseAPI.h"
 #include <string.h>
 #include <math.h>
-<<<<<<< HEAD
 #include <algorithm>
 #include <locale> 
 #include <unordered_set>
-=======
-#include <algorithm> 
-#include <list>
->>>>>>> Modified m1.cpp by editing findIntersectionsOfStreet by deleting duplicates faster
 
 #define PI 3.14159265
 

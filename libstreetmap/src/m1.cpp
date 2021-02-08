@@ -343,6 +343,106 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id) {
     double lonMin = 0;
     double lonMax = 0;
 
+    //for all the streets with streetid;
+    //take each segment, record the largest/smallest lat and lon
+    //as you go through new segments, update the largest/smallest
+
+    for (int i = 0; i < getNumStreetSegments(); i++) {
+        if (getStreetSegmentInfo(i).streetID == street_id) {
+
+            double latFrom_temp = getIntersectionPosition(getStreetSegmentInfo(i).from).latitude();
+            double latTo_temp = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
+            double lonFrom_temp = getIntersectionPosition(getStreetSegmentInfo(i).from).longitude();
+            double lonTo_temp = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
+
+            if (latMax == 0) {
+
+                if (latFrom_temp > latTo_temp) {
+                    latMax = latFrom_temp;
+                    latMin = latTo_temp;
+                } else if (latFrom_temp < latTo_temp) {
+                    latMax = latTo_temp;
+                    latMin = latFrom_temp;
+                }
+                if (lonFrom_temp < lonTo_temp) {
+                    lonMax = lonFrom_temp;
+                    lonMin = lonTo_temp;
+                } else if (lonFrom_temp > lonTo_temp) {
+                    lonMax = lonTo_temp;
+                    lonMin = lonFrom_temp;
+                }
+
+                if (getStreetSegmentInfo(i).numCurvePoints!=0) {
+                    //take into account the curve points
+                    for (int j = 0; j < getStreetSegmentInfo(i).numCurvePoints; j++) {
+                        if (getStreetSegmentCurvePoint(i, j).latitude() < latMin) {
+                            latMin = getStreetSegmentCurvePoint(i, j).latitude();
+                        }
+                        if (getStreetSegmentCurvePoint(i, j).latitude() > latMax) {
+                            latMax = getStreetSegmentCurvePoint(i, j).latitude();
+                        }
+                        if (getStreetSegmentCurvePoint(i, j).longitude() < lonMin) {
+                            lonMin = getStreetSegmentCurvePoint(i, j).longitude();
+                        }
+                        if (getStreetSegmentCurvePoint(i, j).longitude() > lonMax) {
+                            lonMax = getStreetSegmentCurvePoint(i, j).longitude();
+                        }
+
+                    }
+                }
+
+            } else {
+                if (latTo_temp > latMax) {
+                    latMax = latTo_temp;
+                }
+                if (latTo_temp < latMin) {
+                    latMin = latTo_temp;
+                }
+                if (lonTo_temp > lonMax) {
+                    lonMax = lonTo_temp;
+                }
+                if (lonTo_temp > lonMin) {
+                    lonMin = lonTo_temp;
+                }
+                if (getStreetSegmentInfo(i).numCurvePoints != 0) {
+                    //take into account the curve points
+                    for (int j = 0; j < getStreetSegmentInfo(i).numCurvePoints; j++) {
+                        if (getStreetSegmentCurvePoint(i, j).latitude() < latMin) {
+                            latMin = getStreetSegmentCurvePoint(i, j).latitude();
+                        }
+                        if (getStreetSegmentCurvePoint(i, j).latitude() > latMax) {
+                            latMax = getStreetSegmentCurvePoint(i, j).latitude();
+                        }
+                        if (getStreetSegmentCurvePoint(i, j).longitude() < lonMin) {
+                            lonMin = getStreetSegmentCurvePoint(i, j).longitude();
+                        }
+                        if (getStreetSegmentCurvePoint(i, j).longitude() > lonMax) {
+                            lonMax = getStreetSegmentCurvePoint(i, j).longitude();
+                        }
+
+                    }
+                }
+
+            }
+
+        }
+    }
+
+    LatLonBounds streetBounds;
+
+    LatLon minBounds(latMin, lonMax);
+    LatLon maxBounds(latMax, lonMin);
+
+    streetBounds.max = maxBounds;
+    streetBounds.min = minBounds;
+
+    return streetBounds;
+
+    /*double latMin = 0;
+    double latMax = 0;
+    double lonMin = 0;
+    double lonMax = 0;
+
     for (auto it = streetID_street_segments[street_id].begin(); it != streetID_street_segments[street_id].end(); it++) {
         StreetSegmentIdx tempSegmentIdx = streetID_street_segments[street_id][*it];
         StreetSegmentInfo temp_segment = getStreetSegmentInfo(tempSegmentIdx);
@@ -352,93 +452,82 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id) {
         double lonTemp_from = getIntersectionPosition(temp_segment.from).longitude();
         double lonTemp_to = getIntersectionPosition(temp_segment.to).longitude();
 
-        //initialize; the first segment (*it==0) will always take all latMax,latMin,lonMax,lonMin values
-        if (*it == 0) {
+            //initialize; the first segment will always take all latMax,latMin,lonMax,lonMin values
+            if (it == streetID_street_segments[street_id].begin()) {
 
-            if (latTemp_from > latTemp_to) {
-                latMax = latTemp_from;
-                latMin = latTemp_to;
-            } else if (latTemp_from < latTemp_to) {
-                latMax = latTemp_to;
-                latMin = latTemp_from;
-            }
-            if (lonTemp_from > lonTemp_to) {
-                lonMax = lonTemp_from;
-                lonMin = lonTemp_to;
-            } else if (lonTemp_from < lonTemp_to) {
-                lonMax = lonTemp_to;
-                lonMin = lonTemp_from;
-            }
+                if (latTemp_from > latTemp_to) {
+                    latMax = latTemp_from;
+                    latMin = latTemp_to;
+                } else if (latTemp_from < latTemp_to) {
+                    latMax = latTemp_to;
+                    latMin = latTemp_from;
+                }
+                if (lonTemp_from > lonTemp_to) {
+                    lonMax = lonTemp_from;
+                    lonMin = lonTemp_to;
+                } else if (lonTemp_from < lonTemp_to) {
+                    lonMax = lonTemp_to;
+                    lonMin = lonTemp_from;
+                }
 
-            //take into account the curve points
-            if (temp_segment.numCurvePoints != 0) {
+                //take into account the curve points
+                if (temp_segment.numCurvePoints != 0) {
 
-                for (int i = 0; i < temp_segment.numCurvePoints; i++) {
-                    if (getStreetSegmentCurvePoint(*it, i).latitude() > latMax) {
-                        latMax = getStreetSegmentCurvePoint(*it, i).latitude();
+                    for (int i = 0; i < temp_segment.numCurvePoints; i++) {
+                        if (getStreetSegmentCurvePoint(tempSegmentIdx, i).latitude() > latMax) {
+                            latMax = getStreetSegmentCurvePoint(tempSegmentIdx, i).latitude();
+                        }
+                        if (getStreetSegmentCurvePoint(tempSegmentIdx, i).latitude() < latMin) {
+                            latMin = getStreetSegmentCurvePoint(tempSegmentIdx, i).latitude();
+                        }
+                        if (getStreetSegmentCurvePoint(tempSegmentIdx, i).longitude() > lonMax) {
+                            lonMax = getStreetSegmentCurvePoint(tempSegmentIdx, i).latitude();
+                        }
+                        if (getStreetSegmentCurvePoint(tempSegmentIdx, i).longitude() < lonMin) {
+                            lonMin = getStreetSegmentCurvePoint(tempSegmentIdx, i).latitude();
+                        }
                     }
-                    if (getStreetSegmentCurvePoint(*it, i).latitude() < latMin) {
-                        latMin = getStreetSegmentCurvePoint(*it, i).latitude();
-                    }
-                    if (getStreetSegmentCurvePoint(*it, i).longitude() > lonMax) {
-                        lonMax = getStreetSegmentCurvePoint(*it, i).latitude();
-                    }
-                    if (getStreetSegmentCurvePoint(*it, i).longitude() < lonMin) {
-                        lonMin = getStreetSegmentCurvePoint(*it, i).latitude();
+                }
+
+                //if it isn't the first segment
+            } else {
+
+                if (latTemp_from > latTemp_to) {
+                    latMax = latTemp_from;
+                    latMin = latTemp_to;
+                } else if (latTemp_from < latTemp_to) {
+                    latMax = latTemp_to;
+                    latMin = latTemp_from;
+                }
+                if (lonTemp_from > lonTemp_to) {
+                    lonMax = lonTemp_from;
+                    lonMin = lonTemp_to;
+                } else if (lonTemp_from < lonTemp_to) {
+                    lonMax = lonTemp_to;
+                    lonMin = lonTemp_from;
+                }
+
+                //take into account curve points
+                if (temp_segment.numCurvePoints != 0) {
+
+                    for (int i = 0; i < temp_segment.numCurvePoints; i++) {
+                        if (getStreetSegmentCurvePoint(tempSegmentIdx, i).latitude() > latMax) {
+                            latMax = getStreetSegmentCurvePoint(tempSegmentIdx, i).latitude();
+                        }
+                        if (getStreetSegmentCurvePoint(tempSegmentIdx, i).latitude() < latMin) {
+                            latMin = getStreetSegmentCurvePoint(tempSegmentIdx, i).latitude();
+                        }
+                        if (getStreetSegmentCurvePoint(tempSegmentIdx, i).longitude() > lonMax) {
+                            lonMax = getStreetSegmentCurvePoint(tempSegmentIdx, i).latitude();
+                        }
+                        if (getStreetSegmentCurvePoint(tempSegmentIdx, i).longitude() < lonMin) {
+                            lonMin = getStreetSegmentCurvePoint(tempSegmentIdx, i).latitude();
+                        }
                     }
                 }
             }
-
-            //if it isn't the first segment
-        } else {
-
-            if (latTemp_from > latTemp_to) {
-                latMax = latTemp_from;
-                latMin = latTemp_to;
-            } else if (latTemp_from < latTemp_to) {
-                latMax = latTemp_to;
-                latMin = latTemp_from;
-            }
-            if (lonTemp_from > lonTemp_to) {
-                lonMax = lonTemp_from;
-                lonMin = lonTemp_to;
-            } else if (lonTemp_from < lonTemp_to) {
-                lonMax = lonTemp_to;
-                lonMin = lonTemp_from;
-            }
-
-            //take into account curve points
-            if (temp_segment.numCurvePoints != 0) {
-
-                for (int i = 0; i < temp_segment.numCurvePoints; i++) {
-                    if (getStreetSegmentCurvePoint(*it, i).latitude() > latMax) {
-                        latMax = getStreetSegmentCurvePoint(*it, i).latitude();
-                    }
-                    if (getStreetSegmentCurvePoint(*it, i).latitude() < latMin) {
-                        latMin = getStreetSegmentCurvePoint(*it, i).latitude();
-                    }
-                    if (getStreetSegmentCurvePoint(*it, i).longitude() > lonMax) {
-                        lonMax = getStreetSegmentCurvePoint(*it, i).latitude();
-                    }
-                    if (getStreetSegmentCurvePoint(*it, i).longitude() < lonMin) {
-                        lonMin = getStreetSegmentCurvePoint(*it, i).latitude();
-                    }
-                }
-            }
-        }
     }
-
-    //now all 4 values contain the end bounds of the street
-    //construct a latlonbounds object comprising of them and return.
-
-    LatLon minimum(latMin, lonMin);
-    LatLon maximum(latMax, lonMax);
-
-    LatLonBounds streetBounds;
-    streetBounds.max = maximum;
-    streetBounds.min = minimum;
-
-    return streetBounds;
+*/
 
 }
 

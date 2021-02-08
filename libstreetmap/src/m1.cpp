@@ -104,6 +104,10 @@ bool loadMap(std::string map_streets_database_filename) {
 void closeMap() {
     //Clean-up your map related data structures here
     //Delete the three vectors created
+    std::vector<std::vector<StreetSegmentIdx>>().swap(intersection_street_segments);
+    std::vector<std::vector<StreetSegmentIdx>>().swap(streetID_street_segments);
+    std::vector<std::vector<StreetIdx>>().swap(streetID_intersections);
+
     closeStreetDatabase();
 }
 
@@ -325,7 +329,7 @@ double findStreetLength(StreetIdx street_id) {
         StreetLength += findStreetSegmentLength(segment);
     }
 
-    return StreetLength / 3;
+    return StreetLength;
 }
 
 LatLonBounds findStreetBoundingBox(StreetIdx street_id) {

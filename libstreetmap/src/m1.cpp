@@ -43,6 +43,7 @@
 // name.
 std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
 std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;
+//std::vector<std::vector<StreetIdx>> streetID_intersections;
 
 bool loadMap(std::string map_streets_database_filename) {
     bool load_successful = false; //Indicates whether the map has loaded 
@@ -72,6 +73,17 @@ bool loadMap(std::string map_streets_database_filename) {
         int temp_street_id = temp_segment.streetID;
         streetID_street_segments[temp_street_id].push_back(i);
     }
+    
+    /*streetID_intersections.resize(getNumStreets());
+    
+    for(int i = 0; i < getNumStreets(); i++){
+        for(auto j = streetID_street_segments[i].begin(); j != streetID_street_segments[i].end(); j++){
+            StreetSegmentIdx segmentNo = streetID_street_segments[i][*j];
+            StreetSegmentInfo temp_segment = getStreetSegmentInfo(segmentNo);
+            streetID_intersections[i].push_back(temp_segment.from);
+            streetID_intersections[i].push_back(temp_segment.to);
+        }
+    }*/
 
     load_successful = true; //Make sure this is updated to reflect whether
                             //loading the map succeeded or failed
@@ -238,7 +250,7 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
 
 std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id){
     //vector to store intersections of a street
-    std::vector <IntersectionIdx> streetIntersections; 
+    std::vector <IntersectionIdx> streetIntersections; //= streetID_intersections[street_id];
     
     for (std::vector<int>::iterator it = (streetID_street_segments[street_id]).begin(); it != (streetID_street_segments[street_id]).end(); it++){
         StreetSegmentInfo ss_info = getStreetSegmentInfo(*it);

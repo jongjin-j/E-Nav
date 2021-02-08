@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <locale> 
 #include <unordered_set>
+#include <cctype>
 
 #define PI 3.14159265
 
@@ -280,22 +281,22 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
 
     //if prefix is empty
     if (street_prefix.empty()) {
-        return matchingStreetIds;
+        return std::vector<StreetIdx>();
     }
 
     //erase all blank spaces and change street_prefix into lowercase
-    street_prefix.erase(std::remove(streetName.begin(), street_prefix.end(), ' '), street_prefix.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
-    std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower);
+    street_prefix.erase(std::remove(street_prefix.begin(), street_prefix.end(), ' '), street_prefix.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
+    std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
 
     //loop through the streets and find match
     for (StreetIdx i = 0; i < getNumStreets(); i++) {
         streetName = getStreetName(i);
 
-        //erase all the blanks and change to street name to lower case
+        //erase all the blanks and change street name to lower case
         streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
-        std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower);
+        std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower);// code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
 
-        if ((street_prefix.compare(0, street_prefix.size(), streetName)) == 0)
+        if ((streetName.compare(0, street_prefix.size(), street_prefix)) == 0)
             matchingStreetIds.push_back(i);
     }
 

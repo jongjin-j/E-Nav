@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <locale> 
 #include <unordered_set>
+#include <cctype>
 
 #define PI 3.14159265
 
@@ -43,7 +44,8 @@
 // name.
 std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
 std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;
-//std::vector<std::vector<StreetIdx>> streetID_intersections;
+std::vector<std::vector<StreetIdx>> streetID_intersections;
+std::vector<std::string> simplifiedStreetNames; 
 
 bool loadMap(std::string map_streets_database_filename) {
     bool load_successful = false; //Indicates whether the map has loaded 
@@ -74,17 +76,39 @@ bool loadMap(std::string map_streets_database_filename) {
         streetID_street_segments[temp_street_id].push_back(i);
     }
 
-    /*streetID_intersections.resize(getNumStreets());
+    streetID_intersections.resize(getNumStreets());
     
     for(int i = 0; i < getNumStreets(); i++){
-        for(auto j = streetID_street_segments[i].begin(); j != streetID_street_segments[i].end(); j++){
-            StreetSegmentIdx segmentNo = streetID_street_segments[i][*j];
-            StreetSegmentInfo temp_segment = getStreetSegmentInfo(segmentNo);
-            streetID_intersections[i].push_back(temp_segment.from);
-            streetID_intersections[i].push_back(temp_segment.to);
+        for(auto it = streetID_street_segments[i].begin(); it != streetID_street_segments[i].end(); it++){
+            StreetSegmentIdx ss_idx = *it;
+            StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_idx);
+            streetID_intersections[i].push_back(ss_info.from);
+            streetID_intersections[i].push_back(ss_info.to);
         }
-    }*/
+        
+        //erase duplicates
+        std::unordered_set<int> s;
+        for (auto j : streetID_intersections[i]) {
+            s.insert(j);
+        }
+        streetID_intersections[i].assign(s.begin(), s.end());
 
+        std::copy(s.begin(), s.end(), streetID_intersections[i].begin());
+    }
+    
+    simplifiedStreetNames.resize(getNumStreets());
+    
+    for (StreetIdx i = 0; i < getNumStreets(); i++){
+        std::string streetName = getStreetName(i);
+        
+        //remove blank spaces and change to lowercase 
+        streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
+        std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
+        
+        simplifiedStreetNames.push_back(streetName);
+    }
+    
+    
     load_successful = true; //Make sure this is updated to reflect whether
     //loading the map succeeded or failed
 
@@ -93,6 +117,11 @@ bool loadMap(std::string map_streets_database_filename) {
 
 void closeMap() {
     //Clean-up your map related data structures here
+    //Delete the three vectors created
+    std::vector<std::vector<StreetSegmentIdx>>().swap(intersection_street_segments);
+    std::vector<std::vector<StreetSegmentIdx>>().swap(streetID_street_segments);
+    std::vector<std::vector<StreetIdx>>().swap(streetID_intersections);
+
     closeStreetDatabase();
 }
 
@@ -245,26 +274,7 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
 }
 
 std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id) {
-    //vector to store intersections of a street
-    std::vector <IntersectionIdx> streetIntersections; //= streetID_intersections[street_id];
-
-    for (std::vector<int>::iterator it = (streetID_street_segments[street_id]).begin(); it != (streetID_street_segments[street_id]).end(); it++) {
-        StreetSegmentInfo ss_info = getStreetSegmentInfo(*it);
-
-        streetIntersections.push_back(ss_info.from);
-        streetIntersections.push_back(ss_info.to);
-    }
-
-
-    std::unordered_set<int> s;
-    for (auto i : streetIntersections) {
-        s.insert(i);
-    }
-    streetIntersections.assign(s.begin(), s.end());
-
-    std::copy(s.begin(), s.end(), streetIntersections.begin());
-
-    return streetIntersections;
+    return streetID_intersections[street_id];
 }
 
 std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids) {
@@ -285,31 +295,49 @@ std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, 
 }
 
 std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix) {
+    /*
     std::vector<StreetIdx> matchingStreetIds;
     std::string streetName;
 
     //if prefix is empty
-    if (street_prefix == "") {
-        return matchingStreetIds;
+    if (street_prefix.empty()) {
+        return std::vector<StreetIdx>();
     }
 
     //erase all blank spaces and change street_prefix into lowercase
-    street_prefix.erase(std::remove(streetName.begin(), street_prefix.end(), ' '), street_prefix.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
-    std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower);
+    street_prefix.erase(std::remove(street_prefix.begin(), street_prefix.end(), ' '), street_prefix.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
+    std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
 
     //loop through the streets and find match
     for (StreetIdx i = 0; i < getNumStreets(); i++) {
         streetName = getStreetName(i);
 
-        //erase all the blanks and change to street name to lower case
+        //erase all the blanks and change street name to lower case
         streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
-        std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower);
+        std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower);// code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
 
         if ((street_prefix.compare(0, street_prefix.size(), streetName)) == 0)
             matchingStreetIds.push_back(i);
     }
 
     return matchingStreetIds;
+     * */
+    
+    /*
+    std::vector<StreetIdx> matchingStreetIds;
+    
+    //if prefix is empty
+    if (street_prefix.empty()) {
+        return std::vector<StreetIdx>();
+    }
+    
+    for (StreetIdx i = 0; i < getNumStreets(); i++) {
+        if (((simplifiedStreetNames[i]).compare(0, street_prefix.size(), street_prefix)) == 0)
+            matchingStreetIds.push_back(i);
+    }
+    
+    return matchingStreetIds;
+    */
 }
 
 double findStreetLength(StreetIdx street_id) {
@@ -333,7 +361,7 @@ double findStreetLength(StreetIdx street_id) {
         StreetLength += findStreetSegmentLength(segment);
     }
 
-    return StreetLength / 3;
+    return StreetLength;
 }
 
 LatLonBounds findStreetBoundingBox(StreetIdx street_id) {

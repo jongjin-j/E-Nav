@@ -103,6 +103,7 @@ bool loadMap(std::string map_streets_database_filename) {
 
 void closeMap() {
     //Clean-up your map related data structures here
+    //Delete the three vectors created
     closeStreetDatabase();
 }
 

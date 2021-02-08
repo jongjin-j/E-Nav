@@ -45,6 +45,7 @@
 std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
 std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;
 std::vector<std::vector<StreetIdx>> streetID_intersections;
+std::vector<std::string> simplifiedStreetNames; 
 
 bool loadMap(std::string map_streets_database_filename) {
     bool load_successful = false; //Indicates whether the map has loaded 
@@ -94,7 +95,20 @@ bool loadMap(std::string map_streets_database_filename) {
 
         std::copy(s.begin(), s.end(), streetID_intersections[i].begin());
     }
-
+    
+    simplifiedStreetNames.resize(getNumStreets());
+    
+    for (StreetIdx i = 0; i < getNumStreets(); i++){
+        std::string streetName = getStreetName(i);
+        
+        //remove blank spaces and change to lowercase 
+        streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
+        std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
+        
+        simplifiedStreetNames.push_back(streetName);
+    }
+    
+    
     load_successful = true; //Make sure this is updated to reflect whether
     //loading the map succeeded or failed
 
@@ -281,6 +295,7 @@ std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, 
 }
 
 std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix) {
+    /*
     std::vector<StreetIdx> matchingStreetIds;
     std::string streetName;
 
@@ -301,11 +316,28 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
         streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
         std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower);// code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
 
-        if ((streetName.compare(0, street_prefix.size(), street_prefix)) == 0)
+        if ((street_prefix.compare(0, street_prefix.size(), streetName)) == 0)
             matchingStreetIds.push_back(i);
     }
 
     return matchingStreetIds;
+     * */
+    
+    /*
+    std::vector<StreetIdx> matchingStreetIds;
+    
+    //if prefix is empty
+    if (street_prefix.empty()) {
+        return std::vector<StreetIdx>();
+    }
+    
+    for (StreetIdx i = 0; i < getNumStreets(); i++) {
+        if (((simplifiedStreetNames[i]).compare(0, street_prefix.size(), street_prefix)) == 0)
+            matchingStreetIds.push_back(i);
+    }
+    
+    return matchingStreetIds;
+    */
 }
 
 double findStreetLength(StreetIdx street_id) {

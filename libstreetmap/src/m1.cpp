@@ -391,13 +391,20 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id) {
                 } else if (latFrom_temp < latTo_temp) {
                     latMax = latTo_temp;
                     latMin = latFrom_temp;
+                } else if(latFrom_temp == latTo_temp){
+                    latMax = latTo_temp;
+                    latMin = latTo_temp;
                 }
-                if (lonFrom_temp < lonTo_temp) {
+               
+                if (lonFrom_temp > lonTo_temp) {
                     lonMax = lonFrom_temp;
                     lonMin = lonTo_temp;
-                } else if (lonFrom_temp > lonTo_temp) {
+                } else if (lonFrom_temp < lonTo_temp) {
                     lonMax = lonTo_temp;
                     lonMin = lonFrom_temp;
+                } else if(lonFrom_temp == lonTo_temp){
+                    lonMax = lonTo_temp;
+                    lonMin = lonTo_temp;
                 }
 
                 if (getStreetSegmentInfo(i).numCurvePoints!=0) {
@@ -429,7 +436,7 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id) {
                 if (lonTo_temp > lonMax) {
                     lonMax = lonTo_temp;
                 }
-                if (lonTo_temp > lonMin) {
+                if (lonTo_temp < lonMin) {
                     lonMin = lonTo_temp;
                 }
                 if (getStreetSegmentInfo(i).numCurvePoints != 0) {
@@ -458,8 +465,8 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id) {
 
     LatLonBounds streetBounds;
 
-    LatLon minBounds(latMin, lonMax);
-    LatLon maxBounds(latMax, lonMin);
+    LatLon minBounds(latMin, lonMin);
+    LatLon maxBounds(latMax, lonMax);
 
     streetBounds.max = maxBounds;
     streetBounds.min = minBounds;

@@ -78,15 +78,15 @@ bool loadMap(std::string map_streets_database_filename) {
     }
 
     streetID_intersections.resize(getNumStreets());
-    
-    for(int i = 0; i < getNumStreets(); i++){
-        for(auto it = streetID_street_segments[i].begin(); it != streetID_street_segments[i].end(); it++){
+
+    for (int i = 0; i < getNumStreets(); i++) {
+        for (auto it = streetID_street_segments[i].begin(); it != streetID_street_segments[i].end(); it++) {
             StreetSegmentIdx ss_idx = *it;
             StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_idx);
             streetID_intersections[i].push_back(ss_info.from);
             streetID_intersections[i].push_back(ss_info.to);
         }
-        
+
         //erase duplicates
         std::unordered_set<int> s;
         for (auto j : streetID_intersections[i]) {
@@ -96,32 +96,32 @@ bool loadMap(std::string map_streets_database_filename) {
 
         std::copy(s.begin(), s.end(), streetID_intersections[i].begin());
     }
-    
+
     simplifiedStreetNames.resize(getNumStreets());
-    
-    for (StreetIdx i = 0; i < getNumStreets(); i++){
+
+    for (StreetIdx i = 0; i < getNumStreets(); i++) {
         std::string streetName = getStreetName(i);
-        
+
         //remove blank spaces and change to lowercase 
         streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
         std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
-        
+
         simplifiedStreetNames.push_back(streetName);
     }
-    
+
     street_segment_length_and_time.resize(getNumStreetSegments());
-    
-    for(int streetSegNum = 0; streetSegNum < getNumStreetSegments(); streetSegNum++){
+
+    for (int streetSegNum = 0; streetSegNum < getNumStreetSegments(); streetSegNum++) {
         double totalStreetSegmentLength = 0, firstSegmentLength = 0, lastSegmentLength = 0, curveSegmentLength = 0;
         StreetSegmentInfo street_segment = getStreetSegmentInfo(streetSegNum);
-        
+
         if (street_segment.numCurvePoints == 0) {
             LatLon posFrom = getIntersectionPosition(street_segment.from);
             LatLon posTo = getIntersectionPosition(street_segment.to);
             std::pair <LatLon, LatLon> segment(posFrom, posTo);
             totalStreetSegmentLength = findDistanceBetweenTwoPoints(segment);
-        } 
-        
+        }
+
         else {
             int curvePoints = street_segment.numCurvePoints;
             LatLon segmentCurvePoints[curvePoints];
@@ -150,8 +150,8 @@ bool loadMap(std::string map_streets_database_filename) {
         double speed = street_segment.speedLimit;
         street_segment_length_and_time[streetSegNum].push_back(totalStreetSegmentLength / speed);
     }
-    
-    
+
+
     load_successful = true; //Make sure this is updated to reflect whether
     //loading the map succeeded or failed
 
@@ -161,9 +161,9 @@ bool loadMap(std::string map_streets_database_filename) {
 void closeMap() {
     //Clean-up your map related data structures here
     //Delete the three vectors created
-    std::vector<std::vector<StreetSegmentIdx>>().swap(intersection_street_segments);
-    std::vector<std::vector<StreetSegmentIdx>>().swap(streetID_street_segments);
-    std::vector<std::vector<StreetIdx>>().swap(streetID_intersections);
+    std::vector<std::vector < StreetSegmentIdx >> ().swap(intersection_street_segments);
+    std::vector<std::vector < StreetSegmentIdx >> ().swap(streetID_street_segments);
+    std::vector<std::vector < StreetIdx >> ().swap(streetID_intersections);
     std::vector<std::string>().swap(simplifiedStreetNames);
     std::vector<std::vector<double>>().swap(street_segment_length_and_time);
 
@@ -330,7 +330,7 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
 
     return matchingStreetIds;
      * */
-    
+
     /*
     std::vector<StreetIdx> matchingStreetIds;
     
@@ -345,12 +345,53 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     }
     
     return matchingStreetIds;
-    */
+     */
+
+
+    std::string searchTerm = street_prefix;
+    std::vector<StreetIdx> matchingStreets;
+
+    //converting to nonwhitespace+lowercase
+    searchTerm.erase(remove(searchTerm.begin(), searchTerm.end(), ' '), searchTerm.end());
+    std::transform(searchTerm.begin(), searchTerm.end(), searchTerm.begin(), [](unsigned char c) {
+        return std::tolower(c);
+    }); //https://stackoverflow.com/questions/313970/how-to-convert-stdstring-to-lower-case
+
+    for (int i = 1; i < getNumStreets(); i++) { //of large magnitude
+        bool currentlyMatching = true; //initialize to true at the start of each street
+
+        for (int j = 0; j < strlen(searchTerm.c_str()); j++) { //of small magnitude, double loop ok?
+
+            std::string streetToCompare = getStreetName(i); //convert to string because getstreetname(i) is in bin form?
+
+            //converting to nonwhitespace+lowercase
+            streetToCompare.erase(remove(streetToCompare.begin(), streetToCompare.end(), ' '), streetToCompare.end());
+            std::transform(streetToCompare.begin(), streetToCompare.end(), streetToCompare.begin(), [](unsigned char c) {
+                return std::tolower(c);
+            }); //https://stackoverflow.com/questions/313970/how-to-convert-stdstring-to-lower-case
+
+            if (streetToCompare[j] == searchTerm[j]) {
+                //continue if chars matched
+            } else {
+                //if one char doesn't match, break
+                currentlyMatching = false;
+                break;
+            }
+
+
+        }
+        if (currentlyMatching) {
+            matchingStreets.push_back(i);
+        }
+
+    }
+
+    return matchingStreets;
 }
 
 double findStreetLength(StreetIdx street_id) {
     //speed requirement high
-    
+
     double StreetLength = 0;
 
     for (auto it = 0; it < streetID_street_segments[street_id].size(); it++) {
@@ -367,7 +408,7 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id) {
     double latMax = 0;
     double lonMin = 0;
     double lonMax = 0;
-    
+
     //for all the streets with streetid;
     //take each segment, record the largest/smallest lat and lon
     //as you go through new segments, update the largest/smallest
@@ -388,23 +429,23 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id) {
                 } else if (latFrom_temp < latTo_temp) {
                     latMax = latTo_temp;
                     latMin = latFrom_temp;
-                } else if(latFrom_temp == latTo_temp){
+                } else if (latFrom_temp == latTo_temp) {
                     latMax = latTo_temp;
                     latMin = latTo_temp;
                 }
-               
+
                 if (lonFrom_temp > lonTo_temp) {
                     lonMax = lonFrom_temp;
                     lonMin = lonTo_temp;
                 } else if (lonFrom_temp < lonTo_temp) {
                     lonMax = lonTo_temp;
                     lonMin = lonFrom_temp;
-                } else if(lonFrom_temp == lonTo_temp){
+                } else if (lonFrom_temp == lonTo_temp) {
                     lonMax = lonTo_temp;
                     lonMin = lonTo_temp;
                 }
 
-                if (getStreetSegmentInfo(i).numCurvePoints!=0) {
+                if (getStreetSegmentInfo(i).numCurvePoints != 0) {
                     //take into account the curve points
                     for (int j = 0; j < getStreetSegmentInfo(i).numCurvePoints; j++) {
                         if (getStreetSegmentCurvePoint(i, j).latitude() < latMin) {

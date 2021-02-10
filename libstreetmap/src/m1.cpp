@@ -68,10 +68,10 @@ bool loadMap(std::string map_streets_database_filename) {
     }    
     
     
-    
-    
-    
-
+   
+    if(load_successful == false){
+        return false;
+    }
     intersection_street_segments.resize(getNumIntersections());
 
     for (int intersection = 0; intersection < getNumIntersections(); ++intersection) {

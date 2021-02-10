@@ -186,18 +186,7 @@ void closeMap() {
 double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points) {
     //return sqrt of x_difference^2 + y_difference^2 of the two points
 
-    /*double latitudeAverage = 0.5 * kDegreeToRadian * (points.first.latitude() + points.second.latitude());
-    double x_coordinate_1 = kEarthRadiusInMeters * points.first.longitude() * kDegreeToRadian * cos(latitudeAverage);
-    double y_coordinate_1 = kEarthRadiusInMeters * points.first.latitude() * kDegreeToRadian;
-    double x_coordinate_2 = kEarthRadiusInMeters * points.second.longitude() * kDegreeToRadian * cos(latitudeAverage);
-    double y_coordinate_2 = kEarthRadiusInMeters * points.second.latitude() * kDegreeToRadian;
-
-    double x_diff = x_coordinate_2 - x_coordinate_1;
-    double y_diff = y_coordinate_2 - y_coordinate_1;
-    double diffSquared = pow(x_diff, 2) + pow(y_diff, 2);
-    return sqrt(diffSquared);*/
-    
-    //simplified without using pow
+    //computing difference between x and y respectively, returns the sqrt of the sum of the squares
     double xDiff = kEarthRadiusInMeters * kDegreeToRadian * cos(0.5 * kDegreeToRadian * (points.first.latitude() + points.second.latitude())) * (points.second.longitude() - points.first.longitude());
     double yDiff = kEarthRadiusInMeters * kDegreeToRadian * (points.second.latitude() - points.first.latitude());
     return sqrt(xDiff * xDiff + yDiff * yDiff);

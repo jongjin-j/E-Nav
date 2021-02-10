@@ -27,6 +27,7 @@
 #include <locale> 
 #include <unordered_set>
 #include <cctype>
+#include <map>
 
 #define PI 3.14159265
 
@@ -47,6 +48,7 @@ std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;
 std::vector<std::vector<StreetIdx>> streetID_intersections;
 std::vector<std::string> simplifiedStreetNames;
 std::vector<std::vector<double>> street_segment_length_and_time;
+std::multimap<std::string, double> streetName_and_streetID;
 
 bool loadMap(std::string map_streets_database_filename) {
     bool load_successful = false; //Indicates whether the map has loaded 
@@ -59,6 +61,16 @@ bool loadMap(std::string map_streets_database_filename) {
     //
 
     load_successful = loadStreetsDatabaseBIN(map_streets_database_filename);
+    
+    //initializing the multimap
+    for(int i = 0; i < getNumStreets(); i++){
+        streetName_and_streetID.insert(std::make_pair(getStreetName(i),i)); 
+    }    
+    
+    
+    
+    
+    
 
     intersection_street_segments.resize(getNumIntersections());
 

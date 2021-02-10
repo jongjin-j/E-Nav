@@ -124,7 +124,7 @@ bool loadMap(std::string map_streets_database_filename) {
 
         else {
             int curvePoints = street_segment.numCurvePoints;
-            LatLon segmentCurvePoints[curvePoints];
+            LatLon *segmentCurvePoints = new LatLon [curvePoints];
             for (int i = 0; i < curvePoints; i++) {
                 segmentCurvePoints[i] = getStreetSegmentCurvePoint(streetSegNum, i);
             }
@@ -145,6 +145,7 @@ bool loadMap(std::string map_streets_database_filename) {
                 curveSegmentLength += findDistanceBetweenTwoPoints(tempSegment);
             }
             totalStreetSegmentLength = firstSegmentLength + lastSegmentLength + curveSegmentLength;
+            delete[] segmentCurvePoints;
         }
         street_segment_length_and_time[streetSegNum].push_back(totalStreetSegmentLength);
         double speed = street_segment.speedLimit;
@@ -207,7 +208,7 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id) {
 }
 
 int findClosestIntersection(LatLon my_position) {
-    int minDist, minIndex;
+    int minDist, minIndex = 0;
 
     //loop through all intersections and find the distance from my position
     for (int i = 0; i < getNumIntersections(); i++) {

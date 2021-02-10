@@ -352,9 +352,8 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     }
     
     return matchingStreetIds;
-     */
-
-
+    */
+    
     std::string searchTerm = street_prefix;
     std::vector<StreetIdx> matchingStreets;
 

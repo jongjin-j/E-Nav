@@ -62,6 +62,10 @@ bool loadMap(std::string map_streets_database_filename) {
 
     load_successful = loadStreetsDatabaseBIN(map_streets_database_filename);
     
+    if(load_successful == false){
+        return false;
+    }
+    
     
     //initializing the multimap of simplified street names and their index
     for(int i = 0; i < getNumStreets(); i++){
@@ -74,9 +78,7 @@ bool loadMap(std::string map_streets_database_filename) {
     }    
     
     
-    if(load_successful == false){
-        return false;
-    }
+    
     intersection_street_segments.resize(getNumIntersections());
 
     for (int intersection = 0; intersection < getNumIntersections(); ++intersection) {
@@ -403,12 +405,17 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     
     std::vector<StreetIdx> matchingStreetIds;
     
+    //if prefix is empty
+    if (street_prefix.empty()) {
+        return std::vector<StreetIdx>();
+    }
+    
     //erase all blank spaces and change street_prefix into lowercase
     street_prefix.erase(std::remove(street_prefix.begin(), street_prefix.end(), ' '), street_prefix.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
     std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
     
     auto itLow = streetName_and_streetID.lower_bound(street_prefix);
-    auto itHigh = streetName_and_streetID.upper_bound(street_prefix);
+    //auto itHigh = streetName_and_streetID.upper_bound(street_prefix);
     /*
     if (itLow == itHigh){
         if ((street_prefix.compare(0, street_prefix.size(), itLow -> first)) == 0)
@@ -424,12 +431,14 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     }
     */
     
-    while (itLow != streetName_and_streetID.end()){
-        std::string streetName = itLow -> first;
+    std::string streetName = itLow -> first;
+    
+    while (itLow != streetName_and_streetID.end() && ((itLow -> first).compare(0, street_prefix.size(), street_prefix)) == 0){
         
-        if ((streetName.compare(0, street_prefix.size(), street_prefix)) == 0)
+        if (((itLow -> first).compare(0, street_prefix.size(), street_prefix)) == 0)
             matchingStreetIds.push_back(itLow -> second);
         itLow++;
+        //streetName = itLow -> first;
     }
     
     

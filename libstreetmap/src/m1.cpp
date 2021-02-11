@@ -47,7 +47,7 @@ std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
 std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;
 std::vector<std::vector<StreetIdx>> streetID_intersections;
 std::vector<std::string> simplifiedStreetNames;
-std::vector<std::vector<double>> street_segment_length_and_time;
+std::vector<double> street_segment_length_and_time;
 std::multimap<std::string, StreetIdx> streetName_and_streetID;
 
 bool loadMap(std::string map_streets_database_filename) {
@@ -128,7 +128,7 @@ bool loadMap(std::string map_streets_database_filename) {
         simplifiedStreetNames.push_back(streetName);
     }
     */
-    street_segment_length_and_time.resize(getNumStreetSegments());
+    //street_segment_length_and_time.resize(getNumStreetSegments());
 
     for (int streetSegNum = 0; streetSegNum < getNumStreetSegments(); streetSegNum++) {
         double totalStreetSegmentLength = 0, firstSegmentLength = 0, lastSegmentLength = 0, curveSegmentLength = 0;
@@ -166,9 +166,8 @@ bool loadMap(std::string map_streets_database_filename) {
             totalStreetSegmentLength = firstSegmentLength + lastSegmentLength + curveSegmentLength;
             delete[] segmentCurvePoints;
         }
-        street_segment_length_and_time[streetSegNum].push_back(totalStreetSegmentLength);
         double speed = street_segment.speedLimit;
-        street_segment_length_and_time[streetSegNum].push_back(totalStreetSegmentLength / speed);
+        street_segment_length_and_time.push_back(totalStreetSegmentLength / speed);
     }
 
 
@@ -185,7 +184,7 @@ void closeMap() {
     std::vector<std::vector < StreetSegmentIdx >> ().swap(streetID_street_segments);
     std::vector<std::vector < StreetIdx >> ().swap(streetID_intersections);
     //std::vector<std::string>().swap(simplifiedStreetNames);
-    std::vector<std::vector<double>>().swap(street_segment_length_and_time);
+    std::vector<double>().swap(street_segment_length_and_time);
     std::multimap<std::string, StreetIdx> ().swap(streetName_and_streetID);
 
     closeStreetDatabase();
@@ -204,16 +203,14 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
     //load street_segment_info with getStreetSegmentInfo using street_segment_id
     //run for loop with getStreetSegmentCurvePoint by incrementing by 1 every loop
     //return the sum of the lengths
-
-    return street_segment_length_and_time[street_segment_id][0];
+    double time = street_segment_length_and_time[street_segment_id];
+    StreetSegmentInfo street_segment = getStreetSegmentInfo(street_segment_id);
+    double length = time *  (street_segment.speedLimit);
+    return length;
 }
 
 double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id) {
-    /*double streetSegmentLength = findStreetSegmentLength(street_segment_id);
-    StreetSegmentInfo street_segment = getStreetSegmentInfo(street_segment_id);
-    double travelTime = streetSegmentLength / (street_segment.speedLimit);*/
-
-    return street_segment_length_and_time[street_segment_id][1];
+    return street_segment_length_and_time[street_segment_id];
 }
 
 int findClosestIntersection(LatLon my_position) {

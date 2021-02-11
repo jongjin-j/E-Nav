@@ -302,7 +302,7 @@ std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, 
 }
 
 std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix) {
-    
+
     std::vector<StreetIdx> matchingStreetIds;
     
     //if prefix is empty
@@ -315,21 +315,6 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
     
     auto itLow = streetName_and_streetID.lower_bound(street_prefix);
-    //auto itHigh = streetName_and_streetID.upper_bound(street_prefix);
-    /*
-    if (itLow == itHigh){
-        if ((street_prefix.compare(0, street_prefix.size(), itLow -> first)) == 0)
-            matchingStreetIds.push_back(itLow -> second);
-    }
-    */
-    /*
-    //following code referenced from https://www.geeksforgeeks.org/traverse-values-given-key-multimap/
-    while (itLow != itHigh){
-        if ((street_prefix.compare(0, street_prefix.size(), itLow -> first)) == 0)
-            matchingStreetIds.push_back(itLow -> second);
-        itLow++;
-    }
-    */
     
     std::string streetName = itLow -> first;
     
@@ -338,9 +323,7 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
         if (((itLow -> first).compare(0, street_prefix.size(), street_prefix)) == 0)
             matchingStreetIds.push_back(itLow -> second);
         itLow++;
-        //streetName = itLow -> first;
     }
-    
     
     return matchingStreetIds;
 }

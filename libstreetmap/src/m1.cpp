@@ -115,20 +115,6 @@ bool loadMap(std::string map_streets_database_filename) {
 
         std::copy(s.begin(), s.end(), streetID_intersections[i].begin());
     }
-    /*
-    simplifiedStreetNames.resize(getNumStreets());
-
-    for (StreetIdx i = 0; i < getNumStreets(); i++) {
-        std::string streetName = getStreetName(i);
-
-        //remove blank spaces and change to lowercase 
-        streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
-        std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
-
-        simplifiedStreetNames.push_back(streetName);
-    }
-    */
-    //street_segment_length_and_time.resize(getNumStreetSegments());
 
     for (int streetSegNum = 0; streetSegNum < getNumStreetSegments(); streetSegNum++) {
         double totalStreetSegmentLength = 0, firstSegmentLength = 0, lastSegmentLength = 0, curveSegmentLength = 0;
@@ -178,12 +164,11 @@ bool loadMap(std::string map_streets_database_filename) {
 }
 
 void closeMap() {
-    //Clean-up your map related data structures here
+
     //Delete the three vectors created
     std::vector<std::vector < StreetSegmentIdx >> ().swap(intersection_street_segments);
     std::vector<std::vector < StreetSegmentIdx >> ().swap(streetID_street_segments);
     std::vector<std::vector < StreetIdx >> ().swap(streetID_intersections);
-    //std::vector<std::string>().swap(simplifiedStreetNames);
     std::vector<double>().swap(street_segment_length_and_time);
     std::multimap<std::string, StreetIdx> ().swap(streetName_and_streetID);
 
@@ -191,25 +176,26 @@ void closeMap() {
 }
 
 double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points) {
-    //return sqrt of x_difference^2 + y_difference^2 of the two points
 
-    //computing difference between x and y respectively, returns the sqrt of the sum of the squares
+    //compute difference between x1,x2 and y1,y2 respectively, returns the sqrt of the sum of the squares
+    //note xCoord is computed via kEarthRadi * kDegToRad * cos(latavg)
     double xDiff = kEarthRadiusInMeters * kDegreeToRadian * cos(0.5 * kDegreeToRadian * (points.first.latitude() + points.second.latitude())) * (points.second.longitude() - points.first.longitude());
     double yDiff = kEarthRadiusInMeters * kDegreeToRadian * (points.second.latitude() - points.first.latitude());
     return sqrt(xDiff * xDiff + yDiff * yDiff);
 }
 
 double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
-    //load street_segment_info with getStreetSegmentInfo using street_segment_id
-    //run for loop with getStreetSegmentCurvePoint by incrementing by 1 every loop
-    //return the sum of the lengths
+  
+    //obtain time taken to travel the segment via the data structure created in loadMap
     double time = street_segment_length_and_time[street_segment_id];
-    StreetSegmentInfo street_segment = getStreetSegmentInfo(street_segment_id);
-    double length = time *  (street_segment.speedLimit);
+    //obtain length by multiplying time with speed
+    double length = time * (getStreetSegmentInfo(street_segment_id).speedLimit);
     return length;
 }
 
 double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id) {
+    
+    //obtain travel time via the precomputed vector
     return street_segment_length_and_time[street_segment_id];
 }
 
@@ -217,6 +203,7 @@ int findClosestIntersection(LatLon my_position) {
     int minDist, minIndex = 0;
 
     //loop through all intersections and find the distance from my position
+    //compare current index with previous index and update if closer
     for (int i = 0; i < getNumIntersections(); i++) {
         std::pair <LatLon, LatLon> positionPair(getIntersectionPosition(i), my_position);
         double dist = findDistanceBetweenTwoPoints(positionPair);
@@ -315,90 +302,6 @@ std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, 
 }
 
 std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_prefix) {
-    /*
-    std::vector<StreetIdx> matchingStreetIds;
-    std::string streetName;
-
-    //if prefix is empty
-    if (street_prefix.empty()) {
-        return std::vector<StreetIdx>();
-    }
-
-    //erase all blank spaces and change street_prefix into lowercase
-    street_prefix.erase(std::remove(street_prefix.begin(), street_prefix.end(), ' '), street_prefix.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
-    std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
-
-    //loop through the streets and find match
-    for (StreetIdx i = 0; i < getNumStreets(); i++) {
-        streetName = getStreetName(i);
-
-        //erase all the blanks and change street name to lower case
-        streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
-        std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower);// code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
-
-        if ((street_prefix.compare(0, street_prefix.size(), streetName)) == 0)
-            matchingStreetIds.push_back(i);
-    }
-
-    return matchingStreetIds;
-     * */
-
-    /*
-    std::vector<StreetIdx> matchingStreetIds;
-    
-    //if prefix is empty
-    if (street_prefix.empty()) {
-        return std::vector<StreetIdx>();
-    }
-    
-    for (StreetIdx i = 0; i < getNumStreets(); i++) {
-        if (((simplifiedStreetNames[i]).compare(0, street_prefix.size(), street_prefix)) == 0)
-            matchingStreetIds.push_back(i);
-    }
-    
-    return matchingStreetIds;
-    */
-    /*
-    std::string searchTerm = street_prefix;
-    std::vector<StreetIdx> matchingStreets;
-
-    //converting to nonwhitespace+lowercase
-    searchTerm.erase(remove(searchTerm.begin(), searchTerm.end(), ' '), searchTerm.end());
-    std::transform(searchTerm.begin(), searchTerm.end(), searchTerm.begin(), [](unsigned char c) {
-        return std::tolower(c);
-    }); //https://stackoverflow.com/questions/313970/how-to-convert-stdstring-to-lower-case
-
-    for (int i = 1; i < getNumStreets(); i++) { //of large magnitude
-        bool currentlyMatching = true; //initialize to true at the start of each street
-
-        for (int j = 0; j < strlen(searchTerm.c_str()); j++) { //of small magnitude, double loop ok?
-
-            std::string streetToCompare = getStreetName(i); //convert to string because getstreetname(i) is in bin form?
-
-            //converting to nonwhitespace+lowercase
-            streetToCompare.erase(remove(streetToCompare.begin(), streetToCompare.end(), ' '), streetToCompare.end());
-            std::transform(streetToCompare.begin(), streetToCompare.end(), streetToCompare.begin(), [](unsigned char c) {
-                return std::tolower(c);
-            }); //https://stackoverflow.com/questions/313970/how-to-convert-stdstring-to-lower-case
-
-            if (streetToCompare[j] == searchTerm[j]) {
-                //continue if chars matched
-            } else {
-                //if one char doesn't match, break
-                currentlyMatching = false;
-                break;
-            }
-
-
-        }
-        if (currentlyMatching) {
-            matchingStreets.push_back(i);
-        }
-
-    }
-
-    return matchingStreets;
-    */
     
     std::vector<StreetIdx> matchingStreetIds;
     
@@ -443,12 +346,13 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
 }
 
 double findStreetLength(StreetIdx street_id) {
-    //speed requirement high
 
     double StreetLength = 0;
 
+    //loop with break condition set to # of segments the street has
     for (auto it = 0; it < streetID_street_segments[street_id].size(); it++) {
         StreetSegmentIdx segment = streetID_street_segments[street_id][it];
+        //add the segment length as you go
         StreetLength += findStreetSegmentLength(segment);
     }
 
@@ -457,6 +361,7 @@ double findStreetLength(StreetIdx street_id) {
 
 LatLonBounds findStreetBoundingBox(StreetIdx street_id) {
 
+    //declare the min/max of lat/lon that describes the bounding box
     double latMin = 0;
     double latMax = 0;
     double lonMin = 0;
@@ -469,13 +374,16 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id) {
     for (int i = 0; i < getNumStreetSegments(); i++) {
         if (getStreetSegmentInfo(i).streetID == street_id) {
 
+            //simplify variable names
             double latFrom_temp = getIntersectionPosition(getStreetSegmentInfo(i).from).latitude();
             double latTo_temp = getIntersectionPosition(getStreetSegmentInfo(i).to).latitude();
             double lonFrom_temp = getIntersectionPosition(getStreetSegmentInfo(i).from).longitude();
             double lonTo_temp = getIntersectionPosition(getStreetSegmentInfo(i).to).longitude();
 
+            //first segment always takes all values of min/max
             if (latMax == 0) {
 
+                //compare the segment's from & to; larger takes max and the remaining takes min
                 if (latFrom_temp > latTo_temp) {
                     latMax = latFrom_temp;
                     latMin = latTo_temp;
@@ -498,8 +406,10 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id) {
                     lonMin = lonTo_temp;
                 }
 
+                //if the street has curve points, carry out the procedure with the curve points as well
                 if (getStreetSegmentInfo(i).numCurvePoints != 0) {
-                    //take into account the curve points
+
+                    //update value if if any one of the curve points exceeds max or is less than min obtained from the segment
                     for (int j = 0; j < getStreetSegmentInfo(i).numCurvePoints; j++) {
                         if (getStreetSegmentCurvePoint(i, j).latitude() < latMin) {
                             latMin = getStreetSegmentCurvePoint(i, j).latitude();
@@ -513,11 +423,11 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id) {
                         if (getStreetSegmentCurvePoint(i, j).longitude() > lonMax) {
                             lonMax = getStreetSegmentCurvePoint(i, j).longitude();
                         }
-
                     }
                 }
-
-            } else {
+            } 
+            //if not the first segment, compare with existing value
+            else {
                 if (latTo_temp > latMax) {
                     latMax = latTo_temp;
                 }
@@ -557,15 +467,13 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id) {
                         if (getStreetSegmentCurvePoint(i, j).longitude() > lonMax) {
                             lonMax = getStreetSegmentCurvePoint(i, j).longitude();
                         }
-
                     }
                 }
-
             }
-
         }
     }
 
+    //define a struct which will contain all 4 bound points
     LatLonBounds streetBounds;
 
     LatLon minBounds(latMin, lonMin);
@@ -580,27 +488,27 @@ LatLonBounds findStreetBoundingBox(StreetIdx street_id) {
 }
 
 POIIdx findClosestPOI(LatLon my_position, std::string POIname) {
-    // Returns the nearest point of interest of the given name to the given position
-    // Speed Requirement --> none 
-
     // make a vector consisting of the all the poi locations
     // compare using a for loop to return the shortest one
 
     double shortestDistance = 0;
-    double newDistance = 0;
+    double currentDistance = 0;
     POIIdx closestPOIIdx = 0;
 
-    for (int i = 0; i < getNumPointsOfInterest(); i++) { //loop through POI
-        if (getPOIName(i) == POIname) { //if poi name matches,
+    //loop through all POIs; if the name matches input, insert into the vector; if no match, increment.
+    for (int i = 0; i < getNumPointsOfInterest(); i++) { 
+        if (getPOIName(i) == POIname) { 
 
+            //create a pair of the match POI's position and my position
             std::pair <LatLon, LatLon> PositionPOIPair(my_position, getPOIPosition(i));
-
-            newDistance = findDistanceBetweenTwoPoints(PositionPOIPair); //pair of my_position and getPOIPosition
-            if (shortestDistance == 0) {
-                shortestDistance = newDistance;
+            //compute distance to current POI
+            currentDistance = findDistanceBetweenTwoPoints(PositionPOIPair); 
+            
+            if (shortestDistance == 0) { //if first POI match, that POI has to be the closest
+                shortestDistance = currentDistance;
                 closestPOIIdx = i;
-            } else if (shortestDistance > newDistance) {
-                shortestDistance = newDistance;
+            } else if (shortestDistance > currentDistance) { //update only if current shorter than previous shortest
+                shortestDistance = currentDistance;
                 closestPOIIdx = i;
             }
         }
@@ -610,10 +518,11 @@ POIIdx findClosestPOI(LatLon my_position, std::string POIname) {
 }
 
 double findFeatureArea(FeatureIdx feature_id) {
+    
+    double totalArea = 0;
     //convert into x,y coordinates
     LatLon firstPoint = getFeaturePoint(feature_id, 0);
     LatLon lastPoint = getFeaturePoint(feature_id, getNumFeaturePoints(feature_id) - 1);
-    double totalArea = 0;
 
     if (firstPoint == lastPoint) {
         for (int i = 0; i < getNumFeaturePoints(feature_id) - 1; i++) {

@@ -48,7 +48,7 @@ std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;
 std::vector<std::vector<StreetIdx>> streetID_intersections;
 std::vector<std::string> simplifiedStreetNames;
 std::vector<std::vector<double>> street_segment_length_and_time;
-std::multimap<std::string, double> streetName_and_streetID;
+std::multimap<std::string, StreetIdx> streetName_and_streetID;
 
 bool loadMap(std::string map_streets_database_filename) {
     bool load_successful = false; //Indicates whether the map has loaded 
@@ -62,13 +62,18 @@ bool loadMap(std::string map_streets_database_filename) {
 
     load_successful = loadStreetsDatabaseBIN(map_streets_database_filename);
     
-    //initializing the multimap
+    
+    //initializing the multimap of simplified street names and their index
     for(int i = 0; i < getNumStreets(); i++){
-        streetName_and_streetID.insert(std::make_pair(getStreetName(i),i)); 
+        std::string streetName = getStreetName(i);
+        
+        //remove blank spaces and change to lowercase 
+        streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
+        std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
+        streetName_and_streetID.insert(std::make_pair(streetName,i)); 
     }    
     
     
-   
     if(load_successful == false){
         return false;
     }
@@ -108,7 +113,7 @@ bool loadMap(std::string map_streets_database_filename) {
 
         std::copy(s.begin(), s.end(), streetID_intersections[i].begin());
     }
-
+    /*
     simplifiedStreetNames.resize(getNumStreets());
 
     for (StreetIdx i = 0; i < getNumStreets(); i++) {
@@ -120,7 +125,7 @@ bool loadMap(std::string map_streets_database_filename) {
 
         simplifiedStreetNames.push_back(streetName);
     }
-
+    */
     street_segment_length_and_time.resize(getNumStreetSegments());
 
     for (int streetSegNum = 0; streetSegNum < getNumStreetSegments(); streetSegNum++) {
@@ -177,8 +182,9 @@ void closeMap() {
     std::vector<std::vector < StreetSegmentIdx >> ().swap(intersection_street_segments);
     std::vector<std::vector < StreetSegmentIdx >> ().swap(streetID_street_segments);
     std::vector<std::vector < StreetIdx >> ().swap(streetID_intersections);
-    std::vector<std::string>().swap(simplifiedStreetNames);
+    //std::vector<std::string>().swap(simplifiedStreetNames);
     std::vector<std::vector<double>>().swap(street_segment_length_and_time);
+    std::multimap<std::string, StreetIdx> ().swap(streetName_and_streetID);
 
     closeStreetDatabase();
 }
@@ -353,7 +359,7 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     
     return matchingStreetIds;
     */
-    
+    /*
     std::string searchTerm = street_prefix;
     std::vector<StreetIdx> matchingStreets;
 
@@ -393,6 +399,41 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     }
 
     return matchingStreets;
+    */
+    
+    std::vector<StreetIdx> matchingStreetIds;
+    
+    //erase all blank spaces and change street_prefix into lowercase
+    street_prefix.erase(std::remove(street_prefix.begin(), street_prefix.end(), ' '), street_prefix.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
+    std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
+    
+    auto itLow = streetName_and_streetID.lower_bound(street_prefix);
+    auto itHigh = streetName_and_streetID.upper_bound(street_prefix);
+    /*
+    if (itLow == itHigh){
+        if ((street_prefix.compare(0, street_prefix.size(), itLow -> first)) == 0)
+            matchingStreetIds.push_back(itLow -> second);
+    }
+    */
+    /*
+    //following code referenced from https://www.geeksforgeeks.org/traverse-values-given-key-multimap/
+    while (itLow != itHigh){
+        if ((street_prefix.compare(0, street_prefix.size(), itLow -> first)) == 0)
+            matchingStreetIds.push_back(itLow -> second);
+        itLow++;
+    }
+    */
+    
+    while (itLow != streetName_and_streetID.end()){
+        std::string streetName = itLow -> first;
+        
+        if ((streetName.compare(0, street_prefix.size(), street_prefix)) == 0)
+            matchingStreetIds.push_back(itLow -> second);
+        itLow++;
+    }
+    
+    
+    return matchingStreetIds;
 }
 
 double findStreetLength(StreetIdx street_id) {

@@ -324,11 +324,11 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     
     auto itLow = streetName_and_streetID.lower_bound(street_prefix);
     
-    std::string streetName = itLow -> first;
+    //std::string streetName = itLow -> first;
     
     while (itLow != streetName_and_streetID.end() && ((itLow -> first).compare(0, street_prefix.size(), street_prefix)) == 0){
         
-        if (((itLow -> first).compare(0, street_prefix.size(), street_prefix)) == 0)
+        //if (((itLow -> first).compare(0, street_prefix.size(), street_prefix)) == 0)
             matchingStreetIds.push_back(itLow -> second);
         itLow++;
     }

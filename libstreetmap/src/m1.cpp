@@ -46,7 +46,7 @@
 std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
 std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;
 std::vector<std::vector<StreetIdx>> streetID_intersections;
-std::vector<double> street_segment_length_and_time;
+std::vector<double> street_segment_travelTime;
 std::multimap<std::string, StreetIdx> streetName_and_streetID;
 
 bool loadMap(std::string map_streets_database_filename) {
@@ -154,7 +154,7 @@ bool loadMap(std::string map_streets_database_filename) {
             delete[] segmentCurvePoints;
         }
         double speed = street_segment.speedLimit;
-        street_segment_length_and_time.push_back(totalStreetSegmentLength / speed);
+        street_segment_travelTime.push_back(totalStreetSegmentLength / speed);
     }
 
 
@@ -170,7 +170,7 @@ void closeMap() {
     std::vector<std::vector < StreetSegmentIdx >> ().swap(intersection_street_segments);
     std::vector<std::vector < StreetSegmentIdx >> ().swap(streetID_street_segments);
     std::vector<std::vector < StreetIdx >> ().swap(streetID_intersections);
-    std::vector<double>().swap(street_segment_length_and_time);
+    std::vector<double>().swap(street_segment_travelTime);
     std::multimap<std::string, StreetIdx> ().swap(streetName_and_streetID);
 
     closeStreetDatabase();
@@ -187,7 +187,7 @@ double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points) {
 
 double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
     //obtain time taken to travel the segment via the data structure created in loadMap
-    double segmentTravelTime = street_segment_length_and_time[street_segment_id];
+    double segmentTravelTime = street_segment_travelTime[street_segment_id];
     
     //obtain length by multiplying time with speed
     double segmentLength = segmentTravelTime * (getStreetSegmentInfo(street_segment_id).speedLimit);
@@ -197,7 +197,7 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
 
 double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id) {
     //obtain travel time via the precomputed vector
-    return street_segment_length_and_time[street_segment_id];
+    return street_segment_travelTime[street_segment_id];
 }
 
 int findClosestIntersection(LatLon my_position) {

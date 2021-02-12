@@ -323,9 +323,7 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
     
     auto itLow = streetName_and_streetID.lower_bound(street_prefix);
-    
-    //std::string streetName = itLow -> first;
-    
+        
     while (itLow != streetName_and_streetID.end() && ((itLow -> first).compare(0, street_prefix.size(), street_prefix)) == 0){
         
         //if (((itLow -> first).compare(0, street_prefix.size(), street_prefix)) == 0)

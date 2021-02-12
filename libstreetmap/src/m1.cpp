@@ -46,7 +46,6 @@
 std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
 std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;
 std::vector<std::vector<StreetIdx>> streetID_intersections;
-std::vector<std::string> simplifiedStreetNames;
 std::vector<double> street_segment_length_and_time;
 std::multimap<std::string, StreetIdx> streetName_and_streetID;
 
@@ -64,7 +63,7 @@ bool loadMap(std::string map_streets_database_filename) {
         return false;
     }
     
-    //initializing the MultiMap of simplified street names and their index
+    //create a MultiMap of simplified street names and their indexes
     for(int i = 0; i < getNumStreets(); i++){
         std::string streetName = getStreetName(i);
         
@@ -74,8 +73,7 @@ bool loadMap(std::string map_streets_database_filename) {
         streetName_and_streetID.insert(std::make_pair(streetName,i)); 
     }    
     
-    
-    
+    //create a 2D vector to store corresponding street segment IDs for each intersection 
     intersection_street_segments.resize(getNumIntersections());
 
     for (int intersection = 0; intersection < getNumIntersections(); ++intersection) {
@@ -85,6 +83,7 @@ bool loadMap(std::string map_streets_database_filename) {
         }
     }
 
+    //create a 2D vector to store corresponding street segment IDs for each street 
     streetID_street_segments.resize(getNumStreets());
 
     for (int i = 0; i < getNumStreetSegments(); i++) {
@@ -93,6 +92,7 @@ bool loadMap(std::string map_streets_database_filename) {
         streetID_street_segments[temp_street_id].push_back(i);
     }
 
+    //create a 2D vector to store corresponding intersection IDs for each street 
     streetID_intersections.resize(getNumStreets());
 
     for (int i = 0; i < getNumStreets(); i++) {
@@ -112,7 +112,9 @@ bool loadMap(std::string map_streets_database_filename) {
 
         std::copy(s.begin(), s.end(), streetID_intersections[i].begin());
     }
-
+    
+    
+    //create a vector to store the time taken to travel each street segment  
     for (int streetSegNum = 0; streetSegNum < getNumStreetSegments(); streetSegNum++) {
         double totalStreetSegmentLength = 0, firstSegmentLength = 0, lastSegmentLength = 0, curveSegmentLength = 0;
         StreetSegmentInfo street_segment = getStreetSegmentInfo(streetSegNum);
@@ -202,7 +204,7 @@ int findClosestIntersection(LatLon my_position) {
     int minDist, minIndex = 0;
 
     //loop through all intersections and find the distance from my position
-    //compare current index with previous index and update if closer
+    //compare current and previous distances and update if closer
     for (int i = 0; i < getNumIntersections(); i++) {
         std::pair <LatLon, LatLon> positionPair(getIntersectionPosition(i), my_position);
         double dist = findDistanceBetweenTwoPoints(positionPair);
@@ -225,16 +227,15 @@ std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx i
 std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersection_id) {
     //vector to store names of the streets
     std::vector<std::string> streetNames;
-
+    
     int ss_num = getNumIntersectionStreetSegment(intersection_id);
 
-    //loop through the street segment IDs and obtain its segment information
-    //find the street name using the streetID from the street segment and add to the vector created above
+    //loop through the street segment IDs attached to the intersection
     for (int i = 0; i < ss_num; i++) {
         int ss_id = intersection_street_segments[intersection_id][i];
-
+        
+        //find the street name using the segment info and add to the vector
         StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_id);
-
         std::string streetName = getStreetName(ss_info.streetID);
 
         streetNames.push_back(streetName);
@@ -287,6 +288,7 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
 }
 
 std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id) {
+    //return the corresponding intersections using streetID_intersections database
     return streetID_intersections[street_id];
 }
 
@@ -322,12 +324,12 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     street_prefix.erase(std::remove(street_prefix.begin(), street_prefix.end(), ' '), street_prefix.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
     std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
     
+    //find the first instance of the prefix 
     auto itLow = streetName_and_streetID.lower_bound(street_prefix);
-        
+    
+    //loop through the multi-map while prefix matches and push into vector 
     while (itLow != streetName_and_streetID.end() && ((itLow -> first).compare(0, street_prefix.size(), street_prefix)) == 0){
-        
-        //if (((itLow -> first).compare(0, street_prefix.size(), street_prefix)) == 0)
-            matchingStreetIds.push_back(itLow -> second);
+        matchingStreetIds.push_back(itLow -> second);
         itLow++;
     }
     

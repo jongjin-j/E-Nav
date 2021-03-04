@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 
+#include "m1.h"
 #include "m2.h"
 #include "ezgl/application.hpp"
 #include "ezgl/graphics.hpp"
@@ -14,9 +15,21 @@ struct intersection_data{
     std::string name;
 };
 
+float avg_lat;
+
 std::vector<intersection_data> intersections;
 
 void draw_main_canvas(ezgl::renderer *g);
+
+float x_from_lon(float lon){
+    float x = kEarthRadiusInMeters * kDegreeToRadian * cos(kDegreeToRadian * avg_lat) * (lon);
+    return x;
+}
+
+float y_from_lat(float lat){
+    float y = kEarthRadiusInMeters * kDegreeToRadian * (lat);
+    return y;
+}
 
 void drawMap(){
     ezgl::application::settings settings;
@@ -38,12 +51,14 @@ void drawMap(){
         
         max_lat = std::max(max_lat, intersections[i].position.latitude());
         min_lat = std::min(min_lat, intersections[i].position.latitude());
-        max_lon = std::max(max_lon, intersections[i].position.latitude());
-        min_lon = std::min(min_lon, intersections[i].position.latitude());
+        max_lon = std::max(max_lon, intersections[i].position.longitude());
+        min_lon = std::min(min_lon, intersections[i].position.longitude());
       
-    }
+    } 
     
-    ezgl::rectangle initial_world({min_lon, min_lat}, {max_lon, max_lat});
+    avg_lat = (min_lat + max_lat)/2;
+    
+    ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)}, {x_from_lon(max_lon), y_from_lat(max_lat)});
     application.add_canvas("MainCanvas", draw_main_canvas, initial_world);
     
     application.run(nullptr, nullptr, nullptr, nullptr);
@@ -53,11 +68,11 @@ void draw_main_canvas(ezgl::renderer *g){
     g->draw_rectangle({0, 0}, {1000, 1000});
     
     for(int i = 0; i < intersections.size(); i++){
-        float x = intersections[i].position.longitude();
-        float y = intersections[i].position.latitude();
+        float x = x_from_lon(intersections[i].position.longitude());
+        float y = y_from_lat(intersections[i].position.latitude());
         
-        float width = 0.001;
-        float height = 0.001;
+        float width = 100;
+        float height = width;
         
         g->fill_rectangle({x, y}, {x + width, y + height});
     }

@@ -29,8 +29,6 @@
 #include <cctype>
 #include <map>
 
-#define PI 3.14159265
-
 // loadMap will be called with the name of the file that stores the "layer-2"
 // map data accessed through StreetsDatabaseAPI: the street and intersection 
 // data that is higher-level than the raw OSM data). 
@@ -156,7 +154,7 @@ bool loadMap(std::string map_streets_database_filename) {
         double speed = street_segment.speedLimit;
         street_segment_travelTime.push_back(totalStreetSegmentLength / speed);
     }
-
+    
 
     load_successful = true; //Make sure this is updated to reflect whether
     //loading the map succeeded or failed

@@ -11,25 +11,16 @@
 #include "StreetsDatabaseAPI.h"
 
 struct intersection_data{
-    LatLon position;
     std::string name;
+    float x = 0;
+    float y = 0;
 };
 
-float avg_lat;
-
-std::vector<intersection_data> intersections;
+float avg_lat = 0;
 
 void draw_main_canvas(ezgl::renderer *g);
 
-float x_from_lon(float lon){
-    float x = kEarthRadiusInMeters * kDegreeToRadian * cos(kDegreeToRadian * avg_lat) * (lon);
-    return x;
-}
-
-float y_from_lat(float lat){
-    float y = kEarthRadiusInMeters * kDegreeToRadian * (lat);
-    return y;
-}
+std::vector<intersection_data> intersections;
 
 void drawMap(){
     ezgl::application::settings settings;
@@ -45,20 +36,26 @@ void drawMap(){
     double min_lon = max_lon;
     
     intersections.resize(getNumIntersections());
+    
     for(int i = 0; i < getNumIntersections(); i++){
-        intersections[i].position = getIntersectionPosition(i);
         intersections[i].name = getIntersectionName(i);
+        intersections[i].x = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * (getIntersectionPosition(i).longitude());
+        intersections[i].y = kEarthRadiusInMeters * kDegreeToRadian * (getIntersectionPosition(i).latitude());
         
-        max_lat = std::max(max_lat, intersections[i].position.latitude());
-        min_lat = std::min(min_lat, intersections[i].position.latitude());
-        max_lon = std::max(max_lon, intersections[i].position.longitude());
-        min_lon = std::min(min_lon, intersections[i].position.longitude());
-      
+        max_lat = std::max(max_lat, getIntersectionPosition(i).latitude());
+        min_lat = std::min(min_lat, getIntersectionPosition(i).latitude());
+        max_lon = std::max(max_lon, getIntersectionPosition(i).longitude());
+        min_lon = std::min(min_lon, getIntersectionPosition(i).longitude());
     } 
     
     avg_lat = (min_lat + max_lat)/2;
     
-    ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)}, {x_from_lon(max_lon), y_from_lat(max_lat)});
+    double minX = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * (min_lon);
+    double maxX = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * (max_lon);
+    double minY = kEarthRadiusInMeters * kDegreeToRadian * (min_lat);
+    double maxY = kEarthRadiusInMeters * kDegreeToRadian * (max_lat);
+ 
+    ezgl::rectangle initial_world({minX, minY}, {maxX, maxY});
     application.add_canvas("MainCanvas", draw_main_canvas, initial_world);
     
     application.run(nullptr, nullptr, nullptr, nullptr);
@@ -68,8 +65,8 @@ void draw_main_canvas(ezgl::renderer *g){
     g->draw_rectangle({0, 0}, {1000, 1000});
     
     for(int i = 0; i < intersections.size(); i++){
-        float x = x_from_lon(intersections[i].position.longitude());
-        float y = y_from_lat(intersections[i].position.latitude());
+        float x = intersections[i].x;
+        float y = intersections[i].y;
         
         float width = 100;
         float height = width;

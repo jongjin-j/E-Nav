@@ -12,11 +12,11 @@
 
 struct intersection_data{
     std::string name;
-    float x = 0;
-    float y = 0;
+    double x;
+    double y;
 };
 
-float avg_lat = 0;
+float avg_lat;
 
 void draw_main_canvas(ezgl::renderer *g);
 
@@ -50,10 +50,10 @@ void drawMap(){
     
     avg_lat = (min_lat + max_lat)/2;
     
-    double minX = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * (min_lon);
-    double maxX = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * (max_lon);
-    double minY = kEarthRadiusInMeters * kDegreeToRadian * (min_lat);
-    double maxY = kEarthRadiusInMeters * kDegreeToRadian * (max_lat);
+    double minX = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * min_lon;
+    double maxX = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * max_lon;
+    double minY = kEarthRadiusInMeters * kDegreeToRadian * min_lat;
+    double maxY = kEarthRadiusInMeters * kDegreeToRadian * max_lat;
  
     ezgl::rectangle initial_world({minX, minY}, {maxX, maxY});
     application.add_canvas("MainCanvas", draw_main_canvas, initial_world);

@@ -66,7 +66,17 @@ void draw_main_canvas(ezgl::renderer *g){
     }
     
     //drawing streets
+        for(int i = 0; i < getNumStreetSegments(); i++){
+        LatLon segStart = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).from).latitude(),getIntersectionPosition(getStreetSegmentInfo(i).from).longitude());
+        LatLon segFinal = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude(),getIntersectionPosition(getStreetSegmentInfo(i).to).longitude());
     
+        double startX = x_from_lon(segStart.longitude());
+        double startY = y_from_lat(segStart.latitude());
+        double finalX = x_from_lon(segFinal.longitude());
+        double finalY = y_from_lat(segFinal.latitude());
+          
+        g->draw_line({startX,startY}, {finalX,finalY});
+    }
     
     //drawing features
     

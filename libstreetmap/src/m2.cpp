@@ -79,7 +79,7 @@ void draw_main_canvas(ezgl::renderer *g){
     
     
     //drawing streets
-    g->set_color()
+    //g->set_color()
     for(int i = 0; i < getNumStreetSegments(); i++){
         
         //for each street segment, obtain its intersection IDs "from" and "to"

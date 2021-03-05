@@ -124,21 +124,21 @@ void draw_main_canvas(ezgl::renderer *g){
     
     for(int i = 0; i < POIs.size(); i++){
         ezgl::point2d center(POIs[i].x, POIs[i].y);
-        
-        //initial: length = 63525, height = 50014
-        //first zoom: length = 38115, height = 30009
-        //
-        
-        if(scope_length < 6400 && scope_height < 5200){
-            g->set_font_size(10);
+
+        if(scope_length < 385 && scope_height < 305){
+            g->set_font_size(20);
             g->draw_text(center, POIs[i].name);
         }
         
-        /*else if(1700 < scope_length < 2900 && 1500 < scope_height < 2300){
-            g->set_font_size(30);
+        else if(scope_length < 650 && scope_height < 505){
+            g->set_font_size(13);
             g->draw_text(center, POIs[i].name);
-        }*/
-          
+        }
+        
+        else if(scope_length < 1100 && scope_height < 850){
+            g->set_font_size(8);
+            g->draw_text(center, POIs[i].name);
+        } 
     }
     
     //make the search box for street intersections

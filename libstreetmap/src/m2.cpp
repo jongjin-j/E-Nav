@@ -118,25 +118,32 @@ void draw_main_canvas(ezgl::renderer *g){
     std::cout << scope_length << "  " << scope_height << std::endl;
     
     for(int i = 0; i < POIs.size(); i++){
-        ezgl::point2d center(POIs[i].x, POIs[i].y);
+        ezgl::point2d center(POIs[i].x, POIs[i].y + 7.5);
 
-        if(scope_length < 385 && scope_height < 305){
+        if(scope_length < 85 && scope_height < 70){
             g->set_color(ezgl::BLACK);
-            g->set_font_size(20);
+            g->set_font_size(16);
             g->draw_text(center, POIs[i].name);
         }
         
-        else if(scope_length < 650 && scope_height < 505){
+        else if(scope_length < 240 && scope_height < 185){
             g->set_color(ezgl::BLACK);
             g->set_font_size(13);
             g->draw_text(center, POIs[i].name);
         }
         
-        else if(scope_length < 1100 && scope_height < 850){
+        else if(scope_length < 385 && scope_height < 305){
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(10);
+            g->draw_text(center, POIs[i].name);
+        }
+        
+        else if(scope_length < 650 && scope_height < 505){
             g->set_color(ezgl::BLACK);
             g->set_font_size(8);
             g->draw_text(center, POIs[i].name);
-        } 
+        }
+        
     }
     
     //make the search box for street intersections

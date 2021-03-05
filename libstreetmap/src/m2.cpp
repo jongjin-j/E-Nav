@@ -142,28 +142,57 @@ void draw_main_canvas(ezgl::renderer *g){
     
     
     //drawing POIs
+    ezgl::rectangle scope = g->get_visible_world();
+    double scope_length = scope.m_second.x - scope.m_first.x;
+    double scope_height = scope.m_second.y - scope.m_first.y;
+    
     for(int i = 0; i < POIs.size(); i++){
-        float x = POIs[i].x;
-        float y = POIs[i].y;
-        
         //g->get_visible_world();
         
         float radius = 5;
         
         g->set_color(ezgl::BLUE);
         
-        ezgl::point2d center(x, y);
+        ezgl::point2d center(POIs[i].x, POIs[i].y);
         
         g->fill_elliptic_arc (center, radius, radius, 0, 360);
+        
+        ezgl::point2d center_point(POIs[i].x, POIs[i].y + 7.5);
+
+        if(scope_length < 85 && scope_height < 70){
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(16);
+            g->draw_text(center_point, POIs[i].name);
+        }
+        
+        else if(scope_length < 240 && scope_height < 185){
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(13);
+            g->draw_text(center_point, POIs[i].name);
+        }
+        
+        else if(scope_length < 385 && scope_height < 305){
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(10);
+            g->draw_text(center_point, POIs[i].name);
+        }
+        
+        else if(scope_length < 650 && scope_height < 505){
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(8);
+            g->draw_text(center_point, POIs[i].name);
+        }
     }
     
     
     //writing street intersection and POI names
+    /*
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;
     double scope_height = scope.m_second.y - scope.m_first.y;
+    */
     //std::cout << scope_length << "  " << scope_height << std::endl;
-    
+    /*
     for(int i = 0; i < POIs.size(); i++){
         ezgl::point2d center(POIs[i].x, POIs[i].y + 7.5);
 
@@ -201,7 +230,7 @@ void draw_main_canvas(ezgl::renderer *g){
         g->set_font_size(10);
         g->draw_text(centerPoint, streets[i].name);
     } 
-
+*/
     
     //make the search box for street intersections
     
@@ -270,19 +299,13 @@ void drawMap(){
         POIs[i].y = y_from_lat(getPOIPosition(i).latitude());
     }
     
-    streetSegments.resize(getNumStreetSegments());
-    
-    for(int i = 0; i < getNumStreetSegments(); i++){
-        StreetSegmentInfo temp_segment = getStreetSegmentInfo(i);
-        int temp_street_id = temp_segment.streetID;
-        streetSegments[temp_street_id].push_back(i);
-    }
+    //
     
     streets.resize(getNumStreets());
     
     for(int i = 0; i < getNumStreets(); i++){
-        int middle = streetSegments[i].size() / 2;
-        StreetSegmentInfo ss_info = getStreetSegmentInfo(streetSegments[i][middle]);
+        int middle = streetID_street_segments[i].size() / 2;
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(streetID_street_segments[i][3]);
             
         LatLon startPoint = LatLon(getIntersectionPosition(ss_info.from).latitude(),getIntersectionPosition(ss_info.from).longitude());
         LatLon endPoint = LatLon(getIntersectionPosition(ss_info.to).latitude(),getIntersectionPosition(ss_info.to).longitude());
@@ -311,9 +334,6 @@ void drawMap(){
         streets[i].name = getStreetName(ss_info.streetID);
     }
     
-    
-    
-     
     ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)}, {x_from_lon(max_lon), y_from_lat(max_lat)});
     application.add_canvas("MainCanvas", draw_main_canvas, initial_world);
     

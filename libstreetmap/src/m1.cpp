@@ -28,6 +28,7 @@
 #include <unordered_set>
 #include <cctype>
 #include <map>
+#include "globals.h"
 
 // loadMap will be called with the name of the file that stores the "layer-2"
 // map data accessed through StreetsDatabaseAPI: the street and intersection 

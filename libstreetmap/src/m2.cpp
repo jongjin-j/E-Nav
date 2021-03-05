@@ -76,6 +76,13 @@ void draw_main_canvas(ezgl::renderer *g){
         float height = width;
         
         if (intersections[id].highlight){
+            //print name of intersection
+            ezgl::point2d center_point(x,y+7.5);
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(13);
+            g->draw_text(center_point, intersections[id].name);
+            
+            //set color for intersection icon 
             g->set_color(ezgl::RED);
         }
         else{ 
@@ -83,6 +90,7 @@ void draw_main_canvas(ezgl::renderer *g){
         }
         
         g->fill_rectangle({x - width/2, y - height/2}, {x + width/2, y + height/2});
+        
     }
     
     //drawing streets
@@ -186,51 +194,18 @@ void draw_main_canvas(ezgl::renderer *g){
     
     
     //writing street intersection and POI names
-    /*
-    ezgl::rectangle scope = g->get_visible_world();
-    double scope_length = scope.m_second.x - scope.m_first.x;
-    double scope_height = scope.m_second.y - scope.m_first.y;
-    */
-    //std::cout << scope_length << "  " << scope_height << std::endl;
-    /*
-    for(int i = 0; i < POIs.size(); i++){
-        ezgl::point2d center(POIs[i].x, POIs[i].y + 7.5);
-
-        if(scope_length < 85 && scope_height < 70){
-            g->set_color(ezgl::BLACK);
-            g->set_font_size(16);
-            g->draw_text(center, POIs[i].name);
-        }
-        
-        else if(scope_length < 240 && scope_height < 185){
-            g->set_color(ezgl::BLACK);
-            g->set_font_size(13);
-            g->draw_text(center, POIs[i].name);
-        }
-        
-        else if(scope_length < 385 && scope_height < 305){
-            g->set_color(ezgl::BLACK);
-            g->set_font_size(10);
-            g->draw_text(center, POIs[i].name);
-        }
-        
-        else if(scope_length < 650 && scope_height < 505){
-            g->set_color(ezgl::BLACK);
-            g->set_font_size(8);
-            g->draw_text(center, POIs[i].name);
-        }
-        
-    }
     
     for(int i = 0; i < getNumStreets(); i++){
-        double midPointX = 0.5 * (streets[i].end_x + streets[i].start_x);
-        double midPointY = 0.5 * (streets[i].end_y + streets[i].start_y);
-        ezgl::point2d centerPoint (midPointX, midPointY);
-        g->set_text_rotation(streets[i].angle);
-        g->set_font_size(10);
-        g->draw_text(centerPoint, streets[i].name);
+        if (scope_length < 85 && scope_height < 70){
+            double midPointX = 0.5 * (streets[i].end_x + streets[i].start_x);
+            double midPointY = 0.5 * (streets[i].end_y + streets[i].start_y);
+            ezgl::point2d centerPoint (midPointX, midPointY);
+            g->set_text_rotation(streets[i].angle);
+            g->set_font_size(10);
+            g->draw_text(centerPoint, streets[i].name);
+        }
     } 
-*/
+
     
     //make the search box for street intersections
     
@@ -305,7 +280,7 @@ void drawMap(){
     
     for(int i = 0; i < getNumStreets(); i++){
         int middle = streetID_street_segments[i].size() / 2;
-        StreetSegmentInfo ss_info = getStreetSegmentInfo(streetID_street_segments[i][3]);
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(streetID_street_segments[i][middle]);
             
         LatLon startPoint = LatLon(getIntersectionPosition(ss_info.from).latitude(),getIntersectionPosition(ss_info.from).longitude());
         LatLon endPoint = LatLon(getIntersectionPosition(ss_info.to).latitude(),getIntersectionPosition(ss_info.to).longitude());

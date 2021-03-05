@@ -18,6 +18,12 @@ struct intersection_data{
     bool highlight = false;
 };
 
+struct POI_data{
+    std::string name;
+    double x = 0;
+    double y = 0;
+};
+
 float avg_lat;
 
 double x_from_lon(double lon){
@@ -41,6 +47,7 @@ double lat_from_y(double y){
 }
 
 std::vector<intersection_data> intersections;
+std::vector<POI_data> POIs;
 
 
 void draw_main_canvas(ezgl::renderer *g){
@@ -90,6 +97,25 @@ void draw_main_canvas(ezgl::renderer *g){
     
     
     //drawing POIs
+    for(int i = 0; i < POIs.size(); i++){
+        float x = POIs[i].x;
+        float y = POIs[i].y;
+        
+        //g->get_visible_world();
+        
+        float radius = 50;
+        
+        if(intersections[i].highlight){ 
+            g->set_color(ezgl::BLUE);
+        }
+        else{ 
+            g->set_color(ezgl::BLACK);
+        }
+        
+        ezgl::point2d center(x, y);
+        
+        g->fill_elliptic_arc (center, radius, radius, 0, 360);
+    }
     
     
     //writing street intersection and POI names
@@ -120,6 +146,7 @@ void drawMap(){
     
     ezgl::application application(settings);
     
+    //set intersections database
     double max_lat = getIntersectionPosition(0).latitude();
     double min_lat = max_lat;
     double max_lon = getIntersectionPosition(0).longitude();
@@ -145,7 +172,15 @@ void drawMap(){
         intersections[i].x = x_from_lon(getIntersectionPosition(i).longitude());
         intersections[i].y = y_from_lat(getIntersectionPosition(i).latitude());
     }
- 
+    
+    //set POI database
+    
+    for (int i = 0; i < getNumPointsOfInterest(); i++){
+        POIs[i].name = getPOIName(i);
+        POIs[i].x = x_from_lon(getPOIPosition(i).longitude());
+        POIs[i].y = y_from_lat(getPOIPosition(i).latitude());
+    }
+     
     ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)}, {x_from_lon(max_lon), y_from_lat(max_lat)});
     application.add_canvas("MainCanvas", draw_main_canvas, initial_world);
     

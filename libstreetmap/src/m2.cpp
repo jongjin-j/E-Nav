@@ -193,8 +193,8 @@ void draw_main_canvas(ezgl::renderer *g){
     }
     
     for(int i = 0; i < getNumStreets(); i++){
-        double midPointX = 0.5 * (streets[i].end_x - streets[i].start_x);
-        double midPointY = 0.5 * (streets[i].end_y - streets[i].start_y);
+        double midPointX = 0.5 * (streets[i].end_x + streets[i].start_x);
+        double midPointY = 0.5 * (streets[i].end_y + streets[i].start_y);
         ezgl::point2d centerPoint (midPointX, midPointY);
         g->set_text_rotation(streets[i].angle);
         g->set_font_size(10);
@@ -211,6 +211,7 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x,
     
     LatLon pos = LatLon(lat_from_y(y), lon_from_x(x));
     int id = findClosestIntersection(pos);
+    //std::vector<std::string> intersectingStreets = 
     
     std::cout << "Closest Intersection: "
               << intersections[id].name << "\n";
@@ -302,8 +303,7 @@ void drawMap(){
         }
             
         else{
-            double inclination = (endPointY - startPointY) / (endPointX - startPointX);
-            rotation = std::atan(inclination) / kDegreeToRadian;
+            rotation = std::atan2(endPointY - startPointY, endPointX - startPointX) / kDegreeToRadian;
         }
         
         streets[i].angle = rotation;

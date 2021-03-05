@@ -10,6 +10,7 @@
 #include "ezgl/graphics.hpp"
 #include "StreetsDatabaseAPI.h"
 #include "rectangle.hpp"
+#include <math.h>
 
 struct intersection_data{
     std::string name;
@@ -22,6 +23,13 @@ struct POI_data{
     std::string name;
     double x = 0;
     double y = 0;
+};
+
+struct street_data{
+    std::string name;
+    double x = 0;
+    double y = 0;
+    bool oneWay;
 };
 
 float avg_lat;
@@ -48,7 +56,8 @@ double lat_from_y(double y){
 
 std::vector<intersection_data> intersections;
 std::vector<POI_data> POIs;
-
+std::vector<std::vector<StreetSegmentIdx>> streetSegments;
+std::vector<street_data> streets;
 
 void draw_main_canvas(ezgl::renderer *g){
     g->draw_rectangle({0, 0}, {1000, 1000});
@@ -176,6 +185,30 @@ void draw_main_canvas(ezgl::renderer *g){
         
     }
     
+    for(int i = 0; i < getNumStreets(); i++){
+        //g->set_text_rotation();
+        for(auto it = streetSegments[i].begin(); it != streetSegments[i].end(); it++){
+            StreetSegmentInfo ss_info = getStreetSegmentInfo(*it);
+            
+            LatLon startPoint = LatLon(getIntersectionPosition(ss_info.from).latitude(),getIntersectionPosition(ss_info.from).longitude());
+            LatLon endPoint = LatLon(getIntersectionPosition(ss_info.to).latitude(),getIntersectionPosition(ss_info.to).longitude());
+
+            double startPointX = x_from_lon(startPoint.longitude());
+            double startPointY = y_from_lat(startPoint.latitude());
+            double endPointX = x_from_lon(endPoint.longitude());
+            double endPointY = y_from_lat(endPoint.latitude());
+            double centerPointX = 0.5 * (startPointX + endPointX);
+            double centerPointY = 0.5 * (startPointY + endPointY);
+            ezgl::point2d centerPoint(centerPointX, centerPointY);
+            
+            double angle = std::atan((endPointY - startPointY) / (endPointX - startPointX))/ kDegreeToRadian;
+            
+            g->set_text_rotation(angle);
+            g->set_font_size(10);
+            g->draw_text(centerPoint, getStreetName(ss_info.streetID));
+        }
+    }
+    
     //make the search box for street intersections
     
 }
@@ -240,6 +273,14 @@ void drawMap(){
         POIs[i].name = getPOIName(i);
         POIs[i].x = x_from_lon(getPOIPosition(i).longitude());
         POIs[i].y = y_from_lat(getPOIPosition(i).latitude());
+    }
+    
+    streetSegments.resize(getNumStreetSegments());
+    
+    for(int i = 0; i < getNumStreetSegments(); i++){
+        StreetSegmentInfo temp_segment = getStreetSegmentInfo(i);
+        int temp_street_id = temp_segment.streetID;
+        streetSegments[temp_street_id].push_back(i);
     }
      
     ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)}, {x_from_lon(max_lon), y_from_lat(max_lat)});

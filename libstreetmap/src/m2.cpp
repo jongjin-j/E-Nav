@@ -72,7 +72,11 @@ void draw_main_canvas(ezgl::renderer *g){
         g->fill_rectangle({x - width/2, y - height/2}, {x + width/2, y + height/2});
     }
     
-    g->get_visible_world();
+    ezgl::rectangle scope = g->get_visible_world();
+    double scope_length = scope.m_second.x - scope.m_first.x;
+    double scope_height = scope.m_second.y - scope.m_first.y;
+    
+    
     
     //drawing streets
     g->set_color()

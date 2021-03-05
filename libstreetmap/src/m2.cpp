@@ -132,7 +132,7 @@ void draw_main_canvas(ezgl::renderer *g){
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;
     double scope_height = scope.m_second.y - scope.m_first.y;
-    std::cout << scope_length << "  " << scope_height << std::endl;
+    //std::cout << scope_length << "  " << scope_height << std::endl;
     
     for(int i = 0; i < POIs.size(); i++){
         ezgl::point2d center(POIs[i].x, POIs[i].y + 7.5);

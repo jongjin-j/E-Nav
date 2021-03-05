@@ -185,8 +185,7 @@ void draw_main_canvas(ezgl::renderer *g){
         
     }
     
-    for(int i = 0; i < getNumStreets(); i++){
-        //g->set_text_rotation();
+    /*for(int i = 0; i < getNumStreets(); i++){
         for(auto it = streetSegments[i].begin(); it != streetSegments[i].end(); it++){
             StreetSegmentInfo ss_info = getStreetSegmentInfo(*it);
             
@@ -201,13 +200,23 @@ void draw_main_canvas(ezgl::renderer *g){
             double centerPointY = 0.5 * (startPointY + endPointY);
             ezgl::point2d centerPoint(centerPointX, centerPointY);
             
-            double angle = std::atan((endPointY - startPointY) / (endPointX - startPointX))/ kDegreeToRadian;
+            double angle = 0, inclination = 0;
+            
+            if(endPointX - startPointX == 0){
+                angle = 90;
+            }
+            
+            else{
+                inclination = (endPointY - startPointY) / (endPointX - startPointX); 
+            }
+            
+            angle = std::atan(inclination) / kDegreeToRadian;
             
             g->set_text_rotation(angle);
             g->set_font_size(10);
             g->draw_text(centerPoint, getStreetName(ss_info.streetID));
         }
-    }
+    }*/
     
     //make the search box for street intersections
     

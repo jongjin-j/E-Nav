@@ -65,6 +65,8 @@ void draw_main_canvas(ezgl::renderer *g){
         g->fill_rectangle({x - width/2, y - height/2}, {x + width/2, y + height/2});
     }
     
+    g->get_visible_world();
+    
     //drawing streets
         for(int i = 0; i < getNumStreetSegments(); i++){
         LatLon segStart = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).from).latitude(),getIntersectionPosition(getStreetSegmentInfo(i).from).longitude());

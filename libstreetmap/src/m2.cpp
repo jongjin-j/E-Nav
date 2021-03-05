@@ -103,12 +103,7 @@ void draw_main_canvas(ezgl::renderer *g){
         
         float radius = 50;
         
-        if(intersections[i].highlight){ 
-            g->set_color(ezgl::BLUE);
-        }
-        else{ 
-            g->set_color(ezgl::BLACK);
-        }
+        g->set_color(ezgl::BLUE);
         
         ezgl::point2d center(x, y);
         

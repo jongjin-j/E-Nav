@@ -281,7 +281,7 @@ void drawMap(){
     
     for(int i = 0; i < getNumStreets(); i++){
         int middle = streetSegments[i].size() / 2;
-        StreetSegmentInfo ss_info = getStreetSegmentInfo(middle);
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(streetSegments[i][middle]);
             
         LatLon startPoint = LatLon(getIntersectionPosition(ss_info.from).latitude(),getIntersectionPosition(ss_info.from).longitude());
         LatLon endPoint = LatLon(getIntersectionPosition(ss_info.to).latitude(),getIntersectionPosition(ss_info.to).longitude());

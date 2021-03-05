@@ -62,9 +62,26 @@ void draw_main_canvas(ezgl::renderer *g){
         g->fill_rectangle({x - width/2, y - height/2}, {x + width/2, y + height/2});
     }
     
-    for(int i = 0; i < getNumStreets(); i++){
+    g->set_line_width(20);
+    for(int i = 0; i < getNumStreetSegments(); i++){
         
+        g->draw_line(from, to);
     }
+    
+    //drawing streets
+    
+    
+    //drawing features
+    
+    
+    //drawing POIs
+    
+    
+    //writing street intersection and POI names
+    
+    
+    //make the search box for street intersections
+    
 }
 
 void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x, double y){

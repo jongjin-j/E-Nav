@@ -86,12 +86,29 @@ void draw_main_canvas(ezgl::renderer *g){
         double startingY = y_from_lat(startingSeg.latitude());
         double finalX = x_from_lon(endingSeg.longitude());
         double finalY = y_from_lat(endingSeg.latitude());
-      
         
         g->draw_line({startingX,startingY}, {finalX,finalY});
     }
     
     //drawing features
+    for(int i = 0; i < getNumFeatures(); i++){
+
+        //if it's a closed feature
+        if(getFeaturePoint(i,0) == getFeaturePoint(i, getNumFeaturePoints(i)-1)){
+            
+            /*featurePoints.resize(getNumFeaturePoints(i));
+             std::vector<ezgl::point2d> featurePoints;
+
+            
+            for(int j = 0; j < getNumFeaturePoints(i)-1; j++){
+                double xCoord = x_from_lon(getFeaturePoint(i,j).longitude());
+                double yCoord = y_from_lat(getFeaturePoint(i,j).latitude());
+                featurePoints.push_back({xCoord, yCoord});
+            }
+            g->fill_poly(featurePoints);*/
+     
+        }
+    }
     
     
     //drawing POIs

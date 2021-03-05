@@ -9,6 +9,7 @@
 #include "ezgl/application.hpp"
 #include "ezgl/graphics.hpp"
 #include "StreetsDatabaseAPI.h"
+#include "rectangle.hpp"
 
 struct intersection_data{
     std::string name;
@@ -49,6 +50,8 @@ void draw_main_canvas(ezgl::renderer *g){
         float x = intersections[i].x;
         float y = intersections[i].y;
         
+        //g->get_visible_world(); 
+        
         float width = 100;
         float height = width;
         
@@ -60,12 +63,6 @@ void draw_main_canvas(ezgl::renderer *g){
         }
         
         g->fill_rectangle({x - width/2, y - height/2}, {x + width/2, y + height/2});
-    }
-    
-    g->set_line_width(20);
-    for(int i = 0; i < getNumStreetSegments(); i++){
-        
-        g->draw_line(from, to);
     }
     
     //drawing streets

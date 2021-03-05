@@ -62,16 +62,16 @@ std::vector<street_data> streets;
 void draw_main_canvas(ezgl::renderer *g){
     g->draw_rectangle({0, 0}, {1000, 1000});
 
-    for(int i = 0; i < intersections.size(); i++){
-        float x = intersections[i].x;
-        float y = intersections[i].y;
+    for(int id = 0; id < intersections.size(); id++){
+        float x = intersections[id].x;
+        float y = intersections[id].y;
         
         //g->get_visible_world(); 
         
         float width = 10;
         float height = width;
         
-        if(intersections[i].highlight){ 
+        if (intersections[id].highlight){
             g->set_color(ezgl::RED);
         }
         else{ 

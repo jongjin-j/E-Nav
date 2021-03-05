@@ -59,7 +59,7 @@ void draw_main_canvas(ezgl::renderer *g){
         
         //g->get_visible_world(); 
         
-        float width = 100;
+        float width = 10;
         float height = width;
         
         if(intersections[i].highlight){ 
@@ -101,7 +101,7 @@ void draw_main_canvas(ezgl::renderer *g){
         
         //g->get_visible_world();
         
-        float radius = 50;
+        float radius = 5;
         
         g->set_color(ezgl::BLUE);
         
@@ -121,16 +121,19 @@ void draw_main_canvas(ezgl::renderer *g){
         ezgl::point2d center(POIs[i].x, POIs[i].y);
 
         if(scope_length < 385 && scope_height < 305){
+            g->set_color(ezgl::BLACK);
             g->set_font_size(20);
             g->draw_text(center, POIs[i].name);
         }
         
         else if(scope_length < 650 && scope_height < 505){
+            g->set_color(ezgl::BLACK);
             g->set_font_size(13);
             g->draw_text(center, POIs[i].name);
         }
         
         else if(scope_length < 1100 && scope_height < 850){
+            g->set_color(ezgl::BLACK);
             g->set_font_size(8);
             g->draw_text(center, POIs[i].name);
         } 

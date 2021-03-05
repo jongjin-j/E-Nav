@@ -20,17 +20,17 @@ struct intersection_data{
 float avg_lat;
 
 double x_from_lon(double lon){
-    double x = lon * kEarthRadiusInMeters * kDegreeToRadian * std::cos(avg_lat);
+    double x = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * (lon);
     return x;
 }
 
 double y_from_lat(double lat){
-    double y = lat * kEarthRadiusInMeters * kDegreeToRadian;
+    double y = kEarthRadiusInMeters * kDegreeToRadian * lat;
     return y;
 }
 
 double lon_from_x(double x){
-    double lon = x/(kEarthRadiusInMeters * kDegreeToRadian * std::cos(avg_lat));
+    double lon = x/(kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat));
     return lon;
 }
 
@@ -91,7 +91,7 @@ void drawMap(){
     
     intersections.resize(getNumIntersections());
     
-    //find the max and min lat, lon
+    //set name in database and find the max and min lat, lon
     for(int i = 0; i < getNumIntersections(); i++){
         intersections[i].name = getIntersectionName(i);
         
@@ -106,17 +106,11 @@ void drawMap(){
     
     //change intersection points to cartesian coordinates
     for(int i = 0; i < getNumIntersections(); i++){
-        intersections[i].name = getIntersectionName(i);
-        intersections[i].x = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * (getIntersectionPosition(i).longitude());
-        intersections[i].y = kEarthRadiusInMeters * kDegreeToRadian * (getIntersectionPosition(i).latitude());
+        intersections[i].x = x_from_lon(getIntersectionPosition(i).longitude());
+        intersections[i].y = y_from_lat(getIntersectionPosition(i).latitude());
     }
-    
-    double minX = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * min_lon;
-    double maxX = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * max_lon;
-    double minY = kEarthRadiusInMeters * kDegreeToRadian * min_lat;
-    double maxY = kEarthRadiusInMeters * kDegreeToRadian * max_lat;
  
-    ezgl::rectangle initial_world({minX, minY}, {maxX, maxY});
+    ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)}, {x_from_lon(max_lon), y_from_lat(max_lat)});
     application.add_canvas("MainCanvas", draw_main_canvas, initial_world);
     
     application.run(nullptr, act_on_mouse_click, nullptr, nullptr);

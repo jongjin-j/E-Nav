@@ -151,7 +151,12 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x,
     
     std::cout << "Closest Intersection: "
               << intersections[id].name << "\n";
-    intersections[id].highlight = true;
+    
+    if (intersections[id].highlight == true)
+        intersections[id].highlight = false;
+    else
+        intersections[id].highlight = true;
+    
     
     app -> refresh_drawing();
 }

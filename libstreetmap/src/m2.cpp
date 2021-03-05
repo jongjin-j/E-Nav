@@ -68,16 +68,22 @@ void draw_main_canvas(ezgl::renderer *g){
     g->get_visible_world();
     
     //drawing streets
-        for(int i = 0; i < getNumStreetSegments(); i++){
-        LatLon segStart = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).from).latitude(),getIntersectionPosition(getStreetSegmentInfo(i).from).longitude());
-        LatLon segFinal = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude(),getIntersectionPosition(getStreetSegmentInfo(i).to).longitude());
-    
-        double startX = x_from_lon(segStart.longitude());
-        double startY = y_from_lat(segStart.latitude());
-        double finalX = x_from_lon(segFinal.longitude());
-        double finalY = y_from_lat(segFinal.latitude());
-          
-        g->draw_line({startX,startY}, {finalX,finalY});
+    g->set_color()
+    for(int i = 0; i < getNumStreetSegments(); i++){
+        
+        //for each street segment, obtain its intersection IDs "from" and "to"
+        //obtain each intersection ID's position via calling getIntersectionPosition (type LatLon)
+        LatLon startingSeg = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).from).latitude(),getIntersectionPosition(getStreetSegmentInfo(i).from).longitude());
+        LatLon endingSeg = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude(),getIntersectionPosition(getStreetSegmentInfo(i).to).longitude());
+        
+        //convert LatLon into Cartesian coord and draw line for each segment
+        double startingX = x_from_lon(startingSeg.longitude());
+        double startingY = y_from_lat(startingSeg.latitude());
+        double finalX = x_from_lon(endingSeg.longitude());
+        double finalY = y_from_lat(endingSeg.latitude());
+      
+        
+        g->draw_line({startingX,startingY}, {finalX,finalY});
     }
     
     //drawing features

@@ -27,7 +27,10 @@ struct POI_data{
 
 struct street_data{
     std::string name;
-    ezgl::point2d point;
+    double start_x = 0;
+    double start_y = 0;
+    double end_x = 0;
+    double end_y = 0;
     double angle = 0;
     bool oneWay;
 };
@@ -189,11 +192,14 @@ void draw_main_canvas(ezgl::renderer *g){
         
     }
     
-    /*for(int i = 0; i < getNumStreets(); i++){
+    for(int i = 0; i < getNumStreets(); i++){
+        double midPointX = 0.5 * (streets[i].end_x - streets[i].start_x);
+        double midPointY = 0.5 * (streets[i].end_y - streets[i].start_y);
+        ezgl::point2d centerPoint (midPointX, midPointY);
         g->set_text_rotation(streets[i].angle);
         g->set_font_size(10);
-        g->draw_text(streets[i].point, streets[i].name);
-    } */
+        g->draw_text(centerPoint, streets[i].name);
+    } 
 
     
     //make the search box for street intersections
@@ -270,6 +276,8 @@ void drawMap(){
         streetSegments[temp_street_id].push_back(i);
     }
     
+    streets.resize(getNumStreets());
+    
     for(int i = 0; i < getNumStreets(); i++){
         int middle = streetSegments[i].size() / 2;
         StreetSegmentInfo ss_info = getStreetSegmentInfo(middle);
@@ -281,11 +289,11 @@ void drawMap(){
         double startPointY = y_from_lat(startPoint.latitude());
         double endPointX = x_from_lon(endPoint.longitude());
         double endPointY = y_from_lat(endPoint.latitude());
-        double centerPointX = 0.5 * (startPointX + endPointX);
-        double centerPointY = 0.5 * (startPointY + endPointY);
-        ezgl::point2d centerPoint(centerPointX, centerPointY);
         
-        streets[i].point = centerPoint;
+        streets[i].start_x = startPointX;
+        streets[i].end_x = startPointY;
+        streets[i].start_y = endPointX;
+        streets[i].end_y = endPointY;
             
         double rotation = 0;
             

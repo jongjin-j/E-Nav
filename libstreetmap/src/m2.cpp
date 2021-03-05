@@ -72,12 +72,6 @@ void draw_main_canvas(ezgl::renderer *g){
         g->fill_rectangle({x - width/2, y - height/2}, {x + width/2, y + height/2});
     }
     
-    ezgl::rectangle scope = g->get_visible_world();
-    double scope_length = scope.m_second.x - scope.m_first.x;
-    double scope_height = scope.m_second.y - scope.m_first.y;
-    
-    
-    
     //drawing streets
     //g->set_color()
     for(int i = 0; i < getNumStreetSegments(); i++){
@@ -123,7 +117,29 @@ void draw_main_canvas(ezgl::renderer *g){
     
     
     //writing street intersection and POI names
+    ezgl::rectangle scope = g->get_visible_world();
+    double scope_length = scope.m_second.x - scope.m_first.x;
+    double scope_height = scope.m_second.y - scope.m_first.y;
+    std::cout << scope_length << "  " << scope_height << std::endl;
     
+    for(int i = 0; i < POIs.size(); i++){
+        ezgl::point2d center(POIs[i].x, POIs[i].y);
+        
+        //initial: length = 63525, height = 50014
+        //first zoom: length = 38115, height = 30009
+        //
+        
+        if(scope_length < 6400 && scope_height < 5200){
+            g->set_font_size(10);
+            g->draw_text(center, POIs[i].name);
+        }
+        
+        /*else if(1700 < scope_length < 2900 && 1500 < scope_height < 2300){
+            g->set_font_size(30);
+            g->draw_text(center, POIs[i].name);
+        }*/
+          
+    }
     
     //make the search box for street intersections
     

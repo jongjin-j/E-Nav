@@ -220,6 +220,20 @@ void draw_main_canvas(ezgl::renderer *g){
             g->set_text_rotation(angle);
             g->set_font_size(10);
             g->draw_text(centerPoint, getStreetName(ss_info.streetID));
+            
+                        double angle = 0;
+            
+            /*if(abs(endPointX)-abs(startPointX) == 0){
+                g->set_text_rotation(90);
+            }
+            else{
+               angle = std::atan((endPointY - startPointY) / (endPointX - startPointX))/ kDegreeToRadian;
+
+            }
+            
+            g->set_text_rotation(angle);
+            g->set_font_size(1);
+            g->draw_text(centerPoint, getStreetName(ss_info.streetID));*/
         }
     }
     

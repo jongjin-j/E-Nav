@@ -96,17 +96,30 @@ void draw_main_canvas(ezgl::renderer *g){
         //if it's a closed feature
         if(getFeaturePoint(i,0) == getFeaturePoint(i, getNumFeaturePoints(i)-1)){
             
-            /*featurePoints.resize(getNumFeaturePoints(i));
-             std::vector<ezgl::point2d> featurePoints;
+            std::vector<ezgl::point2d> featurePoints;
+            //featurePoints.resize(getNumFeaturePoints(i));
 
             
-            for(int j = 0; j < getNumFeaturePoints(i)-1; j++){
+            /*for(int j = 0; j < getNumFeaturePoints(i); j++){
                 double xCoord = x_from_lon(getFeaturePoint(i,j).longitude());
                 double yCoord = y_from_lat(getFeaturePoint(i,j).latitude());
-                featurePoints.push_back({xCoord, yCoord});
+                featurePoints.push_back({xCoord,yCoord});
             }
             g->fill_poly(featurePoints);*/
      
+        }
+        else{
+            //not a closed feature
+            //draw with open lines
+            for(int j = 0; j < getNumFeaturePoints(i); j++){
+                      
+                double xCoord = x_from_lon(getFeaturePoint(i,j).longitude());
+                double yCoord = y_from_lat(getFeaturePoint(i,j).latitude());
+                                   
+                g->set_color(ezgl::RED);
+                g->draw_line({xCoord,yCoord},{x_from_lon(getFeaturePoint(i,j).longitude()),y_from_lat(getFeaturePoint(i,j).latitude())});
+            }
+
         }
     }
     

@@ -12,15 +12,69 @@
 
 struct intersection_data{
     std::string name;
-    double x;
-    double y;
+    double x = 0;
+    double y = 0;
+    bool highlight = false;
 };
 
 float avg_lat;
 
-void draw_main_canvas(ezgl::renderer *g);
+double x_from_lon(double lon){
+    double x = lon * kEarthRadiusInMeters * kDegreeToRadian * std::cos(avg_lat);
+    return x;
+}
+
+double y_from_lat(double lat){
+    double y = lat * kEarthRadiusInMeters * kDegreeToRadian;
+    return y;
+}
+
+double lon_from_x(double x){
+    double lon = x/(kEarthRadiusInMeters * kDegreeToRadian * std::cos(avg_lat));
+    return lon;
+}
+
+double lat_from_y(double y){
+    double lat = y/(kEarthRadiusInMeters * kDegreeToRadian);
+    return lat;
+}
 
 std::vector<intersection_data> intersections;
+
+
+void draw_main_canvas(ezgl::renderer *g){
+    g->draw_rectangle({0, 0}, {1000, 1000});
+    
+    for(int i = 0; i < intersections.size(); i++){
+        float x = intersections[i].x;
+        float y = intersections[i].y;
+        
+        float width = 100;
+        float height = width;
+        
+        if(intersections[i].highlight){ 
+            g->set_color(ezgl::RED);
+        }
+        else{ 
+            g->set_color(ezgl::GREY_55);
+        }
+        
+        g->fill_rectangle({x - width/2, y - height/2}, {x + width/2, y + height/2});
+    }
+}
+
+void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x, double y){
+    std::cout << "Mouse clicked at (" << x << "," << y << ")\n";
+    
+    LatLon pos = LatLon(lat_from_y(y), lon_from_x(x));
+    int id = findClosestIntersection(pos);
+    
+    std::cout << "Closest Intersection: "
+              << intersections[id].name << "\n";
+    intersections[id].highlight = true;
+    
+    app -> refresh_drawing();
+}
 
 void drawMap(){
     ezgl::application::settings settings;
@@ -37,10 +91,9 @@ void drawMap(){
     
     intersections.resize(getNumIntersections());
     
+    //find the max and min lat, lon
     for(int i = 0; i < getNumIntersections(); i++){
         intersections[i].name = getIntersectionName(i);
-        intersections[i].x = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * (getIntersectionPosition(i).longitude());
-        intersections[i].y = kEarthRadiusInMeters * kDegreeToRadian * (getIntersectionPosition(i).latitude());
         
         max_lat = std::max(max_lat, getIntersectionPosition(i).latitude());
         min_lat = std::min(min_lat, getIntersectionPosition(i).latitude());
@@ -48,7 +101,15 @@ void drawMap(){
         min_lon = std::min(min_lon, getIntersectionPosition(i).longitude());
     } 
     
+    //average lat for cartesian transformation
     avg_lat = (min_lat + max_lat)/2;
+    
+    //change intersection points to cartesian coordinates
+    for(int i = 0; i < getNumIntersections(); i++){
+        intersections[i].name = getIntersectionName(i);
+        intersections[i].x = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * (getIntersectionPosition(i).longitude());
+        intersections[i].y = kEarthRadiusInMeters * kDegreeToRadian * (getIntersectionPosition(i).latitude());
+    }
     
     double minX = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * min_lon;
     double maxX = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * max_lon;
@@ -58,19 +119,6 @@ void drawMap(){
     ezgl::rectangle initial_world({minX, minY}, {maxX, maxY});
     application.add_canvas("MainCanvas", draw_main_canvas, initial_world);
     
-    application.run(nullptr, nullptr, nullptr, nullptr);
+    application.run(nullptr, act_on_mouse_click, nullptr, nullptr);
 }
 
-void draw_main_canvas(ezgl::renderer *g){
-    g->draw_rectangle({0, 0}, {1000, 1000});
-    
-    for(int i = 0; i < intersections.size(); i++){
-        float x = intersections[i].x;
-        float y = intersections[i].y;
-        
-        float width = 100;
-        float height = width;
-        
-        g->fill_rectangle({x, y}, {x + width, y + height});
-    }
-}

@@ -178,6 +178,7 @@ void drawMap(){
     }
     
     //set POI database
+    POIs.resize(getNumPointsOfInterest());
     
     for (int i = 0; i < getNumPointsOfInterest(); i++){
         POIs[i].name = getPOIName(i);

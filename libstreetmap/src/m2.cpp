@@ -11,6 +11,7 @@
 #include "StreetsDatabaseAPI.h"
 #include "rectangle.hpp"
 #include <math.h>
+#include "globals.h"
 
 struct intersection_data{
     std::string name;

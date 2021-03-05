@@ -33,6 +33,8 @@ struct street_data{
     double end_x = 0;
     double end_y = 0;
     double angle = 0;
+    double mid_x = 0;
+    double mid_y = 0;
     bool oneWay;
 };
 
@@ -93,22 +95,21 @@ void draw_main_canvas(ezgl::renderer *g){
         
     }
     
+    ezgl::rectangle scope = g->get_visible_world();
+    double scope_length = scope.m_second.x - scope.m_first.x;
+    double scope_height = scope.m_second.y - scope.m_first.y;
+    
     //drawing streets
     //g->set_color()
     for(int i = 0; i < getNumStreetSegments(); i++){
+        g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
         
-        //for each street segment, obtain its intersection IDs "from" and "to"
-        //obtain each intersection ID's position via calling getIntersectionPosition (type LatLon)
-        LatLon startingSeg = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).from).latitude(),getIntersectionPosition(getStreetSegmentInfo(i).from).longitude());
-        LatLon endingSeg = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude(),getIntersectionPosition(getStreetSegmentInfo(i).to).longitude());
-        
-        //convert LatLon into Cartesian coord and draw line for each segment
-        double startingX = x_from_lon(startingSeg.longitude());
-        double startingY = y_from_lat(startingSeg.latitude());
-        double finalX = x_from_lon(endingSeg.longitude());
-        double finalY = y_from_lat(endingSeg.latitude());
-        
-        g->draw_line({startingX,startingY}, {finalX,finalY});
+        if (scope_length < 500 && scope_height < 400){
+            ezgl::point2d centerPoint (streets[i].mid_x, streets[i].mid_y);
+            g->set_text_rotation(streets[i].angle);
+            g->set_font_size(20);
+            g->draw_text(centerPoint, streets[i].name);
+        }
     }
     
     //drawing features
@@ -150,9 +151,6 @@ void draw_main_canvas(ezgl::renderer *g){
     
     
     //drawing POIs
-    ezgl::rectangle scope = g->get_visible_world();
-    double scope_length = scope.m_second.x - scope.m_first.x;
-    double scope_height = scope.m_second.y - scope.m_first.y;
     
     for(int i = 0; i < POIs.size(); i++){
         //g->get_visible_world();
@@ -160,6 +158,7 @@ void draw_main_canvas(ezgl::renderer *g){
         float radius = 5;
         
         g->set_color(ezgl::BLUE);
+        g->set_text_rotation(0);
         
         ezgl::point2d center(POIs[i].x, POIs[i].y);
         
@@ -195,7 +194,7 @@ void draw_main_canvas(ezgl::renderer *g){
     
     //writing street intersection and POI names
     
-    for(int i = 0; i < getNumStreets(); i++){
+    /*for(int i = 0; i < getNumStreets(); i++){
         if (scope_length < 85 && scope_height < 70){
             double midPointX = 0.5 * (streets[i].end_x + streets[i].start_x);
             double midPointY = 0.5 * (streets[i].end_y + streets[i].start_y);
@@ -204,7 +203,7 @@ void draw_main_canvas(ezgl::renderer *g){
             g->set_font_size(10);
             g->draw_text(centerPoint, streets[i].name);
         }
-    } 
+    } */
 
     
     //make the search box for street intersections
@@ -275,38 +274,35 @@ void drawMap(){
     }
     
     //
+    streets.resize(getNumStreetSegments());
     
-    streets.resize(getNumStreets());
-    
-    for(int i = 0; i < getNumStreets(); i++){
-        int middle = streetID_street_segments[i].size() / 2;
-        StreetSegmentInfo ss_info = getStreetSegmentInfo(streetID_street_segments[i][middle]);
-            
-        LatLon startPoint = LatLon(getIntersectionPosition(ss_info.from).latitude(),getIntersectionPosition(ss_info.from).longitude());
-        LatLon endPoint = LatLon(getIntersectionPosition(ss_info.to).latitude(),getIntersectionPosition(ss_info.to).longitude());
-
-        double startPointX = x_from_lon(startPoint.longitude());
-        double startPointY = y_from_lat(startPoint.latitude());
-        double endPointX = x_from_lon(endPoint.longitude());
-        double endPointY = y_from_lat(endPoint.latitude());
+    for(int i = 0; i < getNumStreetSegments(); i++){
         
-        streets[i].start_x = startPointX;
-        streets[i].end_x = startPointY;
-        streets[i].start_y = endPointX;
-        streets[i].end_y = endPointY;
-            
+        //for each street segment, obtain its intersection IDs "from" and "to"
+        //obtain each intersection ID's position via calling getIntersectionPosition (type LatLon)
+        LatLon startingSeg = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).from).latitude(),getIntersectionPosition(getStreetSegmentInfo(i).from).longitude());
+        LatLon endingSeg = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude(),getIntersectionPosition(getStreetSegmentInfo(i).to).longitude());
+        
+        //convert LatLon into Cartesian coord and draw line for each segment
+        streets[i].start_x = x_from_lon(startingSeg.longitude());
+        streets[i].start_y = y_from_lat(startingSeg.latitude());
+        streets[i].end_x = x_from_lon(endingSeg.longitude());
+        streets[i].end_y = y_from_lat(endingSeg.latitude());
+        streets[i].mid_x = 0.5 * (streets[i].start_x + streets[i].end_x);
+        streets[i].mid_y = 0.5 * (streets[i].start_y + streets[i].end_y);
+
         double rotation = 0;
             
-        if(endPointX == startPointX){
+        if(streets[i].end_x == streets[i].start_x){
             rotation = 90;
         }
             
         else{
-            rotation = std::atan2(endPointY - startPointY, endPointX - startPointX) / kDegreeToRadian;
+            rotation = std::atan(abs((streets[i].end_y - streets[i].start_y) / (streets[i].end_x - streets[i].start_x))) / kDegreeToRadian;
         }
         
         streets[i].angle = rotation;
-        streets[i].name = getStreetName(ss_info.streetID);
+        streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
     }
     
     ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)}, {x_from_lon(max_lon), y_from_lat(max_lat)});

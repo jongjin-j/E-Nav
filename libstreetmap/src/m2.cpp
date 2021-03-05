@@ -27,8 +27,8 @@ struct POI_data{
 
 struct street_data{
     std::string name;
-    double x = 0;
-    double y = 0;
+    ezgl::point2d point;
+    double angle = 0;
     bool oneWay;
 };
 
@@ -189,53 +189,12 @@ void draw_main_canvas(ezgl::renderer *g){
         
     }
     
-    for(int i = 0; i < getNumStreets(); i++){
-        for(auto it = streetSegments[i].begin(); it != streetSegments[i].end(); it++){
-            StreetSegmentInfo ss_info = getStreetSegmentInfo(*it);
-            
-            LatLon startPoint = LatLon(getIntersectionPosition(ss_info.from).latitude(),getIntersectionPosition(ss_info.from).longitude());
-            LatLon endPoint = LatLon(getIntersectionPosition(ss_info.to).latitude(),getIntersectionPosition(ss_info.to).longitude());
+    /*for(int i = 0; i < getNumStreets(); i++){
+        g->set_text_rotation(streets[i].angle);
+        g->set_font_size(10);
+        g->draw_text(streets[i].point, streets[i].name);
+    } */
 
-            double startPointX = x_from_lon(startPoint.longitude());
-            double startPointY = y_from_lat(startPoint.latitude());
-            double endPointX = x_from_lon(endPoint.longitude());
-            double endPointY = y_from_lat(endPoint.latitude());
-            double centerPointX = 0.5 * (startPointX + endPointX);
-            double centerPointY = 0.5 * (startPointY + endPointY);
-            ezgl::point2d centerPoint(centerPointX, centerPointY);
-            
-            double angle = 0, inclination = 0;
-            
-            if(endPointX - startPointX == 0){
-                angle = 90;
-            }
-            
-            else{
-                inclination = (endPointY - startPointY) / (endPointX - startPointX);
-                angle = std::atan(inclination) / kDegreeToRadian;
-            }
-            
-            std::cout << angle << std::endl;
-
-            g->set_text_rotation(angle);
-            g->set_font_size(10);
-            g->draw_text(centerPoint, getStreetName(ss_info.streetID));
-            
-                        double angle = 0;
-            
-            /*if(abs(endPointX)-abs(startPointX) == 0){
-                g->set_text_rotation(90);
-            }
-            else{
-               angle = std::atan((endPointY - startPointY) / (endPointX - startPointX))/ kDegreeToRadian;
-
-            }
-            
-            g->set_text_rotation(angle);
-            g->set_font_size(1);
-            g->draw_text(centerPoint, getStreetName(ss_info.streetID));*/
-        }
-    }
     
     //make the search box for street intersections
     
@@ -309,6 +268,38 @@ void drawMap(){
         StreetSegmentInfo temp_segment = getStreetSegmentInfo(i);
         int temp_street_id = temp_segment.streetID;
         streetSegments[temp_street_id].push_back(i);
+    }
+    
+    for(int i = 0; i < getNumStreets(); i++){
+        int middle = streetSegments[i].size() / 2;
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(middle);
+            
+        LatLon startPoint = LatLon(getIntersectionPosition(ss_info.from).latitude(),getIntersectionPosition(ss_info.from).longitude());
+        LatLon endPoint = LatLon(getIntersectionPosition(ss_info.to).latitude(),getIntersectionPosition(ss_info.to).longitude());
+
+        double startPointX = x_from_lon(startPoint.longitude());
+        double startPointY = y_from_lat(startPoint.latitude());
+        double endPointX = x_from_lon(endPoint.longitude());
+        double endPointY = y_from_lat(endPoint.latitude());
+        double centerPointX = 0.5 * (startPointX + endPointX);
+        double centerPointY = 0.5 * (startPointY + endPointY);
+        ezgl::point2d centerPoint(centerPointX, centerPointY);
+        
+        streets[i].point = centerPoint;
+            
+        double rotation = 0;
+            
+        if(endPointX == startPointX){
+            rotation = 90;
+        }
+            
+        else{
+            double inclination = (endPointY - startPointY) / (endPointX - startPointX);
+            rotation = std::atan(inclination) / kDegreeToRadian;
+        }
+        
+        streets[i].angle = rotation;
+        streets[i].name = getStreetName(ss_info.streetID);
     }
      
     ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)}, {x_from_lon(max_lon), y_from_lat(max_lat)});

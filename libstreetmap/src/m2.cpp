@@ -125,7 +125,11 @@ void draw_main_canvas(ezgl::renderer *g){
                 double xCoord = x_from_lon(getFeaturePoint(i,j).longitude());
                 double yCoord = y_from_lat(getFeaturePoint(i,j).latitude());
                                    
-                g->set_color(ezgl::RED);
+                //choose colour depending on feature type
+                /*g->set_color(ezgl::RED);
+                
+                if(getFeatureType)*/
+                
                 g->draw_line({xCoord,yCoord},{x_from_lon(getFeaturePoint(i,j).longitude()),y_from_lat(getFeaturePoint(i,j).latitude())});
             }
 

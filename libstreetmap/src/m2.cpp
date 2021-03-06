@@ -9,6 +9,7 @@
 #include "ezgl/application.hpp"
 #include "ezgl/graphics.hpp"
 #include "StreetsDatabaseAPI.h"
+#include "OSMDatabaseAPI.h"
 #include "rectangle.hpp"
 #include <math.h>
 #include "globals.h"
@@ -36,6 +37,7 @@ struct street_data{
     double mid_x = 0;
     double mid_y = 0;
     bool oneWay;
+    std::string type;
 };
 
 float avg_lat;
@@ -304,6 +306,28 @@ void drawMap(){
         }
         
         streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
+        
+        //setting the types of street segments
+        for (int ss_num = 0; ss_num < getNumStreetSegments(); ss_num++){
+            StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_num);
+            
+            for (int j = 0; j < getNumberOfWays(); j++){
+		const OSMWay* e = getWayByIndex(j);
+                
+		if (ss_info.wayOSMID == e -> id()){
+                    int k = 1;
+                    std::string key, value;
+                    std::tie(key, value) = getTagPair(e, 0);
+
+                    while (key != "highway"){
+			std::tie(key,value) = getTagPair(e, k);
+			k++;
+                    }
+                    
+                    streets[ss_num].type = value;
+		}
+            }
+        } 
     }
     
     ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)}, {x_from_lon(max_lon), y_from_lat(max_lat)});

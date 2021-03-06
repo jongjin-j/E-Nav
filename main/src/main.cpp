@@ -23,6 +23,7 @@
 
 #include "m1.h"
 #include "m2.h"
+#include "OSMDatabaseAPI.h"
 
 //Program exit codes
 constexpr int SUCCESS_EXIT_CODE = 0;        //Everyting went OK
@@ -31,6 +32,7 @@ constexpr int BAD_ARGUMENTS_EXIT_CODE = 2;  //Invalid command-line usage
 
 //The default map to load if none is specified
 std::string default_map_path = "/cad2/ece297s/public/maps/toronto_canada.streets.bin";
+std::string map_name = "/cad2/ece297s/public/maps/toronto_canada.osm.bin";
 
 
 // The start routine of your program (main) when you are running your standalone
@@ -57,6 +59,7 @@ int main(int argc, char** argv) {
 
     //Load the map and related data structures
     bool load_success = loadMap(map_path);
+    loadOSMDatabaseBIN(map_name);
     if(!load_success) {
         std::cerr << "Failed to load map '" << map_path << "'\n";
         return ERROR_EXIT_CODE;
@@ -72,6 +75,7 @@ int main(int argc, char** argv) {
     
     drawMap();
     closeMap(); 
+    closeOSMDatabase();
 
     return SUCCESS_EXIT_CODE;
 }

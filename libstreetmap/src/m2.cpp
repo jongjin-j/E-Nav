@@ -67,6 +67,10 @@ std::vector<street_data> streets;
 
 void draw_main_canvas(ezgl::renderer *g){
     g->draw_rectangle({0, 0}, {1000, 1000});
+    
+    ezgl::rectangle scope = g->get_visible_world();
+    double scope_length = scope.m_second.x - scope.m_first.x;
+    double scope_height = scope.m_second.y - scope.m_first.y;
 
     for(int id = 0; id < intersections.size(); id++){
         float x = intersections[id].x;
@@ -77,12 +81,13 @@ void draw_main_canvas(ezgl::renderer *g){
         float width = 10;
         float height = width;
         
-        if (intersections[id].highlight){
+        if (intersections[id].highlight && scope_length < 800){
             //print name of intersection
             ezgl::point2d center_point(x,y+7.5);
             g->set_color(ezgl::BLACK);
             g->set_font_size(13);
             g->draw_text(center_point, intersections[id].name);
+            std::cout << "Closest Intersection: " << intersections[id].name << "\n";
             
             //set color for intersection icon 
             g->set_color(ezgl::RED);
@@ -94,13 +99,8 @@ void draw_main_canvas(ezgl::renderer *g){
         g->fill_rectangle({x - width/2, y - height/2}, {x + width/2, y + height/2});
         
     }
-    
-    ezgl::rectangle scope = g->get_visible_world();
-    double scope_length = scope.m_second.x - scope.m_first.x;
-    double scope_height = scope.m_second.y - scope.m_first.y;
 
     //drawing streets
-    //g->set_color()
     for(int i = 0; i < getNumStreetSegments(); i++){
         g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
         
@@ -213,14 +213,11 @@ void draw_main_canvas(ezgl::renderer *g){
 }
 
 void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x, double y){
-    std::cout << "Mouse clicked at (" << x << "," << y << ")\n";
+    //std::cout << "Mouse clicked at (" << x << "," << y << ")\n";
     
     LatLon pos = LatLon(lat_from_y(y), lon_from_x(x));
     int id = findClosestIntersection(pos);
     //std::vector<std::string> intersectingStreets = 
-    
-    std::cout << "Closest Intersection: "
-              << intersections[id].name << "\n";
     
     if (intersections[id].highlight == true)
         intersections[id].highlight = false;

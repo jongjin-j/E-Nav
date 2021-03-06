@@ -75,9 +75,6 @@ void draw_main_canvas(ezgl::renderer *g){
     for(int id = 0; id < intersections.size(); id++){
         float x = intersections[id].x;
         float y = intersections[id].y;
-        
-        //g->get_visible_world(); 
-        
         float width = 10;
         float height = width;
         
@@ -97,18 +94,20 @@ void draw_main_canvas(ezgl::renderer *g){
         }
         
         g->fill_rectangle({x - width/2, y - height/2}, {x + width/2, y + height/2});
-        
     }
 
     //drawing streets
     for(int i = 0; i < getNumStreetSegments(); i++){
+        g->set_line_width(2);
+        g->set_color(ezgl::GREY_55);
         g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
         
-        if (scope_length < 500 && scope_height < 400 && findStreetSegmentLength(i) > 50){
+        if (scope_length < 500 && scope_height < 400 && findStreetSegmentLength(i) > 70){
             if(scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y){
                 ezgl::point2d centerPoint (streets[i].mid_x, streets[i].mid_y);
                 g->set_text_rotation(streets[i].angle);
                 g->set_font_size(15);
+                g->set_color(ezgl::BLACK);
                 g->draw_text(centerPoint, streets[i].name);
             }
         }

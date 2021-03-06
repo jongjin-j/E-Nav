@@ -155,8 +155,6 @@ void draw_main_canvas(ezgl::renderer *g){
     //drawing POIs
     
     for(int i = 0; i < POIs.size(); i++){
-        //g->get_visible_world();
-        
         float radius = 5;
         
         g->set_color(ezgl::BLUE);
@@ -193,37 +191,19 @@ void draw_main_canvas(ezgl::renderer *g){
         }
     }
     
-    
-    //writing street intersection and POI names
-    
-    /*for(int i = 0; i < getNumStreets(); i++){
-        if (scope_length < 85 && scope_height < 70){
-            double midPointX = 0.5 * (streets[i].end_x + streets[i].start_x);
-            double midPointY = 0.5 * (streets[i].end_y + streets[i].start_y);
-            ezgl::point2d centerPoint (midPointX, midPointY);
-            g->set_text_rotation(streets[i].angle);
-            g->set_font_size(10);
-            g->draw_text(centerPoint, streets[i].name);
-        }
-    } */
-
-    
     //make the search box for street intersections
     
 }
 
 void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x, double y){
-    //std::cout << "Mouse clicked at (" << x << "," << y << ")\n";
     
     LatLon pos = LatLon(lat_from_y(y), lon_from_x(x));
     int id = findClosestIntersection(pos);
-    //std::vector<std::string> intersectingStreets = 
     
     if (intersections[id].highlight == true)
         intersections[id].highlight = false;
     else
         intersections[id].highlight = true;
-    
     
     app -> refresh_drawing();
 }
@@ -254,10 +234,10 @@ void drawMap(){
         min_lon = std::min(min_lon, getIntersectionPosition(i).longitude());
     } 
     
-    //average lat for cartesian transformation
+    //average lat for Cartesian transformation
     avg_lat = (min_lat + max_lat)/2;
     
-    //change intersection points to cartesian coordinates
+    //change intersection points to Cartesian coordinates
     for(int i = 0; i < getNumIntersections(); i++){
         intersections[i].x = x_from_lon(getIntersectionPosition(i).longitude());
         intersections[i].y = y_from_lat(getIntersectionPosition(i).latitude());

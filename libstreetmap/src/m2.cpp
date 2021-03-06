@@ -104,7 +104,7 @@ void draw_main_canvas(ezgl::renderer *g){
     for(int i = 0; i < getNumStreetSegments(); i++){
         g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
         
-        if (scope_length < 500 && scope_height < 400){
+        if (scope_length < 500 && scope_height < 400 && findStreetSegmentLength(i) > 50){
             ezgl::point2d centerPoint (streets[i].mid_x, streets[i].mid_y);
             g->set_text_rotation(streets[i].angle);
             g->set_font_size(20);
@@ -301,7 +301,13 @@ void drawMap(){
             rotation = std::atan(abs((streets[i].end_y - streets[i].start_y) / (streets[i].end_x - streets[i].start_x))) / kDegreeToRadian;
         }
         
-        streets[i].angle = rotation;
+        if ((streets[i].end_x > streets[i].start_x && streets[i].end_y > streets[i].start_y) || (streets[i].end_x < streets[i].start_x && streets[i].end_y < streets[i].start_y)){
+            streets[i].angle = rotation;
+        }
+        else{
+            streets[i].angle = -1 * rotation;
+        }
+        
         streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
     }
     

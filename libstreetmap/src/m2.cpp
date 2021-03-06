@@ -119,32 +119,47 @@ void draw_main_canvas(ezgl::renderer *g){
         //if it's a closed feature
         if(getFeaturePoint(i,0) == getFeaturePoint(i, getNumFeaturePoints(i)-1)){
             
-            std::vector<ezgl::point2d> featurePoints;
-            //featurePoints.resize(getNumFeaturePoints(i));
-
+            //declare vector of 2d points
+            /*std::vector<ezgl::point2d> featurePoints;
             
-            /*for(int j = 0; j < getNumFeaturePoints(i); j++){
+            //loop through # feature points and add to vector of 2d points
+            for(int j = 0; j < getNumFeaturePoints(i); j++){
                 double xCoord = x_from_lon(getFeaturePoint(i,j).longitude());
                 double yCoord = y_from_lat(getFeaturePoint(i,j).latitude());
-                featurePoints.push_back({xCoord,yCoord});
-            }
-            g->fill_poly(featurePoints);*/
+                
+                ezgl::point2d myPoint = {xCoord,yCoord};
+
+                featurePoints.push_back(myPoint);
+            }*/
+            
+            //fill poly used to colour the set of points
+             //g->fill_poly(featurePoints);
      
         }
         else{
-            //not a closed feature
+            //open feature
             //draw with open lines
-            for(int j = 0; j < getNumFeaturePoints(i); j++){
+            for(int j = 0; j < getNumFeaturePoints(i)-1; j++){
                       
                 double xCoord = x_from_lon(getFeaturePoint(i,j).longitude());
                 double yCoord = y_from_lat(getFeaturePoint(i,j).latitude());
                                    
                 //choose colour depending on feature type
-                /*g->set_color(ezgl::RED);
-                
-                if(getFeatureType)*/
-                
-                g->draw_line({xCoord,yCoord},{x_from_lon(getFeaturePoint(i,j).longitude()),y_from_lat(getFeaturePoint(i,j).latitude())});
+                /*if(getFeatureType(i) == UNKNOWN){
+                    g->set_color(ezgl::GREY_55);
+                }else if(getFeatureType(i) == (PARK || GREENSPACE || GOLFCOURSE)){
+                    g->set_color(ezgl::GREEN);
+                }else if(getFeatureType(i) == BEACH){
+                    g->set_color(ezgl::YELLOW);
+                }else if(getFeatureType(i) == (LAKE || RIVER || RIVER || STREAM)){
+                    g->set_color(ezgl::BLUE);
+                }else if(getFeatureType(i) == ISLAND){
+                    g->set_color(ezgl::GREY_55);
+                }else if(getFeatureType(i) == BUILDING){
+                    g->set_color(ezgl::GREY_55);
+                }*/
+                //g->set_color(ezgl::BLUE);
+                //g->draw_line({xCoord,yCoord},{x_from_lon(getFeaturePoint(i,j+1).longitude()),y_from_lat(getFeaturePoint(i,j+1).latitude())});
             }
 
         }

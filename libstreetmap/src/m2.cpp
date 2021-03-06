@@ -118,22 +118,24 @@ void draw_main_canvas(ezgl::renderer *g){
 
         //if it's a closed feature
         if(getFeaturePoint(i,0) == getFeaturePoint(i, getNumFeaturePoints(i)-1)){
-            
+           
             //declare vector of 2d points
-            /*std::vector<ezgl::point2d> featurePoints;
+            std::vector<ezgl::point2d> featurePoints;
+            
             
             //loop through # feature points and add to vector of 2d points
-            for(int j = 0; j < getNumFeaturePoints(i); j++){
+            for(int j = 0; j < getNumFeaturePoints(i)-1; j++){
                 double xCoord = x_from_lon(getFeaturePoint(i,j).longitude());
                 double yCoord = y_from_lat(getFeaturePoint(i,j).latitude());
                 
                 ezgl::point2d myPoint = {xCoord,yCoord};
 
                 featurePoints.push_back(myPoint);
-            }*/
+                g->draw_line(myPoint,{x_from_lon(getFeaturePoint(i,j+1).longitude()),y_from_lat(getFeaturePoint(i,j+1).latitude())});
+            }
             
             //fill poly used to colour the set of points
-             //g->fill_poly(featurePoints);
+            //g->fill_poly(featurePoints);
      
         }
         else{

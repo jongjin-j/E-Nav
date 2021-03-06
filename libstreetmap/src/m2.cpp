@@ -39,7 +39,7 @@ struct street_data {
     double mid_x = 0;
     double mid_y = 0;
     bool oneWay;
-    std::string type;
+    std::string street_type;
 };
 
 float avg_lat;
@@ -334,26 +334,37 @@ void drawMap() {
         streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
         
         //setting the types of street segments
-        for (int ss_num = 0; ss_num < getNumStreetSegments(); ss_num++){
-            StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_num);
+        
+        
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(i);
             
-            for (int j = 0; j < getNumberOfWays(); j++){
-		const OSMWay* e = getWayByIndex(j);
+        /*
+        //for (int j = 0; j < getNumberOfWays(); j++){
+        bool found = false; 
+        int j = 0;
+        while (!found){    
+            const OSMWay* e = getWayByIndex(j);
+            
+            OSMID id1 = ss_info.wayOSMID;
+            OSMID id2 = e->id();
+            if (ss_info.wayOSMID == e -> id()){
+                found = true;
+                int k = 1;
                 
-		if (ss_info.wayOSMID == e -> id()){
-                    int k = 1;
-                    std::string key, value;
-                    std::tie(key, value) = getTagPair(e, 0);
+                std::string key, value;
+                std::tie(key, value) = getTagPair(e, 0);
 
-                    while (key != "highway"){
-			std::tie(key,value) = getTagPair(e, k);
-			k++;
-                    }
+                while (key != "highway"){
+                    std::tie(key,value) = getTagPair(e, k);
+                    k++;
+                }
                     
-                    streets[ss_num].type = value;
-		}
+                streets[i].street_type = value;
             }
-        } 
+            
+            j++;
+        }
+         */ 
     }
 
     ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)},

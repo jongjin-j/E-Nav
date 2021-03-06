@@ -98,17 +98,19 @@ void draw_main_canvas(ezgl::renderer *g){
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;
     double scope_height = scope.m_second.y - scope.m_first.y;
-    
+
     //drawing streets
     //g->set_color()
     for(int i = 0; i < getNumStreetSegments(); i++){
         g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
         
         if (scope_length < 500 && scope_height < 400 && findStreetSegmentLength(i) > 50){
-            ezgl::point2d centerPoint (streets[i].mid_x, streets[i].mid_y);
-            g->set_text_rotation(streets[i].angle);
-            g->set_font_size(20);
-            g->draw_text(centerPoint, streets[i].name);
+            if(scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y){
+                ezgl::point2d centerPoint (streets[i].mid_x, streets[i].mid_y);
+                g->set_text_rotation(streets[i].angle);
+                g->set_font_size(15);
+                g->draw_text(centerPoint, streets[i].name);
+            }
         }
     }
     

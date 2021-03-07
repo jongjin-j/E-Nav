@@ -158,6 +158,7 @@ void draw_main_canvas(ezgl::renderer *g) {
         //if it's a closed feature
         if (getFeaturePoint(i, 0) == getFeaturePoint(i, getNumFeaturePoints(i) - 1)) {
 
+            //check first if feature only has 1 point; in that case don't draw
             if (getNumFeaturePoints(i) != 0) {
                 //declare vector of 2d points
                 std::vector<ezgl::point2d> featurePoints;
@@ -166,6 +167,7 @@ void draw_main_canvas(ezgl::renderer *g) {
                     0, 0});
 
 
+                 
                 //loop through # feature points and add to vector of 2d points
                 for (int j = 0; j < getNumFeaturePoints(i) - 1; j++) {
                     double xCoord = x_from_lon(getFeaturePoint(i, j).longitude());

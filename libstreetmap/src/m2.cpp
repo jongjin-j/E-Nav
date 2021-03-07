@@ -64,29 +64,30 @@ double lat_from_y(double y) {
     return lat;
 }
 //helper function to choose colour from feature type
+
 std::string setColour(FeatureType x) {
-    
+
     if (x == UNKNOWN) {
         return "grey";
     } else if (x == PARK) {
         return "green";
     } else if (x == BEACH) {
         return "bisque";
-    }  else if (x == LAKE) {
+    } else if (x == LAKE) {
         return "blue";
-    }  else if (x == RIVER) {
+    } else if (x == RIVER) {
         return "blue";
-    }  else if (x == ISLAND) {
+    } else if (x == ISLAND) {
         return "bisque";
-    }  else if (x == BUILDING) {
+    } else if (x == BUILDING) {
         return "grey";
-    }  else if (x == GREENSPACE) {
+    } else if (x == GREENSPACE) {
         return "green";
-    }  else if (x == GOLFCOURSE) {
+    } else if (x == GOLFCOURSE) {
         return "green";
-    }  else if (x == STREAM) {
+    } else if (x == STREAM) {
         return "blue";
-    } 
+    }
 
 }
 
@@ -157,21 +158,29 @@ void draw_main_canvas(ezgl::renderer *g) {
         //if it's a closed feature
         if (getFeaturePoint(i, 0) == getFeaturePoint(i, getNumFeaturePoints(i) - 1)) {
 
-            //declare vector of 2d points
-            /*std::vector<ezgl::point2d> featurePoints;
-            featurePoints.resize(getNumFeaturePoints(i), {0,0});
-            
-            
-            //loop through # feature points and add to vector of 2d points
-            for(int j = 0; j < getNumFeaturePoints(i); j++){
-                double xCoord = x_from_lon(getFeaturePoint(i,j).longitude());
-                double yCoord = y_from_lat(getFeaturePoint(i,j).latitude());
-                
-                featurePoints[j] = {xCoord,yCoord};
+            if (getNumFeaturePoints(i) != 0) {
+                //declare vector of 2d points
+                std::vector<ezgl::point2d> featurePoints;
+
+                featurePoints.resize(getNumFeaturePoints(i), {
+                    0, 0});
+
+
+                //loop through # feature points and add to vector of 2d points
+                for (int j = 0; j < getNumFeaturePoints(i) - 1; j++) {
+                    double xCoord = x_from_lon(getFeaturePoint(i, j).longitude());
+                    double yCoord = y_from_lat(getFeaturePoint(i, j).latitude());
+
+                    featurePoints[j] = {xCoord, yCoord};
+                }
+
+                //fill poly used to colour the set of points
+
+                g->fill_poly(featurePoints);
+
             }
 
-            //fill poly used to colour the set of points
-            g->fill_poly(featurePoints);*/
+
 
         } else {
             //open feature
@@ -182,16 +191,16 @@ void draw_main_canvas(ezgl::renderer *g) {
                 double yCoord = y_from_lat(getFeaturePoint(i, j).latitude());
 
                 //choose colour depending on feature type
-                if(setColour(getFeatureType(i)) == "blue"){
+                if (setColour(getFeatureType(i)) == "blue") {
                     g->set_color(ezgl::BLUE);
-                }else if(setColour(getFeatureType(i)) == "green"){
+                } else if (setColour(getFeatureType(i)) == "green") {
                     g->set_color(ezgl::GREEN);
-                }else if(setColour(getFeatureType(i)) == "bisque"){
+                } else if (setColour(getFeatureType(i)) == "bisque") {
                     g->set_color(ezgl::BISQUE);
-                }else if(setColour(getFeatureType(i)) == "grey"){
+                } else if (setColour(getFeatureType(i)) == "grey") {
                     g->set_color(ezgl::GREY_55);
                 }
-                
+
                 g->draw_line({xCoord, yCoord},
                 {
                     x_from_lon(getFeaturePoint(i, j + 1).longitude()), y_from_lat(getFeaturePoint(i, j + 1).latitude())
@@ -219,18 +228,15 @@ void draw_main_canvas(ezgl::renderer *g) {
             g->set_color(ezgl::BLACK);
             g->set_font_size(16);
             g->draw_text(center_point, POIs[i].name);
-        }
-        else if (scope_length < 240 && scope_height < 185) {
+        } else if (scope_length < 240 && scope_height < 185) {
             g->set_color(ezgl::BLACK);
             g->set_font_size(13);
             g->draw_text(center_point, POIs[i].name);
-        }
-        else if (scope_length < 385 && scope_height < 305) {
+        } else if (scope_length < 385 && scope_height < 305) {
             g->set_color(ezgl::BLACK);
             g->set_font_size(10);
             g->draw_text(center_point, POIs[i].name);
-        }
-        else if (scope_length < 650 && scope_height < 505) {
+        } else if (scope_length < 650 && scope_height < 505) {
             g->set_color(ezgl::BLACK);
             g->set_font_size(8);
             g->draw_text(center_point, POIs[i].name);
@@ -320,8 +326,7 @@ void drawMap() {
 
         if (streets[i].end_x == streets[i].start_x) {
             rotation = 90;
-        }
-        else {
+        } else {
             rotation = std::atan(abs((streets[i].end_y - streets[i].start_y) / (streets[i].end_x - streets[i].start_x))) / kDegreeToRadian;
         }
 
@@ -332,8 +337,9 @@ void drawMap() {
         }
 
         streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
-        
+
         //setting the types of street segments
+<<<<<<< HEAD
         
         
         StreetSegmentInfo ss_info = getStreetSegmentInfo(i);
@@ -365,6 +371,28 @@ void drawMap() {
             j++;
         }
          */ 
+=======
+        for (int ss_num = 0; ss_num < getNumStreetSegments(); ss_num++) {
+            StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_num);
+
+            for (int j = 0; j < getNumberOfWays(); j++) {
+                const OSMWay* e = getWayByIndex(j);
+
+                if (ss_info.wayOSMID == e -> id()) {
+                    int k = 1;
+                    std::string key, value;
+                    std::tie(key, value) = getTagPair(e, 0);
+
+                    while (key != "highway") {
+                        std::tie(key, value) = getTagPair(e, k);
+                        k++;
+                    }
+
+                    streets[ss_num].type = value;
+                }
+            }
+        }
+>>>>>>> Fixed function for drawing closed features
     }
 
     ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)},

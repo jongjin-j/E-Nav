@@ -86,8 +86,8 @@ const ezgl::color chooseFeatureColour(FeatureType x){
         //islands return green
         return ezgl::color(60,179,113);
     }else if(x == BUILDING){
-        //buildings return light brown
-        return ezgl::color(210,180,140);
+        //buildings return dark grey
+        return ezgl::color(122,122,122);
     }else if(x == GREENSPACE){
         //greenspace returns light green
         return ezgl::color(144,238,144);
@@ -107,10 +107,7 @@ std::vector<std::vector<StreetSegmentIdx>> streetSegments;
 std::vector<street_data> streets;
 
 void draw_main_canvas(ezgl::renderer *g) {
-    g->draw_rectangle({0, 0},
-    {
-        1000, 1000
-    });
+    g->draw_rectangle({0, 0},{1000, 1000});
 
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;
@@ -144,8 +141,9 @@ void draw_main_canvas(ezgl::renderer *g) {
 
     //drawing streets
     for (int i = 0; i < getNumStreetSegments(); i++) {
-        g->set_line_width(3);
-        g->set_color(ezgl::GREY_55);
+        g->set_line_width(6);
+        g->set_color(ezgl::WHITE);
+        g->set_line_cap(ezgl::line_cap::round);
         g->draw_line({streets[i].start_x, streets[i].start_y},
         {
             streets[i].end_x, streets[i].end_y
@@ -196,17 +194,14 @@ void draw_main_canvas(ezgl::renderer *g) {
 
                 //choose colour depending on feature type
                 g->set_color(chooseFeatureColour(getFeatureType(i)));
-                g->draw_line({xCoord, yCoord},
-                {
-                    x_from_lon(getFeaturePoint(i, j + 1).longitude()), y_from_lat(getFeaturePoint(i, j + 1).latitude())
-                });
+                g->set_line_cap(ezgl::line_cap::butt);
+                g->draw_line({xCoord, yCoord},{x_from_lon(getFeaturePoint(i, j + 1).longitude()), y_from_lat(getFeaturePoint(i, j + 1).latitude())});
             }
 
         }
     }
 
     //drawing POIs
-
     for (int i = 0; i < POIs.size(); i++) {
         float radius = 5;
 
@@ -394,8 +389,8 @@ void drawMap() {
     {
         x_from_lon(max_lon), y_from_lat(max_lat)
     });
-    application.add_canvas("MainCanvas", draw_main_canvas, initial_world);
-
+    application.add_canvas("MainCanvas", draw_main_canvas, initial_world, ezgl::color(211,211,211));
+    
     application.run(nullptr, act_on_mouse_click, nullptr, nullptr);
 }
 

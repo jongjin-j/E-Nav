@@ -63,40 +63,41 @@ double lat_from_y(double y) {
     double lat = y / (kEarthRadiusInMeters * kDegreeToRadian);
     return lat;
 }
+
 //helper function to choose colour from feature type
 
-const ezgl::color chooseFeatureColour(FeatureType x){
-    
-    if(x == UNKNOWN){
+const ezgl::color chooseFeatureColour(FeatureType x) {
+
+    if (x == UNKNOWN) {
         //unknown returns default grey
         return ezgl::GREY_55;
-    }else if(x == PARK){
+    } else if (x == PARK) {
         //parks return olive green
-        return ezgl::color(166,218,75);
-    }else if(x == BEACH){
+        return ezgl::color(166, 218, 75);
+    } else if (x == BEACH) {
         //beaches return beige
-        return ezgl::color(220,201,75);
-    }else if(x == LAKE){
+        return ezgl::color(220, 201, 75);
+    } else if (x == LAKE) {
         //lakes return sky blue
-        return ezgl::color(135,206,250);
-    }else if(x == RIVER){
+        return ezgl::color(135, 206, 250);
+    } else if (x == RIVER) {
         //rivers return sky blue
-        return ezgl::color(0,177,235);
-    }else if(x == ISLAND){
+        return ezgl::color(0, 177, 235);
+    } else if (x == ISLAND) {
         //islands return green
-        return ezgl::color(60,179,113);
-    }else if(x == BUILDING){
+        return ezgl::color(60, 179, 113);
+    } else if (x == BUILDING) {
         //buildings return dark grey
-        return ezgl::color(169,169,169);
-    }else if(x == GREENSPACE){
+        return ezgl::color(169, 169, 169);
+    } else if (x == GREENSPACE) {
         //greenspace returns light green
-        return ezgl::color(144,238,144);
-    }else if(x == GOLFCOURSE){
+        return ezgl::color(144, 238, 144);
+    } else if (x == GOLFCOURSE) {
         //golfcourse returns light green
-        return ezgl::color(144,238,144);
-    }else if(x == STREAM){
+        return ezgl::color(144, 238, 144);
+    } else if (x == STREAM) {
         //streams return stronger blue (steel blue)
-        return ezgl::color(70,130,80);
+        return ezgl::color(70, 130, 80);
     }
 
 }
@@ -106,8 +107,16 @@ std::vector<POI_data> POIs;
 std::vector<std::vector<StreetSegmentIdx>> streetSegments;
 std::vector<street_data> streets;
 
+void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice){
+    x->set_line_width(width);
+    x->set_color(colorChoice);
+}
+
 void draw_main_canvas(ezgl::renderer *g) {
-    g->draw_rectangle({0, 0},{1000, 1000});
+    g->draw_rectangle({0, 0},
+    {
+        1000, 1000
+    });
 
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;
@@ -115,27 +124,42 @@ void draw_main_canvas(ezgl::renderer *g) {
 
     //drawing streets
     for (int i = 0; i < getNumStreetSegments(); i++) {
-        g->set_line_width(6);
-        g->set_color(ezgl::color(130,130,130));
-        g->set_line_cap(ezgl::line_cap::round);
-        g->draw_line({streets[i].start_x, streets[i].start_y},
-        {
-            streets[i].end_x, streets[i].end_y
-        });
-        g->set_line_width(4);
-        g->set_color(ezgl::WHITE);
-        g->draw_line({streets[i].start_x, streets[i].start_y},
-        {
-            streets[i].end_x, streets[i].end_y
-        });
-        
-        if (scope_length < 500 && scope_height < 400 && findStreetSegmentLength(i) > 70) {
+
+        //introduce white streets at a max scope of 12000 height & width
+        if (scope_length < 12000 && scope_height < 12000) {
+            //helper function to set width and colour of line
+            colourWidthSetter(g, 6, ezgl::WHITE);
+            g->draw_line({streets[i].start_x, streets[i].start_y},
+            {
+                streets[i].end_x, streets[i].end_y
+            });
+            //introduce boredered streets if scope within approx 2000
+            if (scope_length < 2000 && scope_height < 1700) {
+                colourWidthSetter(g, 6, ezgl::color(130,130,130));
+                g->set_line_cap(ezgl::line_cap::round);
+                g->draw_line({streets[i].start_x, streets[i].start_y},
+                {
+                    streets[i].end_x, streets[i].end_y
+                });
+                //then draw the street in white
+                colourWidthSetter(g, 4, ezgl::WHITE);
+                g->draw_line({streets[i].start_x, streets[i].start_y},
+                {
+                    streets[i].end_x, streets[i].end_y
+                });
+            }
+        }
+
+        if (scope_length < 1500 && scope_height < 1200 && findStreetSegmentLength(i) > 70) {
             if (scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y) {
                 ezgl::point2d centerPoint(streets[i].mid_x, streets[i].mid_y);
-                g->set_text_rotation(streets[i].angle);
-                g->set_font_size(15);
+                
+                //set so that street name is displayed once every 4 blocks
+                if(i%4 == 0){g->set_text_rotation(streets[i].angle);
+                g->set_font_size(10);
                 g->set_color(ezgl::BLACK);
                 g->draw_text(centerPoint, streets[i].name);
+                };
             }
         }
     }
@@ -149,7 +173,9 @@ void draw_main_canvas(ezgl::renderer *g) {
             //declare vector of 2d points
             std::vector<ezgl::point2d> featurePoints;
 
-            featurePoints.resize(getNumFeaturePoints(i), {0, 0});
+            featurePoints.resize(getNumFeaturePoints(i), {
+                0, 0
+            });
 
             //loop through # feature points and add to vector of 2d points
             for (int j = 0; j < getNumFeaturePoints(i); j++) {
@@ -175,7 +201,10 @@ void draw_main_canvas(ezgl::renderer *g) {
                 //choose colour depending on feature type
                 g->set_color(chooseFeatureColour(getFeatureType(i)));
                 g->set_line_cap(ezgl::line_cap::butt);
-                g->draw_line({xCoord, yCoord},{x_from_lon(getFeaturePoint(i, j + 1).longitude()), y_from_lat(getFeaturePoint(i, j + 1).latitude())});
+                g->draw_line({xCoord, yCoord},
+                {
+                    x_from_lon(getFeaturePoint(i, j + 1).longitude()), y_from_lat(getFeaturePoint(i, j + 1).latitude())
+                });
             }
 
         }
@@ -212,7 +241,7 @@ void draw_main_canvas(ezgl::renderer *g) {
             g->draw_text(center_point, POIs[i].name);
         }
     }
-    
+
     //drawing intersections
     for (int id = 0; id < intersections.size(); id++) {
         float x = intersections[id].x;
@@ -396,8 +425,8 @@ void drawMap() {
     {
         x_from_lon(max_lon), y_from_lat(max_lat)
     });
-    application.add_canvas("MainCanvas", draw_main_canvas, initial_world, ezgl::color(230,230,230));
-    
+    application.add_canvas("MainCanvas", draw_main_canvas, initial_world, ezgl::color(230, 230, 230));
+
     application.run(nullptr, act_on_mouse_click, nullptr, nullptr);
 }
 

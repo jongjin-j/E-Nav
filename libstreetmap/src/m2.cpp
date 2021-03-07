@@ -78,7 +78,7 @@ const ezgl::color chooseFeatureColour(FeatureType x){
         return ezgl::color(220,201,75);
     }else if(x == LAKE){
         //lakes return sky blue
-        return ezgl::color(0,177,235);
+        return ezgl::color(135,206,250);
     }else if(x == RIVER){
         //rivers return sky blue
         return ezgl::color(0,177,235);
@@ -87,7 +87,7 @@ const ezgl::color chooseFeatureColour(FeatureType x){
         return ezgl::color(60,179,113);
     }else if(x == BUILDING){
         //buildings return dark grey
-        return ezgl::color(122,122,122);
+        return ezgl::color(169,169,169);
     }else if(x == GREENSPACE){
         //greenspace returns light green
         return ezgl::color(144,238,144);
@@ -113,42 +113,22 @@ void draw_main_canvas(ezgl::renderer *g) {
     double scope_length = scope.m_second.x - scope.m_first.x;
     double scope_height = scope.m_second.y - scope.m_first.y;
 
-    for (int id = 0; id < intersections.size(); id++) {
-        float x = intersections[id].x;
-        float y = intersections[id].y;
-        float width = 10;
-        float height = width;
-
-        if (intersections[id].highlight && scope_length < 800) {
-            //print name of intersection
-            ezgl::point2d center_point(x, y + 7.5);
-            g->set_color(ezgl::BLACK);
-            g->set_font_size(13);
-            g->draw_text(center_point, intersections[id].name);
-            std::cout << "Closest Intersection: " << intersections[id].name << "\n";
-
-            //set color for intersection icon 
-            g->set_color(ezgl::RED);
-        } else {
-            g->set_color(ezgl::GREY_55);
-        }
-
-        g->fill_rectangle({x - width / 2, y - height / 2},
-        {
-            x + width / 2, y + height / 2
-        });
-    }
-
     //drawing streets
     for (int i = 0; i < getNumStreetSegments(); i++) {
         g->set_line_width(6);
-        g->set_color(ezgl::WHITE);
+        g->set_color(ezgl::color(130,130,130));
         g->set_line_cap(ezgl::line_cap::round);
         g->draw_line({streets[i].start_x, streets[i].start_y},
         {
             streets[i].end_x, streets[i].end_y
         });
-
+        g->set_line_width(4);
+        g->set_color(ezgl::WHITE);
+        g->draw_line({streets[i].start_x, streets[i].start_y},
+        {
+            streets[i].end_x, streets[i].end_y
+        });
+        
         if (scope_length < 500 && scope_height < 400 && findStreetSegmentLength(i) > 70) {
             if (scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y) {
                 ezgl::point2d centerPoint(streets[i].mid_x, streets[i].mid_y);
@@ -231,6 +211,33 @@ void draw_main_canvas(ezgl::renderer *g) {
             g->set_font_size(8);
             g->draw_text(center_point, POIs[i].name);
         }
+    }
+    
+    //drawing intersections
+    for (int id = 0; id < intersections.size(); id++) {
+        float x = intersections[id].x;
+        float y = intersections[id].y;
+        float width = 10;
+        float height = width;
+
+        if (intersections[id].highlight && scope_length < 800) {
+            //print name of intersection
+            ezgl::point2d center_point(x, y + 7.5);
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(13);
+            g->draw_text(center_point, intersections[id].name);
+            std::cout << "Closest Intersection: " << intersections[id].name << "\n";
+
+            //set color for intersection icon 
+            g->set_color(ezgl::RED);
+        } else {
+            g->set_color(ezgl::GREY_55);
+        }
+
+        g->fill_rectangle({x - width / 2, y - height / 2},
+        {
+            x + width / 2, y + height / 2
+        });
     }
 
     //make the search box for street intersections
@@ -389,7 +396,7 @@ void drawMap() {
     {
         x_from_lon(max_lon), y_from_lat(max_lat)
     });
-    application.add_canvas("MainCanvas", draw_main_canvas, initial_world, ezgl::color(211,211,211));
+    application.add_canvas("MainCanvas", draw_main_canvas, initial_world, ezgl::color(230,230,230));
     
     application.run(nullptr, act_on_mouse_click, nullptr, nullptr);
 }

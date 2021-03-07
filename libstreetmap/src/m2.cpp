@@ -158,30 +158,26 @@ void draw_main_canvas(ezgl::renderer *g) {
         //if it's a closed feature
         if (getFeaturePoint(i, 0) == getFeaturePoint(i, getNumFeaturePoints(i) - 1)) {
 
-            //check first if feature only has 1 point; in that case don't draw
-            if (getNumFeaturePoints(i) != 0) {
-                //declare vector of 2d points
-                std::vector<ezgl::point2d> featurePoints;
+            //declare vector of 2d points
+            std::vector<ezgl::point2d> featurePoints;
 
-                featurePoints.resize(getNumFeaturePoints(i), {
-                    0, 0});
+            featurePoints.resize(getNumFeaturePoints(i), {
+                0, 0
+            });
 
 
-                 
-                //loop through # feature points and add to vector of 2d points
-                for (int j = 0; j < getNumFeaturePoints(i) - 1; j++) {
-                    double xCoord = x_from_lon(getFeaturePoint(i, j).longitude());
-                    double yCoord = y_from_lat(getFeaturePoint(i, j).latitude());
+            //loop through # feature points and add to vector of 2d points
+            for (int j = 0; j < getNumFeaturePoints(i); j++) {
+                double xCoord = x_from_lon(getFeaturePoint(i, j).longitude());
+                double yCoord = y_from_lat(getFeaturePoint(i, j).latitude());
 
-                    featurePoints[j] = {xCoord, yCoord};
-                }
-
-                //fill poly used to colour the set of points
-
-                g->fill_poly(featurePoints);
-
+                featurePoints[j] = {xCoord, yCoord};
             }
 
+            //fill poly used to colour the set of points
+            if (featurePoints.size() > 1) {
+                g->fill_poly(featurePoints);
+            }
 
 
         } else {
@@ -341,10 +337,10 @@ void drawMap() {
         streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
 
         //setting the types of street segments
-        
-        
+
+
         StreetSegmentInfo ss_info = getStreetSegmentInfo(i);
-            
+
         /*
         //for (int j = 0; j < getNumberOfWays(); j++){
         bool found = false; 
@@ -394,7 +390,7 @@ void drawMap() {
             }
         }
     }
-              */
+         */
     }
 
     ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)},

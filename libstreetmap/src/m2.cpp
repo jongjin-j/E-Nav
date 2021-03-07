@@ -65,28 +65,38 @@ double lat_from_y(double y) {
 }
 //helper function to choose colour from feature type
 
-std::string setColour(FeatureType x) {
-
-    if (x == UNKNOWN) {
-        return "grey";
-    } else if (x == PARK) {
-        return "green";
-    } else if (x == BEACH) {
-        return "bisque";
-    } else if (x == LAKE) {
-        return "blue";
-    } else if (x == RIVER) {
-        return "blue";
-    } else if (x == ISLAND) {
-        return "bisque";
-    } else if (x == BUILDING) {
-        return "grey";
-    } else if (x == GREENSPACE) {
-        return "green";
-    } else if (x == GOLFCOURSE) {
-        return "green";
-    } else if (x == STREAM) {
-        return "blue";
+const ezgl::color chooseFeatureColour(FeatureType x){
+    
+    if(x == UNKNOWN){
+        //unknown returns default grey
+        return ezgl::GREY_55;
+    }else if(x == PARK){
+        //parks return olive green
+        return ezgl::color(166,218,75);
+    }else if(x == BEACH){
+        //beaches return beige
+        return ezgl::color(220,201,75);
+    }else if(x == LAKE){
+        //lakes return sky blue
+        return ezgl::color(0,177,235);
+    }else if(x == RIVER){
+        //rivers return sky blue
+        return ezgl::color(0,177,235);
+    }else if(x == ISLAND){
+        //islands return green
+        return ezgl::color(60,179,113);
+    }else if(x == BUILDING){
+        //buildings return light brown
+        return ezgl::color(210,180,140);
+    }else if(x == GREENSPACE){
+        //greenspace returns light green
+        return ezgl::color(144,238,144);
+    }else if(x == GOLFCOURSE){
+        //golfcourse returns light green
+        return ezgl::color(144,238,144);
+    }else if(x == STREAM){
+        //streams return stronger blue (steel blue)
+        return ezgl::color(70,130,80);
     }
 
 }
@@ -134,7 +144,7 @@ void draw_main_canvas(ezgl::renderer *g) {
 
     //drawing streets
     for (int i = 0; i < getNumStreetSegments(); i++) {
-        g->set_line_width(2);
+        g->set_line_width(3);
         g->set_color(ezgl::GREY_55);
         g->draw_line({streets[i].start_x, streets[i].start_y},
         {
@@ -161,10 +171,7 @@ void draw_main_canvas(ezgl::renderer *g) {
             //declare vector of 2d points
             std::vector<ezgl::point2d> featurePoints;
 
-            featurePoints.resize(getNumFeaturePoints(i), {
-                0, 0
-            });
-
+            featurePoints.resize(getNumFeaturePoints(i), {0, 0});
 
             //loop through # feature points and add to vector of 2d points
             for (int j = 0; j < getNumFeaturePoints(i); j++) {
@@ -173,12 +180,11 @@ void draw_main_canvas(ezgl::renderer *g) {
 
                 featurePoints[j] = {xCoord, yCoord};
             }
-
-            //fill poly used to colour the set of points
+            //fill poly only if feature is 2D
             if (featurePoints.size() > 1) {
+                g->set_color(chooseFeatureColour(getFeatureType(i)));
                 g->fill_poly(featurePoints);
             }
-
 
         } else {
             //open feature
@@ -189,16 +195,7 @@ void draw_main_canvas(ezgl::renderer *g) {
                 double yCoord = y_from_lat(getFeaturePoint(i, j).latitude());
 
                 //choose colour depending on feature type
-                if (setColour(getFeatureType(i)) == "blue") {
-                    g->set_color(ezgl::BLUE);
-                } else if (setColour(getFeatureType(i)) == "green") {
-                    g->set_color(ezgl::GREEN);
-                } else if (setColour(getFeatureType(i)) == "bisque") {
-                    g->set_color(ezgl::BISQUE);
-                } else if (setColour(getFeatureType(i)) == "grey") {
-                    g->set_color(ezgl::GREY_55);
-                }
-
+                g->set_color(chooseFeatureColour(getFeatureType(i)));
                 g->draw_line({xCoord, yCoord},
                 {
                     x_from_lon(getFeaturePoint(i, j + 1).longitude()), y_from_lat(getFeaturePoint(i, j + 1).latitude())

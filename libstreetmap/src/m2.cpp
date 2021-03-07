@@ -91,13 +91,13 @@ const ezgl::color chooseFeatureColour(FeatureType x) {
         return ezgl::color(169, 169, 169);
     } else if (x == GREENSPACE) {
         //greenspace returns light green
-        return ezgl::color(144, 238, 144);
+        return ezgl::color(154, 250, 50);
     } else if (x == GOLFCOURSE) {
         //golfcourse returns light green
-        return ezgl::color(144, 238, 144);
+        return ezgl::color(154, 250, 50);
     } else if (x == STREAM) {
         //streams return stronger blue (steel blue)
-        return ezgl::color(70, 130, 80);
+        return ezgl::color(100, 149, 237);
     }
 
 }
@@ -112,6 +112,31 @@ void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice)
     x->set_color(colorChoice);
 }
 
+/*void test_button(GtkWidget *widget, ezgl::application *application){
+    GtkEntry* text_entry = (GtkEntry*) application->get_object("SearchBar");
+    const char* text = gtk_entry_get_text(text_entry);
+    
+    application->update_message(text);
+    std::cout << text << std::endl;
+
+}
+
+void searchEntry(GtkWidget *widget, ezgl::application *application){
+    GtkEntry* text_entry = (GtkEntry*) application->get_object("SearchBar");
+    const char* searchTerm = gtk_entry_get_text(text_entry);
+    application->update_message(searchTerm);
+    application->refresh_drawing();
+}
+
+g_signal_connect(
+        G_OBJECT(SearchBar), "activate", G_CALLBACK(testPrint),NULL
+);
+
+void testPrint(){
+    std::cout << "testing" << std::endl;
+}*/
+
+
 void draw_main_canvas(ezgl::renderer *g) {
     g->draw_rectangle({0, 0},
     {
@@ -125,7 +150,7 @@ void draw_main_canvas(ezgl::renderer *g) {
     //drawing streets
     for (int i = 0; i < getNumStreetSegments(); i++) {
 
-        //introduce white streets at a max scope of 12000 height & width
+        //introduce white streets at a max scope of 12000 height & width        //suggestion. while loop?
         if (scope_length < 12000 && scope_height < 12000) {
             //helper function to set width and colour of line
             colourWidthSetter(g, 6, ezgl::WHITE);
@@ -133,6 +158,8 @@ void draw_main_canvas(ezgl::renderer *g) {
             {
                 streets[i].end_x, streets[i].end_y
             });
+            
+            
             //introduce boredered streets if scope within approx 2000
             if (scope_length < 2000 && scope_height < 1700) {
                 colourWidthSetter(g, 6, ezgl::color(130,130,130));
@@ -149,13 +176,12 @@ void draw_main_canvas(ezgl::renderer *g) {
                 });
             }
         }
-
         if (scope_length < 1500 && scope_height < 1200 && findStreetSegmentLength(i) > 70) {
             if (scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y) {
                 ezgl::point2d centerPoint(streets[i].mid_x, streets[i].mid_y);
                 
                 //set so that street name is displayed once every 4 blocks
-                if(i%4 == 0){g->set_text_rotation(streets[i].angle);
+                if(i % 4 == 0){g->set_text_rotation(streets[i].angle);
                 g->set_font_size(10);
                 g->set_color(ezgl::BLACK);
                 g->draw_text(centerPoint, streets[i].name);
@@ -186,8 +212,16 @@ void draw_main_canvas(ezgl::renderer *g) {
             }
             //fill poly only if feature is 2D
             if (featurePoints.size() > 1) {
-                g->set_color(chooseFeatureColour(getFeatureType(i)));
+                //exception for buildings (crowdedness) to draw only at scope level of 6000
+                if(getFeatureType(i) == BUILDING){
+                    if(scope_length < 15000 && scope_height < 15000){
+                        g->set_color(chooseFeatureColour(getFeatureType(i)));
+                        g->fill_poly(featurePoints);
+                    }
+                }
+                else{g->set_color(chooseFeatureColour(getFeatureType(i)));
                 g->fill_poly(featurePoints);
+                }
             }
 
         } else {

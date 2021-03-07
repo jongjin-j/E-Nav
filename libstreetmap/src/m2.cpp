@@ -341,7 +341,6 @@ void drawMap() {
         streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
 
         //setting the types of street segments
-<<<<<<< HEAD
         
         
         StreetSegmentInfo ss_info = getStreetSegmentInfo(i);
@@ -372,8 +371,8 @@ void drawMap() {
             
             j++;
         }
-         */ 
-=======
+         
+        
         for (int ss_num = 0; ss_num < getNumStreetSegments(); ss_num++) {
             StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_num);
 
@@ -394,7 +393,8 @@ void drawMap() {
                 }
             }
         }
->>>>>>> Fixed function for drawing closed features
+    }
+              */
     }
 
     ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)},

@@ -140,30 +140,18 @@ void testPrint(){
 
 
 void draw_main_canvas(ezgl::renderer *g) {
-    g->draw_rectangle({0, 0},
-    {
-        1000, 1000
-    });
+    g->draw_rectangle({0, 0}, {000, 1000});
 
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;
     double scope_height = scope.m_second.y - scope.m_first.y;
-
+    
     //drawing streets
     for (int i = 0; i < getNumStreetSegments(); i++) {
 
         //introduce white streets at a max scope of 12000 height & width        //suggestion. while loop?
-        if (scope_length < 12000 && scope_height < 12000) {
-            //find the width of streets 
-                StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
-                std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_wayType.find(tempInfo.wayOSMID);
-                if (it != OSMID_wayType.end() && it->second == "motorway"){
-                   g->set_line_width(20);
-                   g->set_color(ezgl::ORANGE);
-                   g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
-                }
-                
-            //helper function to set width and colour of line
+        if (scope_length < 5000 && scope_height < 5000) {
+            //helper function to set width and color of line
             colourWidthSetter(g, 6, ezgl::WHITE);
             g->draw_line({streets[i].start_x, streets[i].start_y},
             {
@@ -185,40 +173,32 @@ void draw_main_canvas(ezgl::renderer *g) {
                 {
                     streets[i].end_x, streets[i].end_y
                 });
-                
-                //find the width of streets 
-                StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
-                std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_wayType.find(tempInfo.wayOSMID);
-                if (it != OSMID_wayType.end() && it->second == "motorway"){
-                   g->set_line_width(20);
-                   g->set_color(ezgl::ORANGE);
-                   g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
-                }
-            }
-            
-            
+            }  
         }
+        
         if (scope_length < 1500 && scope_height < 1200 && findStreetSegmentLength(i) > 70) {
             if (scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y) {
                 ezgl::point2d centerPoint(streets[i].mid_x, streets[i].mid_y);
                 
                 //set so that street name is displayed once every 4 blocks
-                if(i % 4 == 0){g->set_text_rotation(streets[i].angle);
-                g->set_font_size(10);
-                g->set_color(ezgl::BLACK);
-                g->draw_text(centerPoint, streets[i].name);
+                if(i % 4 == 0){
+                    g->set_text_rotation(streets[i].angle);
+                    g->set_font_size(8);
+                    g->set_color(ezgl::BLACK);
+                    g->draw_text(centerPoint, streets[i].name);
                 };
             }
-            //find the width of streets 
+        }
+        
+        if (scope_length < 39000 && scope_height < 35000){
             StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
             std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_wayType.find(tempInfo.wayOSMID);
             if (it != OSMID_wayType.end() && it->second == "motorway"){
-               g->set_line_width(20);
+               g->set_line_width(1.8);
                g->set_color(ezgl::ORANGE);
                g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
             }
         }
-        
         
     }
 
@@ -231,9 +211,7 @@ void draw_main_canvas(ezgl::renderer *g) {
             //declare vector of 2d points
             std::vector<ezgl::point2d> featurePoints;
 
-            featurePoints.resize(getNumFeaturePoints(i), {
-                0, 0
-            });
+            featurePoints.resize(getNumFeaturePoints(i), {0, 0});
 
             //loop through # feature points and add to vector of 2d points
             for (int j = 0; j < getNumFeaturePoints(i); j++) {
@@ -246,13 +224,16 @@ void draw_main_canvas(ezgl::renderer *g) {
             if (featurePoints.size() > 1) {
                 //exception for buildings (crowdedness) to draw only at scope level of 6000
                 if(getFeatureType(i) == BUILDING){
-                    if(scope_length < 15000 && scope_height < 15000){
+                    if(scope_length < 5000 && scope_height < 5000){
+                        g->set_line_width(1);
                         g->set_color(chooseFeatureColour(getFeatureType(i)));
                         g->fill_poly(featurePoints);
                     }
                 }
-                else{g->set_color(chooseFeatureColour(getFeatureType(i)));
-                g->fill_poly(featurePoints);
+                else{
+                    g->set_line_width(1);
+                    g->set_color(chooseFeatureColour(getFeatureType(i)));
+                    g->fill_poly(featurePoints);
                 }
             }
 
@@ -265,6 +246,7 @@ void draw_main_canvas(ezgl::renderer *g) {
                 double yCoord = y_from_lat(getFeaturePoint(i, j).latitude());
 
                 //choose colour depending on feature type
+                g->set_line_width(1);
                 g->set_color(chooseFeatureColour(getFeatureType(i)));
                 g->set_line_cap(ezgl::line_cap::butt);
                 g->draw_line({xCoord, yCoord},
@@ -284,24 +266,28 @@ void draw_main_canvas(ezgl::renderer *g) {
         g->set_text_rotation(0);
 
         ezgl::point2d center(POIs[i].x, POIs[i].y);
-
-        g->fill_elliptic_arc(center, radius, radius, 0, 360);
-
         ezgl::point2d center_point(POIs[i].x, POIs[i].y + 7.5);
 
         if (scope_length < 85 && scope_height < 70) {
+            g->fill_elliptic_arc(center, radius, radius, 0, 360);
             g->set_color(ezgl::BLACK);
             g->set_font_size(16);
             g->draw_text(center_point, POIs[i].name);
-        } else if (scope_length < 240 && scope_height < 185) {
+        } 
+        else if (scope_length < 240 && scope_height < 185) {
+            g->fill_elliptic_arc(center, radius, radius, 0, 360);
             g->set_color(ezgl::BLACK);
             g->set_font_size(13);
             g->draw_text(center_point, POIs[i].name);
-        } else if (scope_length < 385 && scope_height < 305) {
+        }
+        else if (scope_length < 385 && scope_height < 305) {
+            g->fill_elliptic_arc(center, radius, radius, 0, 360);
             g->set_color(ezgl::BLACK);
             g->set_font_size(10);
             g->draw_text(center_point, POIs[i].name);
-        } else if (scope_length < 650 && scope_height < 505) {
+        }
+        else if (scope_length < 650 && scope_height < 600) {
+            g->fill_elliptic_arc(center, radius, radius, 0, 360);
             g->set_color(ezgl::BLACK);
             g->set_font_size(8);
             g->draw_text(center_point, POIs[i].name);
@@ -325,14 +311,12 @@ void draw_main_canvas(ezgl::renderer *g) {
 
             //set color for intersection icon 
             g->set_color(ezgl::RED);
-        } else {
+            g->fill_rectangle({x - width / 2, y - height / 2}, {x + width / 2, y + height / 2});
+        } 
+        else if(intersections[id].highlight == false && scope_length < 800){
             g->set_color(ezgl::GREY_55);
+            g->fill_rectangle({x - width / 2, y - height / 2}, {x + width / 2, y + height / 2});
         }
-
-        g->fill_rectangle({x - width / 2, y - height / 2},
-        {
-            x + width / 2, y + height / 2
-        });
     }
 
     //make the search box for street intersections
@@ -418,73 +402,20 @@ void drawMap() {
 
         if (streets[i].end_x == streets[i].start_x) {
             rotation = 90;
-        } else {
+        } 
+        else {
             rotation = std::atan(abs((streets[i].end_y - streets[i].start_y) / (streets[i].end_x - streets[i].start_x))) / kDegreeToRadian;
         }
 
         if ((streets[i].end_x > streets[i].start_x && streets[i].end_y > streets[i].start_y) || (streets[i].end_x < streets[i].start_x && streets[i].end_y < streets[i].start_y)) {
             streets[i].angle = rotation;
-        } else {
+        } 
+        else {
             streets[i].angle = -1 * rotation;
         }
 
         streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
 
-        //setting the types of street segments
-
-
-        //StreetSegmentInfo ss_info = getStreetSegmentInfo(i);
-
-        /*
-        //for (int j = 0; j < getNumberOfWays(); j++){
-        bool found = false; 
-        int j = 0;
-        while (!found){    
-            const OSMWay* e = getWayByIndex(j);
-            
-            OSMID id1 = ss_info.wayOSMID;
-            OSMID id2 = e->id();
-            if (ss_info.wayOSMID == e -> id()){
-                found = true;
-                int k = 1;
-                
-                std::string key, value;
-                std::tie(key, value) = getTagPair(e, 0);
-
-                while (key != "highway"){
-                    std::tie(key,value) = getTagPair(e, k);
-                    k++;
-                }
-                    
-                streets[i].street_type = value;
-            }
-            
-            j++;
-        }
-         
-        
-        for (int ss_num = 0; ss_num < getNumStreetSegments(); ss_num++) {
-            StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_num);
-
-            for (int j = 0; j < getNumberOfWays(); j++) {
-                const OSMWay* e = getWayByIndex(j);
-
-                if (ss_info.wayOSMID == e -> id()) {
-                    int k = 1;
-                    std::string key, value;
-                    std::tie(key, value) = getTagPair(e, 0);
-
-                    while (key != "highway") {
-                        std::tie(key, value) = getTagPair(e, k);
-                        k++;
-                    }
-
-                    streets[ss_num].type = value;
-                }
-            }
-        }
-    }
-         */
     }
     
     //creating an unordered map for OSMID and entity ptr

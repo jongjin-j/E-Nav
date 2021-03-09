@@ -15,6 +15,7 @@
 #include "globals.h"
 #include <typeinfo>
 #include <string>
+#include <unordered_map>
 
 struct intersection_data {
     std::string name;
@@ -106,6 +107,7 @@ std::vector<intersection_data> intersections;
 std::vector<POI_data> POIs;
 std::vector<std::vector<StreetSegmentIdx>> streetSegments;
 std::vector<street_data> streets;
+std::unordered_map<OSMID, std::string> OSMID_wayType; 
 
 void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice){
     x->set_line_width(width);
@@ -152,6 +154,15 @@ void draw_main_canvas(ezgl::renderer *g) {
 
         //introduce white streets at a max scope of 12000 height & width        //suggestion. while loop?
         if (scope_length < 12000 && scope_height < 12000) {
+            //find the width of streets 
+                StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
+                std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_wayType.find(tempInfo.wayOSMID);
+                if (it != OSMID_wayType.end() && it->second == "motorway"){
+                   g->set_line_width(20);
+                   g->set_color(ezgl::ORANGE);
+                   g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+                }
+                
             //helper function to set width and colour of line
             colourWidthSetter(g, 6, ezgl::WHITE);
             g->draw_line({streets[i].start_x, streets[i].start_y},
@@ -160,7 +171,7 @@ void draw_main_canvas(ezgl::renderer *g) {
             });
             
             
-            //introduce boredered streets if scope within approx 2000
+            //introduce bordered streets if scope within approx 2000
             if (scope_length < 2000 && scope_height < 1700) {
                 colourWidthSetter(g, 6, ezgl::color(130,130,130));
                 g->set_line_cap(ezgl::line_cap::round);
@@ -174,7 +185,18 @@ void draw_main_canvas(ezgl::renderer *g) {
                 {
                     streets[i].end_x, streets[i].end_y
                 });
+                
+                //find the width of streets 
+                StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
+                std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_wayType.find(tempInfo.wayOSMID);
+                if (it != OSMID_wayType.end() && it->second == "motorway"){
+                   g->set_line_width(20);
+                   g->set_color(ezgl::ORANGE);
+                   g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+                }
             }
+            
+            
         }
         if (scope_length < 1500 && scope_height < 1200 && findStreetSegmentLength(i) > 70) {
             if (scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y) {
@@ -187,7 +209,17 @@ void draw_main_canvas(ezgl::renderer *g) {
                 g->draw_text(centerPoint, streets[i].name);
                 };
             }
+            //find the width of streets 
+            StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
+            std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_wayType.find(tempInfo.wayOSMID);
+            if (it != OSMID_wayType.end() && it->second == "motorway"){
+               g->set_line_width(20);
+               g->set_color(ezgl::ORANGE);
+               g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+            }
         }
+        
+        
     }
 
     //drawing features
@@ -401,7 +433,7 @@ void drawMap() {
         //setting the types of street segments
 
 
-        StreetSegmentInfo ss_info = getStreetSegmentInfo(i);
+        //StreetSegmentInfo ss_info = getStreetSegmentInfo(i);
 
         /*
         //for (int j = 0; j < getNumberOfWays(); j++){
@@ -454,6 +486,30 @@ void drawMap() {
     }
          */
     }
+    
+    //creating an unordered map for OSMID and entity ptr
+    //initialize         
+    for (int i = 0; i < getNumberOfWays(); i++){
+            
+        //get the way pointer 
+        const OSMWay* OSMWay_ptr = getWayByIndex (i);
+        
+        //get the way OSMID
+        OSMID WayID = OSMWay_ptr->id();
+        
+        std::string key, value;
+
+        //loop through the tags and push into unordered map when key is highway
+        for (int j = 0; j < getTagCount(OSMWay_ptr); j++) {
+            
+            std::tie(key, value) = getTagPair(OSMWay_ptr, j);
+            
+            if (key == "highway")
+                OSMID_wayType[WayID] = value;
+        }
+    }
+    
+    
 
     ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)},
     {

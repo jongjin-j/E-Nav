@@ -146,43 +146,55 @@ void drawPOIS(ezgl::renderer *g, int i, double font){
         g->set_color(ezgl::BLUE);
         g->set_text_rotation(0);
 
-        ezgl::point2d center(POIs[i].x, POIs[i].y);
+        double png_x = POIs[i].x + 5;
+        double png_y = POIs[i].y + 5;
         ezgl::point2d center_point(POIs[i].x, POIs[i].y + 5);
-
         
         std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_nodeType.find(POIs[i].id);
         if (it != OSMID_nodeType.end() && it->second == "restaurant"){
-            g->fill_elliptic_arc(center, radius, radius, 0, 360);
+            ezgl::surface *png_surface = ezgl::renderer::load_png("restaurant.png");
+            g->draw_surface(png_surface, {png_x, png_y});
+            ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
             g->set_font_size(font);
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_nodeType.end() && (it->second == "school")){
-            g->fill_elliptic_arc(center, radius, radius, 0, 360);
+            ezgl::surface *png_surface = ezgl::renderer::load_png("school.png");
+            g->draw_surface(png_surface, {png_x, png_y});
+            ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
             g->set_font_size(font);
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_nodeType.end() && (it->second == "hospital")){
-            g->fill_elliptic_arc(center, radius, radius, 0, 360);
+            ezgl::surface *png_surface = ezgl::renderer::load_png("hospital.png");
+            g->draw_surface(png_surface, {png_x, png_y});
+            ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
             g->set_font_size(font);
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_nodeType.end() && (it->second == "cafe")){
-            g->fill_elliptic_arc(center, radius, radius, 0, 360);
+            ezgl::surface *png_surface = ezgl::renderer::load_png("cafe.png");
+            g->draw_surface(png_surface, {png_x, png_y});
+            ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
             g->set_font_size(font);
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_nodeType.end() && (it->second == "bank")){
-            g->fill_elliptic_arc(center, radius, radius, 0, 360);
+            ezgl::surface *png_surface = ezgl::renderer::load_png("bank.png");
+            g->draw_surface(png_surface, {png_x, png_y});
+            ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
             g->set_font_size(font);
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_nodeType.end() && (it->second == "bus_station")){
-            g->fill_elliptic_arc(center, radius, radius, 0, 360);
+            ezgl::surface *png_surface = ezgl::renderer::load_png("bus_station.png");
+            g->draw_surface(png_surface, {png_x, png_y});
+            ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
             g->set_font_size(font);
             g->draw_text(center_point, POIs[i].name);
@@ -196,7 +208,7 @@ void draw_main_canvas(ezgl::renderer *g) {
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;
     double scope_height = scope.m_second.y - scope.m_first.y;
-    std::cout << scope_length << "  " << scope_height << std::endl;
+    //std::cout << scope_length << "  " << scope_height << std::endl;
      
     //drawing streets
     for (int i = 0; i < getNumStreetSegments(); i++) {

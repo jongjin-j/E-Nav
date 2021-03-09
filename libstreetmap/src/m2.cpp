@@ -145,7 +145,8 @@ void draw_main_canvas(ezgl::renderer *g) {
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;
     double scope_height = scope.m_second.y - scope.m_first.y;
-    
+    std::cout << scope_length << "  " << scope_height << std::endl;
+     
     //drawing streets
     for (int i = 0; i < getNumStreetSegments(); i++) {
 
@@ -176,6 +177,21 @@ void draw_main_canvas(ezgl::renderer *g) {
             }  
         }
         
+        if (scope_length < 65000 && scope_height < 60000){
+            StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
+            std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_wayType.find(tempInfo.wayOSMID);
+            if (it != OSMID_wayType.end() && it->second == "motorway"){
+               g->set_line_width(2);
+               g->set_color(ezgl::ORANGE);
+               g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+            }
+            if (it != OSMID_wayType.end() && (it->second == "primary" || it->second == "secondary")){
+               g->set_line_width(1.5);
+               g->set_color(ezgl::WHITE);
+               g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+            }
+        }
+        
         if (scope_length < 1500 && scope_height < 1200 && findStreetSegmentLength(i) > 70) {
             if (scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y) {
                 ezgl::point2d centerPoint(streets[i].mid_x, streets[i].mid_y);
@@ -187,16 +203,6 @@ void draw_main_canvas(ezgl::renderer *g) {
                     g->set_color(ezgl::BLACK);
                     g->draw_text(centerPoint, streets[i].name);
                 };
-            }
-        }
-        
-        if (scope_length < 39000 && scope_height < 35000){
-            StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
-            std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_wayType.find(tempInfo.wayOSMID);
-            if (it != OSMID_wayType.end() && it->second == "motorway"){
-               g->set_line_width(1.8);
-               g->set_color(ezgl::ORANGE);
-               g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
             }
         }
         
@@ -260,13 +266,13 @@ void draw_main_canvas(ezgl::renderer *g) {
 
     //drawing POIs
     for (int i = 0; i < POIs.size(); i++) {
-        float radius = 5;
+        float radius = 3;
 
         g->set_color(ezgl::BLUE);
         g->set_text_rotation(0);
 
         ezgl::point2d center(POIs[i].x, POIs[i].y);
-        ezgl::point2d center_point(POIs[i].x, POIs[i].y + 7.5);
+        ezgl::point2d center_point(POIs[i].x, POIs[i].y + 5);
 
         if (scope_length < 85 && scope_height < 70) {
             g->fill_elliptic_arc(center, radius, radius, 0, 360);
@@ -286,19 +292,13 @@ void draw_main_canvas(ezgl::renderer *g) {
             g->set_font_size(10);
             g->draw_text(center_point, POIs[i].name);
         }
-        else if (scope_length < 650 && scope_height < 600) {
-            g->fill_elliptic_arc(center, radius, radius, 0, 360);
-            g->set_color(ezgl::BLACK);
-            g->set_font_size(8);
-            g->draw_text(center_point, POIs[i].name);
-        }
     }
 
     //drawing intersections
     for (int id = 0; id < intersections.size(); id++) {
         float x = intersections[id].x;
         float y = intersections[id].y;
-        float width = 10;
+        float width = 5;
         float height = width;
 
         if (intersections[id].highlight && scope_length < 800) {

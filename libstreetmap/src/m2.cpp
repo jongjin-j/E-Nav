@@ -26,6 +26,7 @@ struct intersection_data {
 
 struct POI_data {
     std::string name;
+    OSMID id;
     double x = 0;
     double y = 0;
 };
@@ -107,7 +108,8 @@ std::vector<intersection_data> intersections;
 std::vector<POI_data> POIs;
 std::vector<std::vector<StreetSegmentIdx>> streetSegments;
 std::vector<street_data> streets;
-std::unordered_map<OSMID, std::string> OSMID_wayType; 
+std::unordered_map<OSMID, std::string> OSMID_wayType;
+std::unordered_map<OSMID, std::string> OSMID_nodeType;
 
 void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice){
     x->set_line_width(width);
@@ -137,6 +139,55 @@ g_signal_connect(
 void testPrint(){
     std::cout << "testing" << std::endl;
 }*/
+
+void drawPOIS(ezgl::renderer *g, int i, double font){
+    float radius = 3;
+
+        g->set_color(ezgl::BLUE);
+        g->set_text_rotation(0);
+
+        ezgl::point2d center(POIs[i].x, POIs[i].y);
+        ezgl::point2d center_point(POIs[i].x, POIs[i].y + 5);
+
+        
+        std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_nodeType.find(POIs[i].id);
+        if (it != OSMID_nodeType.end() && it->second == "restaurant"){
+            g->fill_elliptic_arc(center, radius, radius, 0, 360);
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(font);
+            g->draw_text(center_point, POIs[i].name);
+        }
+        if (it != OSMID_nodeType.end() && (it->second == "school")){
+            g->fill_elliptic_arc(center, radius, radius, 0, 360);
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(font);
+            g->draw_text(center_point, POIs[i].name);
+        }
+        if (it != OSMID_nodeType.end() && (it->second == "hospital")){
+            g->fill_elliptic_arc(center, radius, radius, 0, 360);
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(font);
+            g->draw_text(center_point, POIs[i].name);
+        }
+        if (it != OSMID_nodeType.end() && (it->second == "cafe")){
+            g->fill_elliptic_arc(center, radius, radius, 0, 360);
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(font);
+            g->draw_text(center_point, POIs[i].name);
+        }
+        if (it != OSMID_nodeType.end() && (it->second == "bank")){
+            g->fill_elliptic_arc(center, radius, radius, 0, 360);
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(font);
+            g->draw_text(center_point, POIs[i].name);
+        }
+        if (it != OSMID_nodeType.end() && (it->second == "bus_station")){
+            g->fill_elliptic_arc(center, radius, radius, 0, 360);
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(font);
+            g->draw_text(center_point, POIs[i].name);
+        }
+}
 
 
 void draw_main_canvas(ezgl::renderer *g) {
@@ -251,7 +302,7 @@ void draw_main_canvas(ezgl::renderer *g) {
                 double xCoord = x_from_lon(getFeaturePoint(i, j).longitude());
                 double yCoord = y_from_lat(getFeaturePoint(i, j).latitude());
 
-                //choose colour depending on feature type
+                //choose color depending on feature type
                 g->set_line_width(1);
                 g->set_color(chooseFeatureColour(getFeatureType(i)));
                 g->set_line_cap(ezgl::line_cap::butt);
@@ -266,31 +317,15 @@ void draw_main_canvas(ezgl::renderer *g) {
 
     //drawing POIs
     for (int i = 0; i < POIs.size(); i++) {
-        float radius = 3;
-
-        g->set_color(ezgl::BLUE);
-        g->set_text_rotation(0);
-
-        ezgl::point2d center(POIs[i].x, POIs[i].y);
-        ezgl::point2d center_point(POIs[i].x, POIs[i].y + 5);
 
         if (scope_length < 85 && scope_height < 70) {
-            g->fill_elliptic_arc(center, radius, radius, 0, 360);
-            g->set_color(ezgl::BLACK);
-            g->set_font_size(16);
-            g->draw_text(center_point, POIs[i].name);
+            drawPOIS(g, i, 16);
         } 
         else if (scope_length < 240 && scope_height < 185) {
-            g->fill_elliptic_arc(center, radius, radius, 0, 360);
-            g->set_color(ezgl::BLACK);
-            g->set_font_size(13);
-            g->draw_text(center_point, POIs[i].name);
+            drawPOIS(g, i, 13);
         }
         else if (scope_length < 385 && scope_height < 305) {
-            g->fill_elliptic_arc(center, radius, radius, 0, 360);
-            g->set_color(ezgl::BLACK);
-            g->set_font_size(10);
-            g->draw_text(center_point, POIs[i].name);
+            drawPOIS(g, i, 10);
         }
     }
 
@@ -378,6 +413,7 @@ void drawMap() {
         POIs[i].name = getPOIName(i);
         POIs[i].x = x_from_lon(getPOIPosition(i).longitude());
         POIs[i].y = y_from_lat(getPOIPosition(i).latitude());
+        POIs[i].id = getPOIOSMNodeID(i);
     }
 
     //
@@ -435,12 +471,31 @@ void drawMap() {
             
             std::tie(key, value) = getTagPair(OSMWay_ptr, j);
             
-            if (key == "highway")
+            if (key == "highway" || key == "aeroway" || key == "railway")
                 OSMID_wayType[WayID] = value;
         }
     }
     
-    
+    for (int i = 0; i < getNumberOfNodes(); i++){
+            
+        //get the way pointer 
+        const OSMNode* OSMNode_ptr = getNodeByIndex(i);
+        
+        //get the way OSMID
+        OSMID NodeID = OSMNode_ptr->id();
+        
+        std::string key, value;
+
+        //loop through the tags and push into unordered map when key is highway
+        for (int j = 0; j < getTagCount(OSMNode_ptr); j++) {
+            
+            std::tie(key, value) = getTagPair(OSMNode_ptr, j);
+            
+            if(key == "amenity" || key == "shop"){
+                OSMID_nodeType[NodeID] = value;
+            }
+        }
+    }
 
     ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)},
     {

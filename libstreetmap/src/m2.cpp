@@ -199,6 +199,38 @@ void drawPOIS(ezgl::renderer *g, int i, double font){
             g->set_font_size(font);
             g->draw_text(center_point, POIs[i].name);
         }
+        if (it != OSMID_wayType.end() && (it->second == "aerodrome")){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("aerodrome.png");
+            g->draw_surface(png_surface, {png_x, png_y});
+            ezgl::renderer::free_surface(png_surface);
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(font);
+            g->draw_text(center_point, POIs[i].name);
+        }
+        if (it != OSMID_wayType.end() && (it->second == "helipad")){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("helipad.png");
+            g->draw_surface(png_surface, {png_x, png_y});
+            ezgl::renderer::free_surface(png_surface);
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(font);
+            g->draw_text(center_point, POIs[i].name);
+        }
+        if (it != OSMID_wayType.end() && (it->second == "subway_entrance")){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("subway_entrance.png");
+            g->draw_surface(png_surface, {png_x, png_y});
+            ezgl::renderer::free_surface(png_surface);
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(font);
+            g->draw_text(center_point, POIs[i].name);
+        }
+        if (it != OSMID_nodeType.end() && (it->second == "supermarket")){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("supermarket.png");
+            g->draw_surface(png_surface, {png_x, png_y});
+            ezgl::renderer::free_surface(png_surface);
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(font);
+            g->draw_text(center_point, POIs[i].name);
+        }
 }
 
 

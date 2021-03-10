@@ -144,6 +144,28 @@ void testPrint(){
     std::cout << "testing" << std::endl;
 }*/
 
+void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data){
+
+    std::cout << "response is ";
+        switch(response_id) {
+            case GTK_RESPONSE_ACCEPT:
+                std::cout << "GTK_RESPONSE_ACCEPT ";
+                break;
+            case GTK_RESPONSE_DELETE_EVENT:
+                std::cout << "GTK_RESPONSE_DELETE_EVENT (i.e. ’X’ button) ";
+                break;
+            case GTK_RESPONSE_REJECT:
+                std::cout << "GTK_RESPONSE_REJECT ";
+                break;
+            default:
+                std::cout << "UNKNOWN ";
+                break;
+        }
+    std::cout << "(" << response_id << ")\n";
+    gtk_widget_destroy(GTK_WIDGET (dialog));
+    
+}
+
 void searchFor(GtkWidget *widget, ezgl::application *application){
     
     //searchTerm will hold what the user inputs
@@ -159,8 +181,39 @@ void searchFor(GtkWidget *widget, ezgl::application *application){
             std::cout << getStreetName(results[i]) << std::endl;
         }
     }
+    GObject *window; // the parent window over which to add the dialog
+    GtkWidget *content_area; // the content area of the dialog
+    GtkWidget *label; // the label we will create to display a message in the content area
+    GtkWidget *dialog; // the dialog box we will create
+
+    window = application->get_object(application->get_main_window_id().c_str());
+
+    dialog = gtk_dialog_new_with_buttons(
+            "Search Results",
+            (GtkWindow*) window,
+            GTK_DIALOG_MODAL,
+            ("OK"),
+            GTK_RESPONSE_ACCEPT,
+            ("CANCEL"),
+            GTK_RESPONSE_REJECT,
+            NULL
+            );
+
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    label = gtk_label_new("Prototype; display search results here");
+    gtk_container_add(GTK_CONTAINER(content_area), label);
+
+    gtk_widget_show_all(dialog);
     
+    g_signal_connect(
+        GTK_DIALOG(dialog),
+        "response",
+        G_CALLBACK(on_dialog_response),
+        NULL
+    );
 }
+
+
 
 void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("SearchBar"), "activate", G_CALLBACK(searchFor), application);

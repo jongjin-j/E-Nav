@@ -162,13 +162,13 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
         g->set_color(ezgl::BLUE);
         g->set_text_rotation(0);
 
-        double png_x = POIs[i].x + 5;
-        double png_y = POIs[i].y + 5;
+        double png_x = POIs[i].x - 3;
+        double png_y = POIs[i].y + 3;
         ezgl::point2d center_point(POIs[i].x, POIs[i].y + 5);
         
         std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_nodeType.find(POIs[i].id);
         if (it != OSMID_nodeType.end() && it->second == "restaurant"){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("restaurant.png");
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png");
             g->draw_surface(png_surface, {png_x, png_y});
             ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
@@ -176,7 +176,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_nodeType.end() && (it->second == "school")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("school.png");
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/school.png");
             g->draw_surface(png_surface, {png_x, png_y});
             ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
@@ -184,7 +184,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_nodeType.end() && (it->second == "hospital")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("hospital.png");
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
             g->draw_surface(png_surface, {png_x, png_y});
             ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
@@ -192,7 +192,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_nodeType.end() && (it->second == "cafe")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("cafe.png");
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/cafe.png");
             g->draw_surface(png_surface, {png_x, png_y});
             ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
@@ -200,7 +200,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_nodeType.end() && (it->second == "bank")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("bank.png");
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bank.png");
             g->draw_surface(png_surface, {png_x, png_y});
             ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
@@ -208,7 +208,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_nodeType.end() && (it->second == "bus_station")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("bus_station.png");
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bus_station.png");
             g->draw_surface(png_surface, {png_x, png_y});
             ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
@@ -216,7 +216,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_wayType.end() && (it->second == "aerodrome")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("aerodrome.png");
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
             g->draw_surface(png_surface, {png_x, png_y});
             ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
@@ -224,7 +224,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_wayType.end() && (it->second == "helipad")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("helipad.png");
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/helipad.png");
             g->draw_surface(png_surface, {png_x, png_y});
             ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
@@ -232,7 +232,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_wayType.end() && (it->second == "subway_entrance")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("subway_entrance.png");
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
             g->draw_surface(png_surface, {png_x, png_y});
             ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);
@@ -240,7 +240,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
             g->draw_text(center_point, POIs[i].name);
         }
         if (it != OSMID_nodeType.end() && (it->second == "supermarket")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("supermarket.png");
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/supermarket.png");
             g->draw_surface(png_surface, {png_x, png_y});
             ezgl::renderer::free_surface(png_surface);
             g->set_color(ezgl::BLACK);

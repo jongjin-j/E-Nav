@@ -109,8 +109,10 @@ std::vector<intersection_data> intersections;
 std::vector<POI_data> POIs;
 std::vector<std::vector<StreetSegmentIdx>> streetSegments;
 std::vector<street_data> streets;
+std::vector<StreetIdx> results; //stores the results from user search
 std::unordered_map<OSMID, std::string> OSMID_wayType;
 std::unordered_map<OSMID, std::string> OSMID_nodeType;
+
 
 void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice){
     x->set_line_width(width);
@@ -147,7 +149,7 @@ void searchFor(GtkWidget *widget, ezgl::application *application){
     //searchTerm will hold what the user inputs
     const char* searchTerm = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchBar"));
     
-    std::vector<StreetIdx> results = findStreetIdsFromPartialStreetName(searchTerm);
+    results = findStreetIdsFromPartialStreetName(searchTerm);
     
     //check if results vector empty
     if(results.size() == 0){
@@ -162,6 +164,7 @@ void searchFor(GtkWidget *widget, ezgl::application *application){
 
 void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("SearchBar"), "activate", G_CALLBACK(searchFor), application);
+    //g_signal_connect(application->get_object(),"",G_CALLBACK(),application);
 }
 
 

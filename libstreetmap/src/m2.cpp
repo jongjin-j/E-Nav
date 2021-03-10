@@ -165,7 +165,7 @@ void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice)
 std::pair<StreetIdx, StreetIdx> resultStreets;
 
 //callback function of searching the first street
-void searchFirstStreet(GtkWidget *widget, ezgl::application *application){
+void searchFirstStreet(GtkWidget *, ezgl::application *application){
     
     //street1 will hold what the user inputs
     const char* street1 = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet1"));
@@ -645,9 +645,9 @@ void draw_main_canvas(ezgl::renderer *g) {
         else if(scope_length < 4200 && scope_height < 3000){
             draw_important_POIs(g, i, 10);
         }
-        /*else{
+        else{
             draw_important_POIs(g, i, 10);
-        }*/
+        }
     }
 
     //drawing intersections

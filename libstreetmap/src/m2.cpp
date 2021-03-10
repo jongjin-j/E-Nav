@@ -385,15 +385,24 @@ void draw_main_canvas(ezgl::renderer *g) {
                 ezgl::point2d centerPoint(streets[i].mid_x, streets[i].mid_y);
                 
                 //set so that street name is displayed once every 4 blocks
-                if(i % 4 == 0){
+                if (i % 4 == 0){
                     g->set_text_rotation(streets[i].angle);
                     g->set_font_size(8);
                     g->set_color(ezgl::BLACK);
                     g->draw_text(centerPoint, streets[i].name);
-                };
+                }
+                
+                /*
+                //print the arrows for one way streets
+                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/arrow.png");
+                g->draw_surface(png_surface, {png_x, png_y});
+                ezgl::renderer::free_surface(png_surface);
+                g->set_color(ezgl::BLACK);
+                g->set_font_size(font);
+                g->draw_text(center_point, POIs[i].name);
+                */
             }
         }
-        
     }
 
     //drawing features

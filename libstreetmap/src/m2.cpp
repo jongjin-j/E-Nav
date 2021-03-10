@@ -175,8 +175,10 @@ void searchFor(GtkWidget *widget, ezgl::application *application){
     
     //check if results vector empty
     if(results.size() == 0){
+        //display error message in results box
         std::cout << "No matching results found" << std::endl;
     }else{
+        //display results in results box
         for(int i = 0; i < results.size(); i++){
             std::cout << getStreetName(results[i]) << std::endl;
         }

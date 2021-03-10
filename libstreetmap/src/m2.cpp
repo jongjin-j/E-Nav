@@ -156,6 +156,66 @@ void draw_POI(ezgl::renderer *g, double png_x, double png_y, ezgl::point2d cente
 }
 */
 
+void draw_important_POIs(ezgl::renderer *g, int i, double font){
+    float radius = 3;
+
+    g->set_color(ezgl::BLUE);
+    g->set_text_rotation(0);
+        
+    ezgl::rectangle scope = g->get_visible_world();
+    double scope_min_x = scope.m_first.x;
+    double scope_max_x = scope.m_second.x;
+    double scope_min_y = scope.m_first.y;
+    double scope_max_y = scope.m_second.y;
+
+    double png_x = POIs[i].x - 3;
+    double png_y = POIs[i].y + 3;
+     ezgl::point2d center_point(POIs[i].x, POIs[i].y + 5);
+    bool include = false;
+        
+    if(png_x > scope_min_x  && png_x < scope_max_x && png_y > scope_min_y  && png_y < scope_max_y){
+        include = true;
+    }
+        
+    std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_nodeType.find(POIs[i].id);
+    std::unordered_map<OSMID, std::string>::const_iterator it2 = OSMID_wayType.find(POIs[i].id);
+    
+     if(include){
+            if (it != OSMID_nodeType.end() && (it->second == "hospital")){
+                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
+                g->draw_surface(png_surface, {png_x, png_y});
+                ezgl::renderer::free_surface(png_surface);
+                g->set_color(ezgl::BLACK);
+                g->set_font_size(font);
+                g->draw_text(center_point, POIs[i].name);
+            }
+            if (it2 != OSMID_wayType.end() && (it2->second == "aerodrome")){
+                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
+                g->draw_surface(png_surface, {png_x, png_y});
+                ezgl::renderer::free_surface(png_surface);
+                g->set_color(ezgl::BLACK);
+                g->set_font_size(font);
+                g->draw_text(center_point, POIs[i].name);
+            }
+            if (it2 != OSMID_wayType.end() && (it2->second == "helipad")){
+                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/helipad.png");
+                g->draw_surface(png_surface, {png_x, png_y});
+                ezgl::renderer::free_surface(png_surface);
+                g->set_color(ezgl::BLACK);
+                g->set_font_size(font);
+                g->draw_text(center_point, POIs[i].name);
+            }
+            if (it2 != OSMID_wayType.end() && (it2->second == "subway_entrance")){
+                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
+                g->draw_surface(png_surface, {png_x, png_y});
+                ezgl::renderer::free_surface(png_surface);
+                g->set_color(ezgl::BLACK);
+                g->set_font_size(font);
+                g->draw_text(center_point, POIs[i].name);
+            }
+        }
+}
+
 //function to draw POIs
 void draw_POIs(ezgl::renderer *g, int i, double font){
         float radius = 3;
@@ -179,6 +239,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
         }
         
         std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_nodeType.find(POIs[i].id);
+        std::unordered_map<OSMID, std::string>::const_iterator it2 = OSMID_wayType.find(POIs[i].id);
         
         if(include){
             if (it != OSMID_nodeType.end() && it->second == "restaurant"){
@@ -191,14 +252,6 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
             }
             if (it != OSMID_nodeType.end() && (it->second == "school")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/school.png");
-                g->draw_surface(png_surface, {png_x, png_y});
-                ezgl::renderer::free_surface(png_surface);
-                g->set_color(ezgl::BLACK);
-                g->set_font_size(font);
-                g->draw_text(center_point, POIs[i].name);
-            }
-            if (it != OSMID_nodeType.end() && (it->second == "hospital")){
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
                 g->draw_surface(png_surface, {png_x, png_y});
                 ezgl::renderer::free_surface(png_surface);
                 g->set_color(ezgl::BLACK);
@@ -229,7 +282,23 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
                 g->set_font_size(font);
                 g->draw_text(center_point, POIs[i].name);
             }
-            if (it != OSMID_wayType.end() && (it->second == "aerodrome")){
+            if (it != OSMID_nodeType.end() && (it->second == "supermarket")){
+                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/supermarket.png");
+                g->draw_surface(png_surface, {png_x, png_y});
+                ezgl::renderer::free_surface(png_surface);
+                g->set_color(ezgl::BLACK);
+                g->set_font_size(font);
+                g->draw_text(center_point, POIs[i].name);
+            }
+            if (it != OSMID_nodeType.end() && (it->second == "hospital")){
+                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
+                g->draw_surface(png_surface, {png_x, png_y});
+                ezgl::renderer::free_surface(png_surface);
+                g->set_color(ezgl::BLACK);
+                g->set_font_size(font);
+                g->draw_text(center_point, POIs[i].name);
+            }
+            if (it2 != OSMID_wayType.end() && (it2->second == "aerodrome")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
                 g->draw_surface(png_surface, {png_x, png_y});
                 ezgl::renderer::free_surface(png_surface);
@@ -237,7 +306,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
                 g->set_font_size(font);
                 g->draw_text(center_point, POIs[i].name);
             }
-            if (it != OSMID_wayType.end() && (it->second == "helipad")){
+            if (it2 != OSMID_wayType.end() && (it2->second == "helipad")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/helipad.png");
                 g->draw_surface(png_surface, {png_x, png_y});
                 ezgl::renderer::free_surface(png_surface);
@@ -245,16 +314,8 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
                 g->set_font_size(font);
                 g->draw_text(center_point, POIs[i].name);
             }
-            if (it != OSMID_wayType.end() && (it->second == "subway_entrance")){
+            if (it2 != OSMID_wayType.end() && (it2->second == "subway_entrance")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
-                g->draw_surface(png_surface, {png_x, png_y});
-                ezgl::renderer::free_surface(png_surface);
-                g->set_color(ezgl::BLACK);
-                g->set_font_size(font);
-                g->draw_text(center_point, POIs[i].name);
-            }
-            if (it != OSMID_nodeType.end() && (it->second == "supermarket")){
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/supermarket.png");
                 g->draw_surface(png_surface, {png_x, png_y});
                 ezgl::renderer::free_surface(png_surface);
                 g->set_color(ezgl::BLACK);
@@ -272,7 +333,7 @@ void draw_main_canvas(ezgl::renderer *g) {
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;
     double scope_height = scope.m_second.y - scope.m_first.y;
-    //std::cout << scope_length << "  " << scope_height << std::endl;
+    std::cout << scope_length << "  " << scope_height << std::endl;
      
     //drawing streets
     for (int i = 0; i < getNumStreetSegments(); i++) {
@@ -412,6 +473,12 @@ void draw_main_canvas(ezgl::renderer *g) {
         }
         else if (scope_length < 385 && scope_height < 305) {
             draw_POIs(g, i, 10);
+        }
+        else if(scope_length < 4200 && scope_height < 3000){
+            draw_important_POIs(g, i, 10);
+        }
+        else{
+            draw_important_POIs(g, i, 10);
         }
     }
 

@@ -134,6 +134,7 @@ void searchEntry(GtkWidget *widget, ezgl::application *application){
 
 g_signal_connect(
         G_OBJECT(SearchBar), "activate", G_CALLBACK(testPrint),NULL
+
 );
 
 void testPrint(){
@@ -246,7 +247,7 @@ void draw_main_canvas(ezgl::renderer *g) {
     for (int i = 0; i < getNumStreetSegments(); i++) {
 
         //introduce white streets at a max scope of 12000 height & width        //suggestion. while loop?
-        if (scope_length < 5000 && scope_height < 5000) {
+        if (scope_length < 7000 && scope_height < 7000) {
             //helper function to set width and color of line
             colourWidthSetter(g, 6, ezgl::WHITE);
             g->draw_line({streets[i].start_x, streets[i].start_y},
@@ -346,14 +347,24 @@ void draw_main_canvas(ezgl::renderer *g) {
                 double xCoord = x_from_lon(getFeaturePoint(i, j).longitude());
                 double yCoord = y_from_lat(getFeaturePoint(i, j).latitude());
 
-                //choose color depending on feature type
-                g->set_line_width(1);
-                g->set_color(chooseFeatureColour(getFeatureType(i)));
+                //choose colour depending on feature type
+                colourWidthSetter(g, 1, chooseFeatureColour(getFeatureType(i)));
                 g->set_line_cap(ezgl::line_cap::butt);
-                g->draw_line({xCoord, yCoord},
-                {
-                    x_from_lon(getFeaturePoint(i, j + 1).longitude()), y_from_lat(getFeaturePoint(i, j + 1).latitude())
-                });
+                    
+                if(getFeatureType(i) == STREAM){
+                    
+                    if(scope_length < 15000 && scope_height < 15000){
+                      g->draw_line({xCoord, yCoord},
+                    {x_from_lon(getFeaturePoint(i, j + 1).longitude()), y_from_lat(getFeaturePoint(i, j + 1).latitude())});  
+                    }
+                    
+                }else{
+                    
+                    g->draw_line({xCoord, yCoord},
+                    {x_from_lon(getFeaturePoint(i, j + 1).longitude()), y_from_lat(getFeaturePoint(i, j + 1).latitude())});
+                }
+                
+                
             }
 
         }

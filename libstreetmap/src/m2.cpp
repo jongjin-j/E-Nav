@@ -38,6 +38,7 @@ struct street_data {
     double end_x = 0;
     double end_y = 0;
     double angle = 0;
+    double oneWay_angle = 0;
     double mid_x = 0;
     double mid_y = 0;
     bool oneWay;
@@ -476,6 +477,7 @@ void drawMap() {
         intersections[i].y = y_from_lat(getIntersectionPosition(i).latitude());
     }
 
+    
     //set POI database
     POIs.resize(getNumPointsOfInterest());
 
@@ -486,7 +488,8 @@ void drawMap() {
         POIs[i].id = getPOIOSMNodeID(i);
     }
 
-    //
+    
+    //set streets database
     streets.resize(getNumStreetSegments());
 
     for (int i = 0; i < getNumStreetSegments(); i++) {
@@ -504,6 +507,7 @@ void drawMap() {
         streets[i].mid_x = 0.5 * (streets[i].start_x + streets[i].end_x);
         streets[i].mid_y = 0.5 * (streets[i].start_y + streets[i].end_y);
 
+        //set rotation of names
         double rotation = 0;
 
         if (streets[i].end_x == streets[i].start_x) {
@@ -520,18 +524,45 @@ void drawMap() {
             streets[i].angle = -1 * rotation;
         }
 
+        //set name of the street
         streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
+        
+        //set rotation of the arrow for one way streets
+        if (streets[i].end_x > streets[i].start_x && streets[i].end_y == streets[i].start_y){
+            streets[i].oneWay_angle = 0;
+        }
+        else if (streets[i].end_x < streets[i].start_x && streets[i].end_y == streets[i].start_y){
+            streets[i].oneWay_angle = 180;
+        }
+        else if (streets[i].end_x == streets[i].start_x && streets[i].end_y > streets[i].start_y){
+            streets[i].oneWay_angle = 90;
+        }
+        else if (streets[i].end_x == streets[i].start_x && streets[i].end_y < streets[i].start_y){
+            streets[i].oneWay_angle = -90;
+        }
+        else if (streets[i].end_x > streets[i].start_x && streets[i].end_y > streets[i].start_y){
+            streets[i].oneWay_angle = rotation;
+        }
+        else if (streets[i].end_x < streets[i].start_x && streets[i].end_y > streets[i].start_y){
+            streets[i].oneWay_angle = 180 - rotation;
+        }
+        else if (streets[i].end_x < streets[i].start_x && streets[i].end_y < streets[i].start_y){
+            streets[i].oneWay_angle = 180 + rotation;
+        }
+        else{
+            streets[i].oneWay_angle = -1 * rotation;
+        }
+           
+        
 
     }
     
-    //creating an unordered map for OSMID and entity ptr
-    //initialize         
+    
+    //creating an unordered map for OSMID and way pointer         
     for (int i = 0; i < getNumberOfWays(); i++){
             
-        //get the way pointer 
+        //get the way pointer and OSMID
         const OSMWay* OSMWay_ptr = getWayByIndex (i);
-        
-        //get the way OSMID
         OSMID WayID = OSMWay_ptr->id();
         
         std::string key, value;
@@ -548,15 +579,13 @@ void drawMap() {
     
     for (int i = 0; i < getNumberOfNodes(); i++){
             
-        //get the way pointer 
+        //get the node pointer and OSMID
         const OSMNode* OSMNode_ptr = getNodeByIndex(i);
-        
-        //get the way OSMID
         OSMID NodeID = OSMNode_ptr->id();
         
         std::string key, value;
 
-        //loop through the tags and push into unordered map when key is highway
+        //loop through the tags and push into unordered map when key is amenity or shop
         for (int j = 0; j < getTagCount(OSMNode_ptr); j++) {
             
             std::tie(key, value) = getTagPair(OSMNode_ptr, j);

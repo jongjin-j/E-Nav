@@ -142,6 +142,15 @@ void testPrint(){
     std::cout << "testing" << std::endl;
 }*/
 
+void searchFor(){
+    std::cout<<"hello"<<std::endl;
+}
+
+void initial_setup(ezgl::application *application, bool new_window){
+    g_signal_connect(application->get_object("SearchBar"), "activate", G_CALLBACK(searchFor), application);
+}
+
+
 //function to draw a POI
 /*
 void draw_POI(ezgl::renderer *g, double png_x, double png_y, ezgl::point2d center_point, double font, std::string POI_type){
@@ -698,6 +707,6 @@ void drawMap() {
     });
     application.add_canvas("MainCanvas", draw_main_canvas, initial_world, ezgl::color(230, 230, 230));
 
-    application.run(nullptr, act_on_mouse_click, nullptr, nullptr);
+    application.run(initial_setup, act_on_mouse_click, nullptr, nullptr);
 }
 

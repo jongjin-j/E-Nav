@@ -405,6 +405,26 @@ void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i){
     }
 }
 
+void writeStreetName(ezgl::renderer *g, ezgl::point2d center, StreetSegmentInfo segInfo, std::string name, int i){
+    if(segInfo.numCurvePoints == 0){
+        g->draw_text(center, name);
+    }
+    else{
+        int midPoint = segInfo.numCurvePoints / 2;
+        LatLon point;
+        if(midPoint % 2 == 0){
+            point = getStreetSegmentCurvePoint(i, midPoint);
+        }
+        else{
+            point = getStreetSegmentCurvePoint(i, midPoint - 1);
+        }
+        double mid_x = x_from_lon(point.longitude());
+        double mid_y = y_from_lat(point.latitude());
+        ezgl::point2d middlePoint(mid_x, mid_y);
+        g->draw_text(middlePoint, name);
+    }
+}
+
 void draw_main_canvas(ezgl::renderer *g) {
     g->draw_rectangle({0, 0}, {000, 1000});
 
@@ -493,6 +513,7 @@ void draw_main_canvas(ezgl::renderer *g) {
         if (scope_length < 1500 && scope_height < 1200) {
             if (findStreetSegmentLength(i) > 70 && scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y) {
                 ezgl::point2d centerPoint(streets[i].mid_x, streets[i].mid_y);
+                StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
                 
                 //display the street names
                 g->set_text_rotation(streets[i].angle);
@@ -505,16 +526,18 @@ void draw_main_canvas(ezgl::renderer *g) {
                 
                 if (streets[i].oneWay){
                     if (streets[i].reverse){
-                       g->draw_text(centerPoint, "< " + streets[i].name + " <");
+                       //g->draw_text(centerPoint, "< " + streets[i].name + " <");
+                       writeStreetName(g, centerPoint, tempInfo, "< " + streets[i].name + " <", i);
                     }
                     else {
-                       g->draw_text(centerPoint, "> " + streets[i].name + " >");
+                       //g->draw_text(centerPoint, "> " + streets[i].name + " >");
+                       writeStreetName(g, centerPoint, tempInfo, "> " + streets[i].name + " >", i);
                     }
                 }
                 else {
-                    g->draw_text(centerPoint, streets[i].name);
+                    //g->draw_text(centerPoint, streets[i].name);
+                    writeStreetName(g, centerPoint, tempInfo, streets[i].name, i);
                     
-                
                 }
             }
         }

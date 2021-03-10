@@ -313,11 +313,11 @@ void draw_important_POIs(ezgl::renderer *g, int i, double font){
              ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
             draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
         }
-        if (it2 != OSMID_wayType.end() && (it2->second == "aerodrome")){
+        if (it2 != OSMID_nodeType.end() && (it2->second == "aerodrome")){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
             draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
         }
-        if (it2 != OSMID_wayType.end() && (it2->second == "helipad")){
+        if (it2 != OSMID_nodeType.end() && (it2->second == "helipad")){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/helipad.png");
             draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
         }
@@ -380,11 +380,11 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
                 draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
             }
-            if (it2 != OSMID_wayType.end() && (it2->second == "aerodrome")){
+            if (it2 != OSMID_nodeType.end() && (it2->second == "aerodrome")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
                 draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
             }
-            if (it2 != OSMID_wayType.end() && (it2->second == "helipad")){
+            if (it2 != OSMID_nodeType.end() && (it2->second == "helipad")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/helipad.png");
                 draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
             }
@@ -645,9 +645,9 @@ void draw_main_canvas(ezgl::renderer *g) {
         else if(scope_length < 4200 && scope_height < 3000){
             draw_important_POIs(g, i, 10);
         }
-        else{
+        /*else{
             draw_important_POIs(g, i, 10);
-        }
+        }*/
     }
 
     //drawing intersections
@@ -838,7 +838,7 @@ void drawMap() {
             
             std::tie(key, value) = getTagPair(OSMWay_ptr, j);
             
-            if (key == "highway" || key == "aeroway" || key == "railway")
+            if (key == "highway" || key == "railway")
                 OSMID_wayType[WayID] = value;
         }
     }
@@ -856,7 +856,7 @@ void drawMap() {
             
             std::tie(key, value) = getTagPair(OSMNode_ptr, j);
             
-            if(key == "amenity" || key == "shop"){
+            if(key == "amenity" || key == "aeroway" || key == "shop"){
                 OSMID_nodeType[NodeID] = value;
             }
         }

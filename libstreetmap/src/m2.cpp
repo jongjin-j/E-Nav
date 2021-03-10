@@ -457,6 +457,37 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x,
     app -> refresh_drawing();
 }
 
+void findOneWayAngle(double start_x, double end_x, double start_y, double end_y, double rotation, int i){
+    double angle = 0;
+    
+    if (end_x > start_x && end_y == start_y){
+        angle = 0;
+    }
+    else if (end_x < start_x && end_y == start_y){
+        angle = 180;
+    }
+    else if (end_x == start_x && end_y > start_y){
+        angle = 90;
+    }
+    else if (end_x == start_x && end_y < start_y){
+        angle = -90;
+    }
+    else if (end_x > start_x && end_y > start_y){
+        angle = rotation;
+    }
+    else if (end_x < start_x && end_y > start_y){
+        angle = 180 - rotation;
+    }
+    else if (end_x < start_x && end_y < start_y){
+        angle = 180 + rotation;
+    }
+    else{
+        angle = -1 * rotation;
+    }
+    
+    streets[i].oneWay_angle = angle;
+}
+
 void drawMap() {
     ezgl::application::settings settings;
     settings.main_ui_resource = "libstreetmap/resources/main.ui";
@@ -543,33 +574,7 @@ void drawMap() {
         streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
         
         //set rotation of the arrow for one way streets
-        if (streets[i].end_x > streets[i].start_x && streets[i].end_y == streets[i].start_y){
-            streets[i].oneWay_angle = 0;
-        }
-        else if (streets[i].end_x < streets[i].start_x && streets[i].end_y == streets[i].start_y){
-            streets[i].oneWay_angle = 180;
-        }
-        else if (streets[i].end_x == streets[i].start_x && streets[i].end_y > streets[i].start_y){
-            streets[i].oneWay_angle = 90;
-        }
-        else if (streets[i].end_x == streets[i].start_x && streets[i].end_y < streets[i].start_y){
-            streets[i].oneWay_angle = -90;
-        }
-        else if (streets[i].end_x > streets[i].start_x && streets[i].end_y > streets[i].start_y){
-            streets[i].oneWay_angle = rotation;
-        }
-        else if (streets[i].end_x < streets[i].start_x && streets[i].end_y > streets[i].start_y){
-            streets[i].oneWay_angle = 180 - rotation;
-        }
-        else if (streets[i].end_x < streets[i].start_x && streets[i].end_y < streets[i].start_y){
-            streets[i].oneWay_angle = 180 + rotation;
-        }
-        else{
-            streets[i].oneWay_angle = -1 * rotation;
-        }
-           
-        
-
+        findOneWayAngle(streets[i].start_x, streets[i].end_x, streets[i].start_y, streets[i].end_y, rotation, i);
     }
     
     

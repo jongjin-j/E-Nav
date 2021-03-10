@@ -468,12 +468,14 @@ void draw_main_canvas(ezgl::renderer *g) {
     for (int id = 0; id < intersections.size(); id++) {
         float x = intersections[id].x;
         float y = intersections[id].y;
-        float width = 5;
-        float height = width;
+        float radius = 1;
+        if(scope_length < 1800 && scope_length > 800){
+            radius = 1.5;
+        }
 
         if (intersections[id].highlight && scope_length < 800) {
             //print name of intersection
-            ezgl::point2d center_point(x, y + 7.5);
+            ezgl::point2d center_point(x, y + 5);
             g->set_color(ezgl::BLACK);
             g->set_font_size(13);
             g->draw_text(center_point, intersections[id].name);
@@ -481,11 +483,13 @@ void draw_main_canvas(ezgl::renderer *g) {
 
             //set color for intersection icon 
             g->set_color(ezgl::RED);
-            g->fill_rectangle({x - width / 2, y - height / 2}, {x + width / 2, y + height / 2});
+            ezgl::point2d center(x, y);
+            g->fill_arc(center, radius, 0, 360);
         } 
         else if(intersections[id].highlight == false && scope_length < 800){
             g->set_color(ezgl::GREY_55);
-            g->fill_rectangle({x - width / 2, y - height / 2}, {x + width / 2, y + height / 2});
+            ezgl::point2d center(x, y);
+            g->fill_arc(center, radius, 0, 360);
         }
     }
 

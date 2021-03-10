@@ -445,26 +445,18 @@ void draw_main_canvas(ezgl::renderer *g) {
                 if(scope_length < 1000){
                     g->set_font_size(12);
                 }
-                if(scope_length < 600){
-                    g->set_font_size(12);
-                }
-                if(scope_length < 400){
-                    g->set_font_size(12);
-                }
-                if(scope_length < 200){
-                    g->set_font_size(12);
-                }
                 
                 if (streets[i].oneWay){
-                    if (!streets[i].reverse){
-                      g->draw_text(centerPoint, ">" + streets[i].name + ">");
+                    if (streets[i].reverse){
+                       g->draw_text(centerPoint, "< " + streets[i].name + " <");
                     }
                     else {
-                       g->draw_text(centerPoint, "<" + streets[i].name + "<");
+                       g->draw_text(centerPoint, "> " + streets[i].name + " >");
                     }
                 }
                 else {
                     g->draw_text(centerPoint, streets[i].name);
+                    
                 
                 }
             }
@@ -686,7 +678,6 @@ void drawMap() {
             if (end_y < start_y){
                 streets[i].reverse = true;
             }
-                   
         } 
         else {
             rotation = std::atan(abs((end_y - start_y) / (end_x - start_x))) / kDegreeToRadian;
@@ -699,22 +690,33 @@ void drawMap() {
         } 
         
         //to is in second quadrant
-        else if (end_x < start_x && end_y > start_y){
+        if (end_x < start_x && end_y > start_y){
             streets[i].angle = -1 * rotation;
             streets[i].reverse = true;
         }
         
         //to is in third quadrant
-        else if (end_x < start_x && end_y < start_y){
+        if (end_x < start_x && end_y < start_y){
             streets[i].angle = rotation;
             streets[i].reverse = true;
         }
         
         //to is in fourth quadrant
-        else if (end_x > start_x && end_y < start_y){
+        if (end_x > start_x && end_y < start_y){
             streets[i].angle = -1 * rotation;
         }
-
+        
+        //to is on positive x axis
+        if (end_x > start_x && end_y == start_y){
+            streets[i].angle = rotation;
+        }
+        
+        //to is on negative x axis
+        if (end_x < start_x && end_y == start_y){
+            streets[i].angle = rotation;
+            streets[i].reverse = true;
+        }
+        
         //set name of the street
         streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
         

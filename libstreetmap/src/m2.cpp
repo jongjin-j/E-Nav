@@ -123,9 +123,9 @@ void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice)
     application->update_message(text);
     std::cout << text << std::endl;
 
-}
+}*/
 
-void searchEntry(GtkWidget *widget, ezgl::application *application){
+/*void searchEntry(GtkWidget *widget, ezgl::application *application){
     GtkEntry* text_entry = (GtkEntry*) application->get_object("SearchBar");
     const char* searchTerm = gtk_entry_get_text(text_entry);
     application->update_message(searchTerm);

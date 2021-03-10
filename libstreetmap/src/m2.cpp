@@ -262,7 +262,6 @@ void initial_setup(ezgl::application *application, bool /*new_window*/){
 
 void draw_POI_function(ezgl::renderer *g, ezgl::point2d center_point, double font, ezgl::surface *p, std::string name){
     g->set_text_rotation(0);
-    //ezgl::surface *png_surface = ezgl::renderer::load_png(load_address);
     g->draw_surface(p, {center_point.x - 1, center_point.y - 2});
     ezgl::renderer::free_surface(p);
     g->set_color(ezgl::BLACK);
@@ -280,7 +279,7 @@ void draw_important_POIs(ezgl::renderer *g, int i, double font){
     double scope_min_y = scope.m_first.y;
     double scope_max_y = scope.m_second.y;
 
-     ezgl::point2d center_point(POIs[i].x, POIs[i].y + 2);
+    ezgl::point2d center_point(POIs[i].x, POIs[i].y + 2);
     bool include = false;
         
     if(POIs[i].x > scope_min_x  && POIs[i].x < scope_max_x && POIs[i].y > scope_min_y  && POIs[i].y < scope_max_y){
@@ -290,24 +289,24 @@ void draw_important_POIs(ezgl::renderer *g, int i, double font){
     std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_nodeType.find(POIs[i].id);
     std::unordered_map<OSMID, std::string>::const_iterator it2 = OSMID_wayType.find(POIs[i].id);
     
-     if(include){
-            if (it != OSMID_nodeType.end() && (it->second == "hospital")){
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
-            }
-            if (it2 != OSMID_wayType.end() && (it2->second == "aerodrome")){
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
-            }
-            if (it2 != OSMID_wayType.end() && (it2->second == "helipad")){
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/helipad.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
-            }
-            if (it2 != OSMID_wayType.end() && (it2->second == "subway_entrance")){
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
-            }
+    if(include){
+        if (it != OSMID_nodeType.end() && (it->second == "hospital")){
+             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
+            draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
         }
+        if (it2 != OSMID_wayType.end() && (it2->second == "aerodrome")){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
+            draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+        }
+        if (it2 != OSMID_wayType.end() && (it2->second == "helipad")){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/helipad.png");
+            draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+        }
+        if (it2 != OSMID_wayType.end() && (it2->second == "subway_entrance")){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
+            draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+        }
+    }
 }
 
 //function to draw POIs
@@ -378,6 +377,33 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
         
 }
 
+void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i){
+    if(tempInfo.numCurvePoints == 0){
+         g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+    }   
+    else{
+            int curvePoints = tempInfo.numCurvePoints;
+            
+            //create a dynamic array to store the curve points in the street segment
+            LatLon *segmentCurvePoints = new LatLon [curvePoints + 2];
+            for (int j = 1; j < curvePoints + 1; j++) {
+                segmentCurvePoints[j] = getStreetSegmentCurvePoint(i, j - 1);
+            }
+
+            segmentCurvePoints[0] = getIntersectionPosition(tempInfo.from);
+            segmentCurvePoints[curvePoints + 1] = getIntersectionPosition(tempInfo.to);
+
+            //compute distance of each street segment excluding the first and the last street segment
+            for (int j = 0; j < curvePoints + 1; j++) {
+                double firstCurve_x = x_from_lon((segmentCurvePoints[j]).longitude());
+                double firstCurve_y = y_from_lat((segmentCurvePoints[j]).latitude());
+                double lastCurve_x = x_from_lon((segmentCurvePoints[j + 1]).longitude());
+                double lastCurve_y = y_from_lat((segmentCurvePoints[j + 1]).latitude());
+                g->draw_line({firstCurve_x, firstCurve_y}, {lastCurve_x, lastCurve_y});
+            }
+            delete[] segmentCurvePoints;
+    }
+}
 
 void draw_main_canvas(ezgl::renderer *g) {
     g->draw_rectangle({0, 0}, {000, 1000});
@@ -385,7 +411,7 @@ void draw_main_canvas(ezgl::renderer *g) {
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;
     double scope_height = scope.m_second.y - scope.m_first.y;
-    std::cout << scope_length << "  " << scope_height << std::endl;
+    //std::cout << scope_length << "  " << scope_height << std::endl;
      
     //drawing streets
     for (int i = 0; i < getNumStreetSegments(); i++) {
@@ -394,11 +420,9 @@ void draw_main_canvas(ezgl::renderer *g) {
         if (scope_length < 7000 && scope_height < 7000) {
             //helper function to set width and color of line
             colourWidthSetter(g, 6, ezgl::WHITE);
-            g->draw_line({streets[i].start_x, streets[i].start_y},
-            {
-                streets[i].end_x, streets[i].end_y
-            });
-            
+            StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
+            //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+            drawSegment(g, tempInfo, i);
             
             //introduce bordered streets if scope within approx 2000
             if (scope_length < 2000 && scope_height < 1700) {
@@ -416,10 +440,8 @@ void draw_main_canvas(ezgl::renderer *g) {
                 if(scope_length < 200){
                     g->set_line_width(18);
                 }
-                g->draw_line({streets[i].start_x, streets[i].start_y},
-                {
-                    streets[i].end_x, streets[i].end_y
-                });
+                //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+                drawSegment(g,tempInfo, i);
                 //then draw the street in white
                 colourWidthSetter(g, 4, ezgl::WHITE);
                 if(scope_length < 1000){
@@ -434,10 +456,8 @@ void draw_main_canvas(ezgl::renderer *g) {
                 if(scope_length < 200){
                     g->set_line_width(17);
                 }
-                g->draw_line({streets[i].start_x, streets[i].start_y},
-                {
-                    streets[i].end_x, streets[i].end_y
-                });
+                //g->draw_line({streets[i].start_x, streets[i].start_y},{streets[i].end_x, streets[i].end_y});
+                drawSegment(g, tempInfo, i);
             }  
         }
         
@@ -459,12 +479,14 @@ void draw_main_canvas(ezgl::renderer *g) {
                     g->set_line_width(24);
                 }
                 g->set_color(ezgl::ORANGE);
-                g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+                //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+                drawSegment(g, tempInfo, i);
             }
             if (it != OSMID_wayType.end() && (it->second == "primary" || it->second == "secondary")){
                 g->set_line_width(1.5);
                 g->set_color(ezgl::WHITE);
-                g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+                //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+                drawSegment(g, tempInfo, i);
             }
         }
         

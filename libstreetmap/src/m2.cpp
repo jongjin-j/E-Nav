@@ -331,14 +331,26 @@ void draw_main_canvas(ezgl::renderer *g) {
             StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
             std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_wayType.find(tempInfo.wayOSMID);
             if (it != OSMID_wayType.end() && it->second == "motorway"){
-               g->set_line_width(4);
-               g->set_color(ezgl::ORANGE);
-               g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+                g->set_line_width(4);
+                if(scope_length < 2700){
+                    g->set_line_width(8);
+                } 
+                if(scope_length < 1700){
+                    g->set_line_width(12);
+                } 
+                if(scope_length < 1000){
+                    g->set_line_width(16);
+                }
+                if(scope_length < 600){
+                    g->set_line_width(24);
+                }
+                g->set_color(ezgl::ORANGE);
+                g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
             }
             if (it != OSMID_wayType.end() && (it->second == "primary" || it->second == "secondary")){
-               g->set_line_width(1.5);
-               g->set_color(ezgl::WHITE);
-               g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+                g->set_line_width(1.5);
+                g->set_color(ezgl::WHITE);
+                g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
             }
         }
         

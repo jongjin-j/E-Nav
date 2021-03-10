@@ -141,7 +141,22 @@ void testPrint(){
     std::cout << "testing" << std::endl;
 }*/
 
-void drawPOIS(ezgl::renderer *g, int i, double font){
+//function to draw a POI
+/*
+void draw_POI(ezgl::renderer *g, double png_x, double png_y, ezgl::point2d center_point, double font, std::string POI_type){
+    g->set_color(ezgl::BLUE);
+    g->set_text_rotation(0);
+    ezgl::surface *png_surface = ezgl::renderer::load_png(POI_type);
+    g->draw_surface(png_surface, {png_x, png_y});
+    ezgl::renderer::free_surface(png_surface);
+    g->set_color(ezgl::BLACK);
+    g->set_font_size(font);
+    g->draw_text(center_point, POIs[i].name);
+}
+*/
+
+//function to draw POIs
+void draw_POIs(ezgl::renderer *g, int i, double font){
     float radius = 3;
 
         g->set_color(ezgl::BLUE);
@@ -374,13 +389,13 @@ void draw_main_canvas(ezgl::renderer *g) {
     for (int i = 0; i < POIs.size(); i++) {
 
         if (scope_length < 85 && scope_height < 70) {
-            drawPOIS(g, i, 16);
+            draw_POIs(g, i, 16);
         } 
         else if (scope_length < 240 && scope_height < 185) {
-            drawPOIS(g, i, 13);
+            draw_POIs(g, i, 13);
         }
         else if (scope_length < 385 && scope_height < 305) {
-            drawPOIS(g, i, 10);
+            draw_POIs(g, i, 10);
         }
     }
 

@@ -142,11 +142,25 @@ void testPrint(){
     std::cout << "testing" << std::endl;
 }*/
 
-void searchFor(){
-    std::cout<<"hello"<<std::endl;
+void searchFor(GtkWidget *widget, ezgl::application *application){
+    
+    //searchTerm will hold what the user inputs
+    const char* searchTerm = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchBar"));
+    
+    std::vector<StreetIdx> results = findStreetIdsFromPartialStreetName(searchTerm);
+    
+    //check if results vector empty
+    if(results.size() == 0){
+        std::cout << "No matching results found" << std::endl;
+    }else{
+        for(int i = 0; i < results.size(); i++){
+            std::cout << getStreetName(results[i]) << std::endl;
+        }
+    }
+    
 }
 
-void initial_setup(ezgl::application *application, bool new_window){
+void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("SearchBar"), "activate", G_CALLBACK(searchFor), application);
 }
 

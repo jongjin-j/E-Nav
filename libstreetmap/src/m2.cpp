@@ -328,7 +328,7 @@ void draw_main_canvas(ezgl::renderer *g) {
             StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
             std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_wayType.find(tempInfo.wayOSMID);
             if (it != OSMID_wayType.end() && it->second == "motorway"){
-               g->set_line_width(2);
+               g->set_line_width(4);
                g->set_color(ezgl::ORANGE);
                g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
             }
@@ -339,8 +339,8 @@ void draw_main_canvas(ezgl::renderer *g) {
             }
         }
         
-        if (scope_length < 1500 && scope_height < 1200 && findStreetSegmentLength(i) > 70) {
-            if (scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y) {
+        if (scope_length < 1500 && scope_height < 1200) {
+            if (findStreetSegmentLength(i) > 70 && scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y) {
                 ezgl::point2d centerPoint(streets[i].mid_x, streets[i].mid_y);
                 
                 //set so that street name is displayed once every 4 blocks
@@ -350,9 +350,10 @@ void draw_main_canvas(ezgl::renderer *g) {
                     g->set_color(ezgl::BLACK);
                     g->draw_text(centerPoint, streets[i].name);
                 }
-                
-                
-                //print the arrows for one way streets
+            }
+            
+            //if one way, print the arrows for one way streets
+            if (getStreetSegmentInfo(i).oneWay){
                 double png_x = 0, png_y = 0;
                 if (streets[i].angle >= 45 || streets[i].angle <= -45){
                     png_x = streets[i].mid_x - 3;
@@ -363,12 +364,19 @@ void draw_main_canvas(ezgl::renderer *g) {
                     png_y = streets[i].mid_y + 3;
                 }
                 
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/arrow.png");
-                g->draw_surface(png_surface, {png_x, png_y});
-                ezgl::renderer::free_surface(png_surface);
+                ezgl::point2d centerPoint(png_x, png_y);
+                
+                //ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/arrow.png");
+                g->set_font_size(15);
+                g->set_text_rotation(streets[i].oneWay_angle);
+                g->draw_text(centerPoint, "->");
+                //g->draw_surface(png_surface, {png_x, png_y});
+                //ezgl::renderer::free_surface(png_surface);
             }
         }
     }
+    
+                
 
     //drawing features
     for (int i = 0; i < getNumFeatures(); i++) {

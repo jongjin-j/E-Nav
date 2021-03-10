@@ -353,7 +353,7 @@ void draw_main_canvas(ezgl::renderer *g) {
             }
             
             //if one way, print the arrows for one way streets
-            if (getStreetSegmentInfo(i).oneWay){
+            if (getStreetSegmentInfo(i).oneWay && scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y){
                 double png_x = 0, png_y = 0;
                 if (streets[i].angle >= 45 || streets[i].angle <= -45){
                     png_x = streets[i].mid_x - 3;
@@ -367,9 +367,10 @@ void draw_main_canvas(ezgl::renderer *g) {
                 ezgl::point2d centerPoint(png_x, png_y);
                 
                 //ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/arrow.png");
-                g->set_font_size(15);
+                g->set_font_size(25);
+                g->set_color(ezgl::BLACK);
                 g->set_text_rotation(streets[i].oneWay_angle);
-                g->draw_text(centerPoint, "->");
+                g->draw_text(centerPoint, "-->");
                 //g->draw_surface(png_surface, {png_x, png_y});
                 //ezgl::renderer::free_surface(png_surface);
             }

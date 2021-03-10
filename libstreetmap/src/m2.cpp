@@ -169,7 +169,7 @@ void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data)
 void searchFor(GtkWidget *widget, ezgl::application *application){
     
     //searchTerm will hold what the user inputs
-    const char* searchTerm = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchBar"));
+    const char* searchTerm = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet1"));
     
     results = findStreetIdsFromPartialStreetName(searchTerm);
     
@@ -218,7 +218,7 @@ void searchFor(GtkWidget *widget, ezgl::application *application){
 
 
 void initial_setup(ezgl::application *application, bool /*new_window*/){
-    g_signal_connect(application->get_object("SearchBar"), "activate", G_CALLBACK(searchFor), application);
+    g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(searchFor), application);
     //g_signal_connect(application->get_object(),"",G_CALLBACK(),application);
 }
 

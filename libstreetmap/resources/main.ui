@@ -220,7 +220,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton">
+          <object class="GtkButton" id="FindButton">
             <property name="label" translatable="yes">Find Intersections</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>

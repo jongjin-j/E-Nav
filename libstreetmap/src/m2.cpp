@@ -109,7 +109,8 @@ std::vector<intersection_data> intersections;
 std::vector<POI_data> POIs;
 std::vector<std::vector<StreetSegmentIdx>> streetSegments;
 std::vector<street_data> streets;
-std::vector<StreetIdx> results; //stores the results from user search
+std::vector<StreetIdx> results1; //stores the results from user search street 1
+std::vector<StreetIdx> results2; //stores the results from user search street 2
 std::unordered_map<OSMID, std::string> OSMID_wayType;
 std::unordered_map<OSMID, std::string> OSMID_nodeType;
 
@@ -119,32 +120,7 @@ void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice)
     x->set_color(colorChoice);
 }
 
-/*void test_button(GtkWidget *widget, ezgl::application *application){
-    GtkEntry* text_entry = (GtkEntry*) application->get_object("SearchBar");
-    const char* text = gtk_entry_get_text(text_entry);
-    
-    application->update_message(text);
-    std::cout << text << std::endl;
-
-}*/
-
-/*void searchEntry(GtkWidget *widget, ezgl::application *application){
-    GtkEntry* text_entry = (GtkEntry*) application->get_object("SearchBar");
-    const char* searchTerm = gtk_entry_get_text(text_entry);
-    application->update_message(searchTerm);
-    application->refresh_drawing();
-}
-
-g_signal_connect(
-        G_OBJECT(SearchBar), "activate", G_CALLBACK(testPrint),NULL
-
-);
-
-void testPrint(){
-    std::cout << "testing" << std::endl;
-}*/
-
-void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data){
+/*void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data){
 
     std::cout << "response is ";
         switch(response_id) {
@@ -164,25 +140,39 @@ void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data)
     std::cout << "(" << response_id << ")\n";
     gtk_widget_destroy(GTK_WIDGET (dialog));
     
-}
+}*/
 
-void searchFor(GtkWidget *widget, ezgl::application *application){
+//std pair to store the two chosen streets; this is passed onto the findIntersections function
+std::pair<StreetIdx, StreetIdx> resultStreets;
+
+//callback function of searching the first street
+void searchFirstStreet(GtkWidget *widget, ezgl::application *application){
     
-    //searchTerm will hold what the user inputs
-    const char* searchTerm = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet1"));
+    //street1 will hold what the user inputs
+    const char* street1 = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet1"));
     
-    results = findStreetIdsFromPartialStreetName(searchTerm);
+    //results1 is the vector of matching streets
+    results1 = findStreetIdsFromPartialStreetName(street1);
     
-    //check if results vector empty
-    if(results.size() == 0){
-        //display error message in results box
+    //check if vector empty
+    if(results1.size() == 0){
         std::cout << "No matching results found" << std::endl;
     }else{
-        //display results in results box
-        for(int i = 0; i < results.size(); i++){
-            std::cout << getStreetName(results[i]) << std::endl;
+        //else, give the list of results for the user to choose from
+        /*
+        for(int i = 0; i < results1.size(); i++){
+            std::cout << getStreetName(results1[i]) << std::endl;
         }
+         */
+        //test code, ignore
+        resultStreets.first = results1[0];
+        std::cout << results1[0] << std::endl;
+        
+        
+        //save the user's choice into the pair
+        //chosen = resultStreets.first (type StreetIdx)
     }
+    
     /*GObject *window; // the parent window over which to add the dialog
     GtkWidget *content_area; // the content area of the dialog
     GtkWidget *label; // the label we will create to display a message in the content area
@@ -215,10 +205,55 @@ void searchFor(GtkWidget *widget, ezgl::application *application){
     );*/
 }
 
+//callback function of searching the second street
+void searchSecondStreet(GtkWidget *widget, ezgl::application *application){
+    
+    //street2 will hold what the user inputs
+    const char* street2 = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet2"));
+    
+    //results2 stores the vector of results
+    results2 = findStreetIdsFromPartialStreetName(street2);
+    
+    //check if vector empty
+    if(results2.size() == 0){
+        //display error message in results box
+        std::cout << "No matching results found" << std::endl;
+    }else{
+        //else, give the list of results for the user to choose from
+        /*
+        for(int i = 0; i < results2.size(); i++){
+            std::cout << getStreetName(results2[i]) << std::endl;
+        }
+        */
+        //test code, ignore
+        resultStreets.second = results2[0];
+        std::cout << results2[0] << std::endl;
+        
+        std:: cout << resultStreets.first << std::endl;
+        std:: cout << resultStreets.second << std::endl;
+        
+        //std::cout << findIntersectionsOfTwoStreets(resultStreets)[0] << std::endl;
+                
+        
+        //save the user's choice into the pair
+        //chosen = resultStreets.first (type StreetIdx)
+    }
+    //application->refresh_drawing();
+}
+
+void displayIntersections(GtkWidget *widget, ezgl::application *application){
+    
+    //consider case where pressed without a valid pair
+    //if valid pair, display the intersections
+    std::cout << "Find button clicked" << std::endl;
+    
+}
 
 
 void initial_setup(ezgl::application *application, bool /*new_window*/){
-    g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(searchFor), application);
+    g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(searchFirstStreet), application);
+    g_signal_connect(application->get_object("SearchStreet2"), "activate", G_CALLBACK(searchSecondStreet), application);
+    g_signal_connect(application->get_object("FindButton"), "clicked", G_CALLBACK(displayIntersections), application);
     //g_signal_connect(application->get_object(),"",G_CALLBACK(),application);
 }
 

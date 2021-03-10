@@ -355,15 +355,21 @@ void draw_main_canvas(ezgl::renderer *g) {
                     g->draw_text(centerPoint, streets[i].name);
                 }
                 
-                /*
+                
                 //print the arrows for one way streets
+                double png_x = 0, png_y = 0;
+                if (streets[i].angle >= 45 || streets[i].angle <= -45){
+                    png_x = streets[i].mid_x - 3;
+                    png_y = streets[i].mid_y; 
+                }
+                else {
+                    png_x = streets[i].mid_x;
+                    png_y = streets[i].mid_y + 3;
+                }
+                
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/arrow.png");
                 g->draw_surface(png_surface, {png_x, png_y});
                 ezgl::renderer::free_surface(png_surface);
-                g->set_color(ezgl::BLACK);
-                g->set_font_size(font);
-                g->draw_text(center_point, POIs[i].name);
-                */
             }
         }
     }
@@ -496,7 +502,7 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x,
     app -> refresh_drawing();
 }
 
-void findOneWayAngle(double start_x, double end_x, double start_y, double end_y, double rotation, int i){
+void setOneWayAngle(double start_x, double end_x, double start_y, double end_y, double rotation, int i){
     double angle = 0;
     
     if (end_x > start_x && end_y == start_y){
@@ -613,7 +619,7 @@ void drawMap() {
         streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
         
         //set rotation of the arrow for one way streets
-        findOneWayAngle(streets[i].start_x, streets[i].end_x, streets[i].start_y, streets[i].end_y, rotation, i);
+        setOneWayAngle(streets[i].start_x, streets[i].end_x, streets[i].start_y, streets[i].end_y, rotation, i);
     }
     
     

@@ -477,9 +477,9 @@ void draw_main_canvas(ezgl::renderer *g) {
         else if(scope_length < 4200 && scope_height < 3000){
             draw_important_POIs(g, i, 10);
         }
-        else{
+        /*else{
             draw_important_POIs(g, i, 10);
-        }
+        }*/
     }
 
     //drawing intersections

@@ -369,12 +369,36 @@ void draw_main_canvas(ezgl::renderer *g) {
             if (scope_length < 2000 && scope_height < 1700) {
                 colourWidthSetter(g, 6, ezgl::color(130,130,130));
                 g->set_line_cap(ezgl::line_cap::round);
+                if(scope_length < 1000){
+                    g->set_line_width(9);
+                }
+                if(scope_length < 600){
+                    g->set_line_width(12);
+                }
+                if(scope_length < 400){
+                    g->set_line_width(15);
+                }
+                if(scope_length < 200){
+                    g->set_line_width(18);
+                }
                 g->draw_line({streets[i].start_x, streets[i].start_y},
                 {
                     streets[i].end_x, streets[i].end_y
                 });
                 //then draw the street in white
                 colourWidthSetter(g, 4, ezgl::WHITE);
+                if(scope_length < 1000){
+                    g->set_line_width(8);
+                }
+                if(scope_length < 600){
+                    g->set_line_width(11);
+                }
+                if(scope_length < 400){
+                    g->set_line_width(14);
+                }
+                if(scope_length < 200){
+                    g->set_line_width(17);
+                }
                 g->draw_line({streets[i].start_x, streets[i].start_y},
                 {
                     streets[i].end_x, streets[i].end_y
@@ -417,6 +441,19 @@ void draw_main_canvas(ezgl::renderer *g) {
                 g->set_text_rotation(streets[i].angle);
                 g->set_font_size(8);
                 g->set_color(ezgl::BLACK);
+                
+                if(scope_length < 1000){
+                    g->set_font_size(12);
+                }
+                if(scope_length < 600){
+                    g->set_font_size(12);
+                }
+                if(scope_length < 400){
+                    g->set_font_size(12);
+                }
+                if(scope_length < 200){
+                    g->set_font_size(12);
+                }
                 
                 if (streets[i].oneWay){
                     if (!streets[i].reverse){

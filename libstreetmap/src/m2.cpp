@@ -181,7 +181,7 @@ void searchFor(GtkWidget *widget, ezgl::application *application){
             std::cout << getStreetName(results[i]) << std::endl;
         }
     }
-    GObject *window; // the parent window over which to add the dialog
+    /*GObject *window; // the parent window over which to add the dialog
     GtkWidget *content_area; // the content area of the dialog
     GtkWidget *label; // the label we will create to display a message in the content area
     GtkWidget *dialog; // the dialog box we will create
@@ -210,7 +210,7 @@ void searchFor(GtkWidget *widget, ezgl::application *application){
         "response",
         G_CALLBACK(on_dialog_response),
         NULL
-    );
+    );*/
 }
 
 

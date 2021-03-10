@@ -38,10 +38,10 @@ struct street_data {
     double end_x = 0;
     double end_y = 0;
     double angle = 0;
-    double oneWay_angle = 0;
     double mid_x = 0;
     double mid_y = 0;
     bool oneWay;
+    bool reverse = false;
     std::string street_type;
 };
 
@@ -411,36 +411,23 @@ void draw_main_canvas(ezgl::renderer *g) {
             if (findStreetSegmentLength(i) > 70 && scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y) {
                 ezgl::point2d centerPoint(streets[i].mid_x, streets[i].mid_y);
                 
-                //set so that street name is displayed once every 4 blocks
-                if (i % 4 == 0){
-                    g->set_text_rotation(streets[i].angle);
-                    g->set_font_size(8);
-                    g->set_color(ezgl::BLACK);
-                    g->draw_text(centerPoint, streets[i].name);
-                }
-            }
-            
-            //if one way, print the arrows for one way streets
-            if (getStreetSegmentInfo(i).oneWay && scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y){
-                double png_x = 0, png_y = 0;
-                if (streets[i].angle >= 45 || streets[i].angle <= -45){
-                    png_x = streets[i].mid_x - 3;
-                    png_y = streets[i].mid_y; 
+                //display the street names
+                g->set_text_rotation(streets[i].angle);
+                g->set_font_size(8);
+                g->set_color(ezgl::BLACK);
+                
+                if (streets[i].oneWay){
+                    if (!streets[i].reverse){
+                      g->draw_text(centerPoint, ">" + streets[i].name + ">");
+                    }
+                    else {
+                       g->draw_text(centerPoint, "<" + streets[i].name + "<");
+                    }
                 }
                 else {
-                    png_x = streets[i].mid_x;
-                    png_y = streets[i].mid_y + 3;
+                    g->draw_text(centerPoint, streets[i].name);
+                
                 }
-                
-                ezgl::point2d centerPoint(png_x, png_y);
-                
-                //ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/arrow.png");
-                g->set_font_size(25);
-                g->set_color(ezgl::BLACK);
-                g->set_text_rotation(streets[i].oneWay_angle);
-                g->draw_text(centerPoint, "-->");
-                //g->draw_surface(png_surface, {png_x, png_y});
-                //ezgl::renderer::free_surface(png_surface);
             }
         }
     }
@@ -579,36 +566,6 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x,
     app -> refresh_drawing();
 }
 
-void setOneWayAngle(double start_x, double end_x, double start_y, double end_y, double rotation, int i){
-    double angle = 0;
-    
-    if (end_x > start_x && end_y == start_y){
-        angle = 0;
-    }
-    else if (end_x < start_x && end_y == start_y){
-        angle = 180;
-    }
-    else if (end_x == start_x && end_y > start_y){
-        angle = 90;
-    }
-    else if (end_x == start_x && end_y < start_y){
-        angle = -90;
-    }
-    else if (end_x > start_x && end_y > start_y){
-        angle = rotation;
-    }
-    else if (end_x < start_x && end_y > start_y){
-        angle = 180 - rotation;
-    }
-    else if (end_x < start_x && end_y < start_y){
-        angle = 180 + rotation;
-    }
-    else{
-        angle = -1 * rotation;
-    }
-    
-    streets[i].oneWay_angle = angle;
-}
 
 void drawMap() {
     ezgl::application::settings settings;
@@ -675,28 +632,55 @@ void drawMap() {
         streets[i].mid_x = 0.5 * (streets[i].start_x + streets[i].end_x);
         streets[i].mid_y = 0.5 * (streets[i].start_y + streets[i].end_y);
 
+        
+        double start_x = streets[i].start_x, start_y = streets[i].start_y;
+        double end_x = streets[i].end_x, end_y = streets[i].end_y;
+        
         //set rotation of names
         double rotation = 0;
 
-        if (streets[i].end_x == streets[i].start_x) {
+        //if the x coordinates of start and end are equal
+        if (end_x == start_x) {
             rotation = 90;
+            
+            //if end y and start y are in reverse
+            if (end_y < start_y){
+                streets[i].reverse = true;
+            }
+                   
         } 
         else {
-            rotation = std::atan(abs((streets[i].end_y - streets[i].start_y) / (streets[i].end_x - streets[i].start_x))) / kDegreeToRadian;
+            rotation = std::atan(abs((end_y - start_y) / (end_x - start_x))) / kDegreeToRadian;
         }
-
-        if ((streets[i].end_x > streets[i].start_x && streets[i].end_y > streets[i].start_y) || (streets[i].end_x < streets[i].start_x && streets[i].end_y < streets[i].start_y)) {
+        
+        //setting the correct rotations of the names and figuring out the directions of the ways
+        //when from is seen as the origin and to is in first quadrant 
+        if (end_x > start_x && end_y > start_y) {
             streets[i].angle = rotation;
         } 
-        else {
+        
+        //to is in second quadrant
+        else if (end_x < start_x && end_y > start_y){
+            streets[i].angle = -1 * rotation;
+            streets[i].reverse = true;
+        }
+        
+        //to is in third quadrant
+        else if (end_x < start_x && end_y < start_y){
+            streets[i].angle = rotation;
+            streets[i].reverse = true;
+        }
+        
+        //to is in fourth quadrant
+        else if (end_x > start_x && end_y < start_y){
             streets[i].angle = -1 * rotation;
         }
 
         //set name of the street
         streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
         
-        //set rotation of the arrow for one way streets
-        setOneWayAngle(streets[i].start_x, streets[i].end_x, streets[i].start_y, streets[i].end_y, rotation, i);
+        //set one way boolean
+        streets[i].oneWay = getStreetSegmentInfo(i).oneWay;
     }
     
     

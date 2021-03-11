@@ -120,9 +120,7 @@ void searchSecondStreet(GtkWidget*, ezgl::application *application){
         }
         */
         //test code, ignore
-        resultStreets.second = database.results2[0];
-        std::cout << database.results2[0] << std::endl;
-        
+        resultStreets.second = database.results2[0];        
         std:: cout << resultStreets.second << std::endl;
         
         //std::cout << findIntersectionsOfTwoStreets(resultStreets)[0] << std::endl;
@@ -136,19 +134,23 @@ void searchSecondStreet(GtkWidget*, ezgl::application *application){
 
 void displayIntersections(GtkWidget*, ezgl::application *application){
     
-    //consider case where pressed without a valid pair
-    //if valid pair, display the intersections
-    std::cout << "The pair of streetIds are: " << resultStreets.first << " and " << resultStreets.second << std::endl;
-    std::cout << "The street names are: " << getStreetName(resultStreets.first) << " and " << getStreetName(resultStreets.second) << std::endl; 
-    
-    std::cout << findIntersectionsOfTwoStreets(resultStreets).size() << std::endl;      //of type IntersectionIdx vector
-    
     if(findIntersectionsOfTwoStreets(resultStreets).size() == 0){
         std::cout << "No intersections found between the streets" << std::endl;
+    }else if(getStreetName(resultStreets.first) == "<unknown>" || getStreetName(resultStreets.second) == "<unknown>"){
+        std::cout << "Please enter two valid streets" << std::endl;
     }else{
-        database.intersections[findIntersectionsOfTwoStreets(resultStreets)[0]].highlight = 1;
+        
+            //consider case where pressed without a valid pair
+            //if valid pair, display the intersections
+            std::cout << "The pair of streetIds are: " << resultStreets.first << " and " << resultStreets.second << std::endl;
+            std::cout << "The street names are: " << getStreetName(resultStreets.first) << " and " << getStreetName(resultStreets.second) << std::endl; 
+            std::cout << findIntersectionsOfTwoStreets(resultStreets).size() << std::endl;      //of type IntersectionIdx vector
+
+            for(int i = 0; i < findIntersectionsOfTwoStreets(resultStreets).size(); i++){
+                database.intersections[findIntersectionsOfTwoStreets(resultStreets)[i]].highlight = 1;
+            }
     }
- 
+     
     application->refresh_drawing();
     
 }
@@ -362,7 +364,7 @@ void draw_main_canvas(ezgl::renderer *g) {
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;
     double scope_height = scope.m_second.y - scope.m_first.y;
-    //std::cout << scope_length << "  " << scope_height << std::endl;
+    std::cout << scope_length << "  " << scope_height << std::endl;
      
     //drawing features
     for (int i = 0; i < getNumFeatures(); i++) {
@@ -576,17 +578,21 @@ void draw_main_canvas(ezgl::renderer *g) {
         }
 
         if (database.intersections[id].highlight) {
-            //print name of intersection
-            ezgl::point2d center_point(x, y + 65);
-            g->set_color(ezgl::BLACK);
-            g->set_font_size(13);
-            g->draw_text(center_point, database.intersections[id].name);
-            std::cout << "Closest Intersection: " << database.intersections[id].name << "\n";
 
             ezgl::point2d center(x, y);
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/redpin.png");
-            g->draw_surface(png_surface, {center.x - 20, center.y + 38});
+            //g->draw_surface(png_surface, {center.x - 20, center.y + 38});
+            double scopeRatioX = 0.0325426;
+            double scopeRatioY = 0.1005421;
+            g->draw_surface(png_surface, {center.x - scopeRatioX * scope_length, center.y + scopeRatioY * scope_height});
             ezgl::renderer::free_surface(png_surface);
+            
+            //print name of intersection
+            ezgl::point2d center_point(x, y + scopeRatioY* (1.15) * scope_height);
+            g->set_color(ezgl::BLACK);
+            g->set_font_size(13);
+            g->draw_text(center_point, database.intersections[id].name);
+            std::cout << "Closest Intersection: " << database.intersections[id].name << std::endl;
             
             
         } 

@@ -93,7 +93,7 @@
             </child>
             <child>
               <object class="GtkButton" id="ZoomInButton">
-                <property name="label" translatable="yes">Zoom In</property>
+                <property name="label" translatable="yes">+</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
@@ -106,7 +106,7 @@
             </child>
             <child>
               <object class="GtkButton" id="ZoomOutButton">
-                <property name="label" translatable="yes">Zoom Out</property>
+                <property name="label" translatable="yes">-</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>
@@ -132,7 +132,7 @@
             </child>
             <child>
               <object class="GtkButton" id="ProceedButton">
-                <property name="label" translatable="yes">Proceed</property>
+                <property name="label" translatable="yes">Exit</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="receives_default">True</property>

@@ -22,6 +22,7 @@ extern struct databases database;
 
 
 //helper function to choose colour from feature type
+bool darkMode = false;
 
 const ezgl::color chooseFeatureColour(FeatureType x) {
 
@@ -45,7 +46,7 @@ const ezgl::color chooseFeatureColour(FeatureType x) {
         return ezgl::color(60, 179, 113);
     } else if (x == BUILDING) {
         //buildings return dark grey
-        return ezgl::color(169, 169, 169);
+            return ezgl::color(169, 169, 169);
     } else if (x == GREENSPACE) {
         //greenspace returns light green
         return ezgl::color(154, 250, 50);
@@ -165,14 +166,22 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
     application->refresh_drawing();
 }
 
-GtkListStore* resultList = gtk_list_store_new(1, G_TYPE_STRING);
+//GtkListStore* resultList = gtk_list_store_new(1, G_TYPE_STRING);
 
-void reloadMap(){
+void reloadMap(GtkWidget*, ezgl::application *application){
     std::cout << "Map reloaded" << std::endl;
 }
 
-void switchDarkMode(){
-    std::cout << " Dark mode active" << std::endl;
+void switchDarkMode(GtkWidget*, ezgl::application *application){
+    std::cout << " Dark mode active" << std::endl; 
+    
+    if(darkMode == false){
+        darkMode = true;
+    }else if(darkMode == true){
+        darkMode = false;
+    }
+    application -> refresh_drawing();
+    
 }
 
 void initial_setup(ezgl::application *application, bool /*new_window*/){
@@ -722,7 +731,8 @@ void drawMap() {
     {
         x_from_lon(max_lon), y_from_lat(max_lat)
     });
-    application.add_canvas("MainCanvas", draw_main_canvas, initial_world, ezgl::color(230, 230, 230));
+    ezgl::color standardColor = ezgl::color(230,230,230,230);
+    application.add_canvas("MainCanvas", draw_main_canvas, initial_world, standardColor);
 
     application.run(initial_setup, act_on_mouse_click, nullptr, nullptr);
 }

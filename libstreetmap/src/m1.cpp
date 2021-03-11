@@ -327,7 +327,6 @@ void OSMID_wayValue(){
     }
 }
 
-//set an unordered_map of OSMID and value of non-amenities
 void OSMID_nodeValue(){
     for (int i = 0; i < getNumberOfNodes(); i++){
             
@@ -374,7 +373,6 @@ void OSMID_nodePointer(){
         }
     }
 }
-
 
 
 bool loadMap(std::string map_streets_database_filename) {

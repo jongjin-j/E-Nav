@@ -313,28 +313,34 @@ void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i, ezgl::col
 }
 
 void writeStreetName(ezgl::renderer *g, ezgl::point2d center, StreetSegmentInfo segInfo, std::string name, int i){
-    if(segInfo.numCurvePoints == 0){
-        g->draw_text(center, name);
-    }
-    else{
-        int midPoint = segInfo.numCurvePoints / 2;
-        LatLon point;
-        LatLon point2;
-        if(midPoint % 2 == 0){
-            //access curvePoint from 0 ~ numCurvePoints - 1
-            point = getStreetSegmentCurvePoint(i, midPoint);
-            double mid_x = x_from_lon(point.longitude());
-            double mid_y = y_from_lat(point.latitude());
-            ezgl::point2d middlePoint(mid_x, mid_y);
-            g->draw_text(middlePoint, name);
+    if (name != "<unknown>"){
+        if (name == "> <unknown> >" || name == "< <unknown> <"){
+            name.erase (name.begin()+1, name.end()-1);
+        } 
+        
+        if(segInfo.numCurvePoints == 0){
+            g->draw_text(center, name);
         }
         else{
-            point = getStreetSegmentCurvePoint(i, midPoint - 1);
-            point2 = getStreetSegmentCurvePoint(i, midPoint);
-            double mid_x = 0.5 * (x_from_lon(point.longitude()) + x_from_lon(point2.longitude()));
-            double mid_y = 0.5 * (y_from_lat(point.latitude()) + y_from_lat(point2.latitude()));
-            ezgl::point2d middlePoint(mid_x, mid_y);
-            g->draw_text(middlePoint, name);
+            int midPoint = segInfo.numCurvePoints / 2;
+            LatLon point;
+            LatLon point2;
+            if(midPoint % 2 == 0){
+                //access curvePoint from 0 ~ numCurvePoints - 1
+                point = getStreetSegmentCurvePoint(i, midPoint);
+                double mid_x = x_from_lon(point.longitude());
+                double mid_y = y_from_lat(point.latitude());
+                ezgl::point2d middlePoint(mid_x, mid_y);
+                g->draw_text(middlePoint, name);
+            }
+            else{
+                point = getStreetSegmentCurvePoint(i, midPoint - 1);
+                point2 = getStreetSegmentCurvePoint(i, midPoint);
+                double mid_x = 0.5 * (x_from_lon(point.longitude()) + x_from_lon(point2.longitude()));
+                double mid_y = 0.5 * (y_from_lat(point.latitude()) + y_from_lat(point2.latitude()));
+                ezgl::point2d middlePoint(mid_x, mid_y);
+                g->draw_text(middlePoint, name);
+            }
         }
     }
 }
@@ -347,6 +353,72 @@ void draw_main_canvas(ezgl::renderer *g) {
     double scope_height = scope.m_second.y - scope.m_first.y;
     //std::cout << scope_length << "  " << scope_height << std::endl;
      
+    //drawing features
+    for (int i = 0; i < getNumFeatures(); i++) {
+
+        //if it's a closed feature
+        if (getFeaturePoint(i, 0) == getFeaturePoint(i, getNumFeaturePoints(i) - 1)) {
+
+            //declare vector of 2d points
+            std::vector<ezgl::point2d> featurePoints;
+
+            featurePoints.resize(getNumFeaturePoints(i), {0, 0});
+
+            //loop through # feature points and add to vector of 2d points
+            for (int j = 0; j < getNumFeaturePoints(i); j++) {
+                double xCoord = x_from_lon(getFeaturePoint(i, j).longitude());
+                double yCoord = y_from_lat(getFeaturePoint(i, j).latitude());
+
+                featurePoints[j] = {xCoord, yCoord};
+            }
+            //fill poly only if feature is 2D
+            if (featurePoints.size() > 1) {
+                //exception for buildings (crowdedness) to draw only at scope level of 6000
+                if(getFeatureType(i) == BUILDING){
+                    if(scope_length < 5000 && scope_height < 5000){
+                        g->set_line_width(1);
+                        g->set_color(chooseFeatureColour(getFeatureType(i)));
+                        g->fill_poly(featurePoints);
+                    }
+                }
+                else{
+                    g->set_line_width(1);
+                    g->set_color(chooseFeatureColour(getFeatureType(i)));
+                    g->fill_poly(featurePoints);
+                }
+            }
+
+        } else {
+            //open feature
+            //draw with open lines
+            for (int j = 0; j < getNumFeaturePoints(i) - 1; j++) {
+
+                double xCoord = x_from_lon(getFeaturePoint(i, j).longitude());
+                double yCoord = y_from_lat(getFeaturePoint(i, j).latitude());
+
+                //choose colour depending on feature type
+                colourWidthSetter(g, 1, chooseFeatureColour(getFeatureType(i)));
+                g->set_line_cap(ezgl::line_cap::butt);
+                    
+                if(getFeatureType(i) == STREAM){
+                    
+                    if(scope_length < 15000 && scope_height < 15000){
+                      g->draw_line({xCoord, yCoord},
+                    {x_from_lon(getFeaturePoint(i, j + 1).longitude()), y_from_lat(getFeaturePoint(i, j + 1).latitude())});  
+                    }
+                    
+                }else{
+                    
+                    g->draw_line({xCoord, yCoord},
+                    {x_from_lon(getFeaturePoint(i, j + 1).longitude()), y_from_lat(getFeaturePoint(i, j + 1).latitude())});
+                }
+                
+                
+            }
+
+        }
+    }
+    
     //drawing streets
     for (int i = 0; i < getNumStreetSegments(); i++) {
 
@@ -463,74 +535,6 @@ void draw_main_canvas(ezgl::renderer *g) {
         }
     }
     
-                
-
-    //drawing features
-    for (int i = 0; i < getNumFeatures(); i++) {
-
-        //if it's a closed feature
-        if (getFeaturePoint(i, 0) == getFeaturePoint(i, getNumFeaturePoints(i) - 1)) {
-
-            //declare vector of 2d points
-            std::vector<ezgl::point2d> featurePoints;
-
-            featurePoints.resize(getNumFeaturePoints(i), {0, 0});
-
-            //loop through # feature points and add to vector of 2d points
-            for (int j = 0; j < getNumFeaturePoints(i); j++) {
-                double xCoord = x_from_lon(getFeaturePoint(i, j).longitude());
-                double yCoord = y_from_lat(getFeaturePoint(i, j).latitude());
-
-                featurePoints[j] = {xCoord, yCoord};
-            }
-            //fill poly only if feature is 2D
-            if (featurePoints.size() > 1) {
-                //exception for buildings (crowdedness) to draw only at scope level of 6000
-                if(getFeatureType(i) == BUILDING){
-                    if(scope_length < 5000 && scope_height < 5000){
-                        g->set_line_width(1);
-                        g->set_color(chooseFeatureColour(getFeatureType(i)));
-                        g->fill_poly(featurePoints);
-                    }
-                }
-                else{
-                    g->set_line_width(1);
-                    g->set_color(chooseFeatureColour(getFeatureType(i)));
-                    g->fill_poly(featurePoints);
-                }
-            }
-
-        } else {
-            //open feature
-            //draw with open lines
-            for (int j = 0; j < getNumFeaturePoints(i) - 1; j++) {
-
-                double xCoord = x_from_lon(getFeaturePoint(i, j).longitude());
-                double yCoord = y_from_lat(getFeaturePoint(i, j).latitude());
-
-                //choose colour depending on feature type
-                colourWidthSetter(g, 1, chooseFeatureColour(getFeatureType(i)));
-                g->set_line_cap(ezgl::line_cap::butt);
-                    
-                if(getFeatureType(i) == STREAM){
-                    
-                    if(scope_length < 15000 && scope_height < 15000){
-                      g->draw_line({xCoord, yCoord},
-                    {x_from_lon(getFeaturePoint(i, j + 1).longitude()), y_from_lat(getFeaturePoint(i, j + 1).latitude())});  
-                    }
-                    
-                }else{
-                    
-                    g->draw_line({xCoord, yCoord},
-                    {x_from_lon(getFeaturePoint(i, j + 1).longitude()), y_from_lat(getFeaturePoint(i, j + 1).latitude())});
-                }
-                
-                
-            }
-
-        }
-    }
-
     //drawing POIs
     for (int i = 0; i < database.POIs.size(); i++) {
 

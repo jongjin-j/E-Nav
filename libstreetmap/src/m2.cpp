@@ -100,7 +100,7 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
 }
 
 //callback function of searching the second street
-void searchSecondStreet(GtkWidget *widget, ezgl::application *application){
+void searchSecondStreet(GtkWidget*, ezgl::application *application){
     
     //street2 will hold what the user inputs
     const char* street2 = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet2"));
@@ -134,12 +134,19 @@ void searchSecondStreet(GtkWidget *widget, ezgl::application *application){
     //application->refresh_drawing();
 }
 
-void displayIntersections(GtkWidget *widget, ezgl::application *application){
+void displayIntersections(GtkWidget*, ezgl::application *application){
     
     //consider case where pressed without a valid pair
     //if valid pair, display the intersections
     std::cout << "Find button clicked" << std::endl;
     std:: cout << "The pair of streetIds are: " << resultStreets.first << " and " << resultStreets.second << std::endl;
+    
+    std::cout << findIntersectionsOfTwoStreets(resultStreets).size() << std::endl;      //of type IntersectionIdx vector
+    
+    database.intersections[findIntersectionsOfTwoStreets(resultStreets)[0]].highlight = 1;
+    
+    
+    application->refresh_drawing();
     
 }
 

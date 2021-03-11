@@ -220,9 +220,9 @@ void draw_important_POIs(ezgl::renderer *g, int i, double font){
     std::unordered_map<OSMID, std::string>::const_iterator it2 = (database.OSMID_wayType).find((database.POIs[i]).id);
     
     if(include){
-        if (it != (database.OSMID_nodeType).end() && (it->second == "hospital")){
-             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
-            draw_POI_function(g, center_point, font, png_surface, (database.POIs[i]).name);
+        if (it != database.OSMID_nodeType.end() && (it->second == "hospital" || it->second == "clinic" || it->second == "dentist" || it->second == "doctors")){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
         if (it2 != (database.OSMID_nodeType).end() && (it2->second == "aerodrome")){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
@@ -258,52 +258,119 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
             include = true;
         }
         
-        std::unordered_map<OSMID, std::string>::const_iterator it = database.OSMID_nodeType.find(database.POIs[i].id);
-        std::unordered_map<OSMID, std::string>::const_iterator it2 = database.OSMID_wayType.find(database.POIs[i].id);
+        //std::unordered_map<OSMID, std::string>::const_iterator it = database.OSMID_nodeType.find(database.POIs[i].id);
+        //std::unordered_map<OSMID, std::string>::const_iterator it2 = database.OSMID_wayType.find(database.POIs[i].id);
         
         if(include){
-            if (it != database.OSMID_nodeType.end() && it->second == "restaurant"){
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png");
-                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
+            if (getPOIType(i) == "restaurant"){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (it != database.OSMID_nodeType.end() && (it->second == "school")){
+            if (getPOIType(i) == "school"){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/school.png");
                 draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (it != database.OSMID_nodeType.end() && (it->second == "cafe")){
+            if (getPOIType(i) == "cafe"){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/cafe.png");
                 draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (it != database.OSMID_nodeType.end() && (it->second == "bank")){
+            if (getPOIType(i) == "bank"){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bank.png");
                 draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (it != database.OSMID_nodeType.end() && (it->second == "bus_station")){
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bus_station.png");
-                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
-            }
-            if (it != database.OSMID_nodeType.end() && (it->second == "supermarket")){
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/supermarket.png");
-                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
-            }
-            if (it != database.OSMID_nodeType.end() && (it->second == "hospital")){
+            if (getPOIType(i) == "hospital" || getPOIType(i) == "clinic" || getPOIType(i) == "dentist" || getPOIType(i) == "doctors"){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
-                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
-            }
-            if (it2 != database.OSMID_nodeType.end() && (it2->second == "aerodrome")){
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
-                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
-            }
-            if (it2 != database.OSMID_nodeType.end() && (it2->second == "helipad")){
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/helipad.png");
-                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
-            }
-            if (it2 != database.OSMID_wayType.end() && (it2->second == "subway_entrance")){
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
                 draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
         }
         
+}
+
+void draw_POIs_nonAmenity(ezgl::renderer *g, double font){    
+    
+    //get the current scope of the map
+    ezgl::rectangle scope = g->get_visible_world();
+    double scope_min_x = scope.m_first.x;
+    double scope_max_x = scope.m_second.x;
+    double scope_min_y = scope.m_first.y;
+    double scope_max_y = scope.m_second.y;
+    
+    //loop through the OSMID_nodePtr database and display the POIs
+    for (auto it = database.OSMID_nodePtr.begin(); it != database.OSMID_nodePtr.end(); it++) {
+        OSMID nodeID = it->first;
+        
+        LatLon position = getNodeCoords(it->second);
+        double pos_x = x_from_lon(position.longitude());
+        double pos_y = y_from_lat(position.latitude());
+        
+        //std::cout << pos_x << " " << pos_y << std::endl;
+        //std::cout << i << std::endl;
+        //i++;
+        
+        //center
+        ezgl::point2d center_point(pos_x, pos_y);
+        
+        if(pos_x > scope_min_x && pos_x < scope_max_x && pos_y > scope_min_y && pos_y < scope_max_y){
+            //node type
+            std::string nodeType = database.OSMID_nodeType.at(nodeID);
+            
+            if (nodeType == "subway_entrance"){
+                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
+                draw_POI_function(g, center_point, font, png_surface, "");
+            }
+            if (nodeType == "bus_stop"){
+                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bus_station.png");
+                draw_POI_function(g, center_point, font, png_surface, "");
+            }
+            if (nodeType == "aerodrome"){
+                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
+                draw_POI_function(g, center_point, font, png_surface, "");
+            }
+            if (nodeType == "supermarket"){
+                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/supermarket.png");
+                draw_POI_function(g, center_point, font, png_surface, "");
+            }
+        }
+    }
+}
+
+void draw_important_POIs_nonAmenity(ezgl::renderer *g, double font){
+    //get the current scope of the map
+    ezgl::rectangle scope = g->get_visible_world();
+    double scope_min_x = scope.m_first.x;
+    double scope_max_x = scope.m_second.x;
+    double scope_min_y = scope.m_first.y;
+    double scope_max_y = scope.m_second.y;
+    
+    //loop through the OSMID_nodePtr database and display the POIs
+    for (auto it = database.OSMID_nodePtr.begin(); it != database.OSMID_nodePtr.end(); it++) {
+        OSMID nodeID = it->first;
+        
+        LatLon position = getNodeCoords(it->second);
+        double pos_x = x_from_lon(position.longitude());
+        double pos_y = y_from_lat(position.latitude());
+        
+        //std::cout << pos_x << " " << pos_y << std::endl;
+        //std::cout << i << std::endl;
+        //i++;
+        
+        //center
+        ezgl::point2d center_point(pos_x, pos_y);
+        
+        if(pos_x > scope_min_x && pos_x < scope_max_x && pos_y > scope_min_y && pos_y < scope_max_y){
+            //node type
+            std::string nodeType = database.OSMID_nodeType.at(nodeID);
+            
+            if (nodeType == "aerodrome"){
+                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
+                draw_POI_function(g, center_point, font, png_surface, "");
+            }
+            if (nodeType == "bus_station"){
+                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bus_station.png");
+                draw_POI_function(g, center_point, font, png_surface, "");
+            }
+        }
+    }
 }
 
 void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i, ezgl::color colorChoice){
@@ -577,7 +644,19 @@ void draw_main_canvas(ezgl::renderer *g) {
             draw_important_POIs(g, i, 10);
         }*/
     }
-
+    //non-amenity
+    if (scope_length < 85 && scope_height < 70) {
+        draw_POIs_nonAmenity(g, 16);
+    } 
+    if (scope_length < 240 && scope_height < 185) {
+        draw_POIs_nonAmenity(g, 13);
+    }
+    if (scope_length < 385 && scope_height < 305) {
+        draw_POIs_nonAmenity(g, 10);
+    }
+    if(scope_length < 4200 && scope_height < 3000){
+        draw_important_POIs_nonAmenity(g, 10);
+    }
     //drawing intersections
     for (int id = 0; id < database.intersections.size(); id++) {
         float x = database.intersections[id].x;

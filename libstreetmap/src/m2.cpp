@@ -453,9 +453,15 @@ void draw_main_canvas(ezgl::renderer *g) {
             }
             if (it != database.OSMID_wayType.end() && (it->second == "primary" || it->second == "secondary")){
                 g->set_line_width(1.5);
+                if(scope_length > 5000){
+                    drawSegment(g, tempInfo, i, ezgl::WHITE);
+                }
+                else{
+                    g->set_line_width(4);
+                    drawSegment(g, tempInfo, i, ezgl::YELLOW);
+                }
                 //g->set_color(ezgl::WHITE);
                 //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
-                drawSegment(g, tempInfo, i, ezgl::WHITE);
             }
         }
         

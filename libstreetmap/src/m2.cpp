@@ -148,18 +148,26 @@ void displayIntersections(GtkWidget*, ezgl::application *application){
     }else{
         database.intersections[findIntersectionsOfTwoStreets(resultStreets)[0]].highlight = 1;
     }
-    
-    
-    
+ 
     application->refresh_drawing();
     
 }
 
+void resetIntersections(GtkWidget*, ezgl::application *application){
+    
+    for(int i = 0; i < getNumIntersections(); i++){
+        if(database.intersections[i].highlight == 1){
+            database.intersections[i].highlight = 0;
+        }
+    }
+    application->refresh_drawing();
+}
 
 void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(searchFirstStreet), application);
     g_signal_connect(application->get_object("SearchStreet2"), "activate", G_CALLBACK(searchSecondStreet), application);
     g_signal_connect(application->get_object("FindButton"), "clicked", G_CALLBACK(displayIntersections), application);
+    g_signal_connect(application->get_object("ResetButton"), "clicked", G_CALLBACK(resetIntersections), application);
     //g_signal_connect(application->get_object(),"",G_CALLBACK(),application);
 }
 
@@ -540,7 +548,7 @@ void draw_main_canvas(ezgl::renderer *g) {
 
         if (scope_length < 85 && scope_height < 70) {
             draw_POIs(g, i, 16);
-        } 
+        }
         else if (scope_length < 240 && scope_height < 185) {
             draw_POIs(g, i, 13);
         }

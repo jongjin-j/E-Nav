@@ -581,9 +581,9 @@ void draw_main_canvas(ezgl::renderer *g) {
 
             ezgl::point2d center(x, y);
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/redpin.png");
-            //g->draw_surface(png_surface, {center.x - 20, center.y + 38});
-            double scopeRatioX = 0.0325426;
-            double scopeRatioY = 0.1005421;
+            //g->draw_surface(png_surface, {center.x - 5, center.y + 16});
+            double scopeRatioX = 0.00928098;
+            double scopeRatioY = 0.05407086;
             g->draw_surface(png_surface, {center.x - scopeRatioX * scope_length, center.y + scopeRatioY * scope_height});
             ezgl::renderer::free_surface(png_surface);
             

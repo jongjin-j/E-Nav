@@ -63,6 +63,7 @@ struct databases {
     std::vector<StreetIdx> results2; //stores the results from user search street 2
     std::unordered_map<OSMID, std::string> OSMID_wayType;
     std::unordered_map<OSMID, std::string> OSMID_nodeType;
+    std::unordered_map<OSMID, const OSMNode*> OSMID_nodePtr;
 };
 
 extern float avg_lat;

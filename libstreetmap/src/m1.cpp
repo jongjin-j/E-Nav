@@ -327,6 +327,7 @@ void OSMID_wayValue(){
     }
 }
 
+//set an unordered_map of OSMID and value of non-amenities
 void OSMID_nodeValue(){
     for (int i = 0; i < getNumberOfNodes(); i++){
             
@@ -341,12 +342,39 @@ void OSMID_nodeValue(){
             
             std::tie(key, value) = getTagPair(OSMNode_ptr, j);
             
-            if(key == "amenity" || key == "aeroway" || key == "shop"){
+            if ((key == "railway" && value == "subway_entrance") || (key == "highway" && value == "bus_stop") || 
+                (key == "aeroway" && value == "aerodrome") || (key == "shop" && value == "supermarket")){
                 database.OSMID_nodeType[NodeID] = value;
             }
         }
     }
 }
+
+//set an unordered_map of OSMID and pointer of non-amenities
+void OSMID_nodePointer(){
+    for (int i = 0; i < getNumberOfNodes(); i++){
+            
+        //get the node pointer and OSMID
+        const OSMNode* OSMNode_ptr = getNodeByIndex(i);
+        OSMID NodeID = OSMNode_ptr->id();
+        
+        std::string key, value;
+
+        //loop through the tags and push into unordered map when key is amenity or shop
+        for (int j = 0; j < getTagCount(OSMNode_ptr); j++) {
+            
+            std::tie(key, value) = getTagPair(OSMNode_ptr, j);
+            
+            
+            if ((key == "railway" && value == "subway_entrance") || (key == "highway" && value == "bus_stop") || 
+                (key == "aeroway" && value == "aerodrome") || (key == "shop" && value == "supermarket")){                
+                //std::cout << key << " " << value << std::endl;
+                database.OSMID_nodePtr[NodeID] = OSMNode_ptr;
+            }
+        }
+    }
+}
+
 
 
 bool loadMap(std::string map_streets_database_filename) {
@@ -379,6 +407,7 @@ bool loadMap(std::string map_streets_database_filename) {
     streets_database();
     OSMID_wayValue();
     OSMID_nodeValue();
+    OSMID_nodePointer();
     
   
     load_successful = true; //Make sure this is updated to reflect whether

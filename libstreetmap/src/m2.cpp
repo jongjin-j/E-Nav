@@ -258,7 +258,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bank.png");
                 draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (getPOIType(i) == "hospital" || getPOIType(i) == "clinic" || getPOIType(i) == "dentist" || getPOIType(i) == "doctors"){
+            if (getPOIType(i) == "hospital" || getPOIType(i) == "clinic"){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
                 draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
@@ -282,24 +282,16 @@ void draw_important_POIs(ezgl::renderer *g, int i, double font){
         include = true;
     }
         
-    std::unordered_map<OSMID, std::string>::const_iterator it = (database.OSMID_nodeType).find((database.POIs[i]).id);
-    std::unordered_map<OSMID, std::string>::const_iterator it2 = (database.OSMID_wayType).find((database.POIs[i]).id);
+    //std::unordered_map<OSMID, std::string>::const_iterator it = (database.OSMID_nodeType).find((database.POIs[i]).id);
+    //std::unordered_map<OSMID, std::string>::const_iterator it2 = (database.OSMID_wayType).find((database.POIs[i]).id);
     
     if(include){
-        if (it != database.OSMID_nodeType.end() && (it->second == "hospital" || it->second == "clinic" || it->second == "dentist" || it->second == "doctors")){
+        if (getPOIType(i) == "hospital" || getPOIType(i) == "clinic"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        if (it2 != (database.OSMID_nodeType).end() && (it2->second == "aerodrome")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
-            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
-        }
-        if (it2 != database.OSMID_nodeType.end() && (it2->second == "helipad")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/helipad.png");
-            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
-        }
-        if (it2 != database.OSMID_wayType.end() && (it2->second == "subway_entrance")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
+        if (getPOIType(i) == "bus_station"){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bus_station.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
     }
@@ -382,10 +374,6 @@ void draw_important_POIs_nonAmenity(ezgl::renderer *g, double font){
             
             if (nodeType == "aerodrome"){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
-                draw_POI_function(g, center_point, font, png_surface, "");
-            }
-            if (nodeType == "bus_station"){
-                ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bus_station.png");
                 draw_POI_function(g, center_point, font, png_surface, "");
             }
         }
@@ -659,23 +647,30 @@ void draw_main_canvas(ezgl::renderer *g) {
         else if(scope_length < 4200 && scope_height < 3000){
             draw_important_POIs(g, i, 10);
         }
-        /*else{
-            draw_important_POIs(g, i, 10);
-        }*/
+        else{
+            //draw_important_POIs(g, i, 10);
+        }
     }
+    
     //non-amenity
     if (scope_length < 85 && scope_height < 70) {
         draw_POIs_nonAmenity(g, 16);
     } 
-    if (scope_length < 240 && scope_height < 185) {
+    else if (scope_length < 240 && scope_height < 185) {
         draw_POIs_nonAmenity(g, 13);
     }
-    if (scope_length < 385 && scope_height < 305) {
+    else if (scope_length < 385 && scope_height < 305) {
         draw_POIs_nonAmenity(g, 10);
     }
-    if(scope_length < 4200 && scope_height < 3000){
+    else if (scope_length < 4200 && scope_height < 3000){
         draw_important_POIs_nonAmenity(g, 10);
     }
+    else{
+        //draw_important_POIs_nonAmenity(g, 10);
+    }
+            
+    
+    
     //drawing intersections
     for (int id = 0; id < database.intersections.size(); id++) {
         float x = database.intersections[id].x;

@@ -167,13 +167,23 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
 
 GtkListStore* resultList = gtk_list_store_new(1, G_TYPE_STRING);
 
+void reloadMap(){
+    std::cout << "Map reloaded" << std::endl;
+}
 
+void switchDarkMode(){
+    std::cout << " Dark mode active" << std::endl;
+}
 
 void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(searchFirstStreet), application);
     g_signal_connect(application->get_object("SearchStreet2"), "activate", G_CALLBACK(searchSecondStreet), application);
     g_signal_connect(application->get_object("FindButton"), "clicked", G_CALLBACK(displayIntersections), application);
     g_signal_connect(application->get_object("ResetButton"), "clicked", G_CALLBACK(resetIntersections), application);
+    //g_signal_connect(selectCity)--used to select the city to reload
+    g_signal_connect(application->get_object("GoButton"), "clicked", G_CALLBACK(reloadMap), application);
+    g_signal_connect(application->get_object("DarkModeButton"), "clicked", G_CALLBACK(switchDarkMode), application);
+    
     //g_signal_connect(application->get_object(),"",G_CALLBACK(),application);
 }
 

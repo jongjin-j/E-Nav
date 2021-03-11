@@ -157,7 +157,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="GoButton">
                 <property name="label" translatable="yes">GO</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -221,17 +221,6 @@
               <packing>
                 <property name="left_attach">0</property>
                 <property name="top_attach">1</property>
-                <property name="width">3</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">11</property>
                 <property name="width">3</property>
               </packing>
             </child>
@@ -313,6 +302,9 @@
                 <property name="top_attach">12</property>
                 <property name="width">3</property>
               </packing>
+            </child>
+            <child>
+              <placeholder/>
             </child>
             <child>
               <placeholder/>

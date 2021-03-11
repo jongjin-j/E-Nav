@@ -314,16 +314,23 @@ void writeStreetName(ezgl::renderer *g, ezgl::point2d center, StreetSegmentInfo 
     else{
         int midPoint = segInfo.numCurvePoints / 2;
         LatLon point;
+        LatLon point2;
         if(midPoint % 2 == 0){
+            //access curvePoint from 0 ~ numCurvePoints - 1
             point = getStreetSegmentCurvePoint(i, midPoint);
+            double mid_x = x_from_lon(point.longitude());
+            double mid_y = y_from_lat(point.latitude());
+            ezgl::point2d middlePoint(mid_x, mid_y);
+            g->draw_text(middlePoint, name);
         }
         else{
             point = getStreetSegmentCurvePoint(i, midPoint - 1);
+            point2 = getStreetSegmentCurvePoint(i, midPoint);
+            double mid_x = 0.5 * (x_from_lon(point.longitude()) + x_from_lon(point2.longitude()));
+            double mid_y = 0.5 * (y_from_lat(point.latitude()) + y_from_lat(point2.latitude()));
+            ezgl::point2d middlePoint(mid_x, mid_y);
+            g->draw_text(middlePoint, name);
         }
-        double mid_x = x_from_lon(point.longitude());
-        double mid_y = y_from_lat(point.latitude());
-        ezgl::point2d middlePoint(mid_x, mid_y);
-        g->draw_text(middlePoint, name);
     }
 }
 

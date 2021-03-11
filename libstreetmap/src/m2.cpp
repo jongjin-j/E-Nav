@@ -564,18 +564,24 @@ void draw_main_canvas(ezgl::renderer *g) {
             radius = 1.5;
         }
 
-        if (database.intersections[id].highlight && scope_length < 800) {
+        if (database.intersections[id].highlight) {
             //print name of intersection
-            ezgl::point2d center_point(x, y + 5);
+            ezgl::point2d center_point(x, y + 65);
             g->set_color(ezgl::BLACK);
             g->set_font_size(13);
             g->draw_text(center_point, database.intersections[id].name);
             std::cout << "Closest Intersection: " << database.intersections[id].name << "\n";
 
             //set color for intersection icon 
-            g->set_color(ezgl::RED);
+            //g->set_color(ezgl::RED);
             ezgl::point2d center(x, y);
-            g->fill_arc(center, radius, 0, 360);
+            //g->fill_arc(center, radius, 0, 360);
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/redpin.png");
+            
+            g->draw_surface(png_surface, {center.x - 20, center.y + 38});
+            ezgl::renderer::free_surface(png_surface);
+            
+            
         } 
         else if(database.intersections[id].highlight == false && scope_length < 800){
             g->set_color(ezgl::GREY_55);

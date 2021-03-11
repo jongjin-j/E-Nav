@@ -143,7 +143,12 @@ void displayIntersections(GtkWidget*, ezgl::application *application){
     
     std::cout << findIntersectionsOfTwoStreets(resultStreets).size() << std::endl;      //of type IntersectionIdx vector
     
-    database.intersections[findIntersectionsOfTwoStreets(resultStreets)[0]].highlight = 1;
+    if(findIntersectionsOfTwoStreets(resultStreets).size() == 0){
+        std::cout << "No intersections found between the streets" << std::endl;
+    }else{
+        database.intersections[findIntersectionsOfTwoStreets(resultStreets)[0]].highlight = 1;
+    }
+    
     
     
     application->refresh_drawing();

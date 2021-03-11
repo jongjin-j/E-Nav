@@ -59,16 +59,13 @@ const ezgl::color chooseFeatureColour(FeatureType x) {
 
 }
 
-
-std::vector<StreetIdx> results1; //stores the results from user search street 1
-std::vector<StreetIdx> results2; //stores the results from user search street 2
-
 void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice){
     x->set_line_width(width);
     x->set_color(colorChoice);
 }
 
-
+std::vector<StreetIdx> results1; //stores the results from user search street 1
+std::vector<StreetIdx> results2; //stores the results from user search street 2
 
 //std pair to store the two chosen streets; this is passed onto the findIntersections function
 std::pair<StreetIdx, StreetIdx> resultStreets;
@@ -100,37 +97,6 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
         //save the user's choice into the pair
         //chosen = resultStreets.first (type StreetIdx)
     }
-    
-    /*GObject *window; // the parent window over which to add the dialog
-    GtkWidget *content_area; // the content area of the dialog
-    GtkWidget *label; // the label we will create to display a message in the content area
-    GtkWidget *dialog; // the dialog box we will create
-
-    window = application->get_object(application->get_main_window_id().c_str());
-
-    dialog = gtk_dialog_new_with_buttons(
-            "Search Results",
-            (GtkWindow*) window,
-            GTK_DIALOG_MODAL,
-            ("OK"),
-            GTK_RESPONSE_ACCEPT,
-            ("CANCEL"),
-            GTK_RESPONSE_REJECT,
-            NULL
-            );
-
-    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-    label = gtk_label_new("Prototype; display search results here");
-    gtk_container_add(GTK_CONTAINER(content_area), label);
-
-    gtk_widget_show_all(dialog);
-    
-    g_signal_connect(
-        GTK_DIALOG(dialog),
-        "response",
-        G_CALLBACK(on_dialog_response),
-        NULL
-    );*/
 }
 
 //callback function of searching the second street

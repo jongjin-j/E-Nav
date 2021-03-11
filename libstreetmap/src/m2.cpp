@@ -219,45 +219,6 @@ void draw_POI_function(ezgl::renderer *g, ezgl::point2d center_point, double fon
 }
 
 
-void draw_important_POIs(ezgl::renderer *g, int i, double font){
-    g->set_text_rotation(0);
-        
-    ezgl::rectangle scope = g->get_visible_world();
-    double scope_min_x = scope.m_first.x;
-    double scope_max_x = scope.m_second.x;
-    double scope_min_y = scope.m_first.y;
-    double scope_max_y = scope.m_second.y;
-
-    ezgl::point2d center_point((database.POIs[i]).x, (database.POIs[i]).y + 2);
-    bool include = false;
-        
-    if((database.POIs[i]).x > scope_min_x  && (database.POIs[i]).x < scope_max_x && (database.POIs[i]).y > scope_min_y  && (database.POIs[i]).y < scope_max_y){
-        include = true;
-    }
-        
-    std::unordered_map<OSMID, std::string>::const_iterator it = (database.OSMID_nodeType).find((database.POIs[i]).id);
-    std::unordered_map<OSMID, std::string>::const_iterator it2 = (database.OSMID_wayType).find((database.POIs[i]).id);
-    
-    if(include){
-        if (it != database.OSMID_nodeType.end() && (it->second == "hospital" || it->second == "clinic" || it->second == "dentist" || it->second == "doctors")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
-            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
-        }
-        if (it2 != (database.OSMID_nodeType).end() && (it2->second == "aerodrome")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
-            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
-        }
-        if (it2 != database.OSMID_nodeType.end() && (it2->second == "helipad")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/helipad.png");
-            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
-        }
-        if (it2 != database.OSMID_wayType.end() && (it2->second == "subway_entrance")){
-            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
-            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
-        }
-    }
-}
-
 //function to draw POIs
 void draw_POIs(ezgl::renderer *g, int i, double font){
 
@@ -303,6 +264,45 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
             }
         }
         
+}
+
+void draw_important_POIs(ezgl::renderer *g, int i, double font){
+    g->set_text_rotation(0);
+        
+    ezgl::rectangle scope = g->get_visible_world();
+    double scope_min_x = scope.m_first.x;
+    double scope_max_x = scope.m_second.x;
+    double scope_min_y = scope.m_first.y;
+    double scope_max_y = scope.m_second.y;
+
+    ezgl::point2d center_point((database.POIs[i]).x, (database.POIs[i]).y + 2);
+    bool include = false;
+        
+    if((database.POIs[i]).x > scope_min_x  && (database.POIs[i]).x < scope_max_x && (database.POIs[i]).y > scope_min_y  && (database.POIs[i]).y < scope_max_y){
+        include = true;
+    }
+        
+    std::unordered_map<OSMID, std::string>::const_iterator it = (database.OSMID_nodeType).find((database.POIs[i]).id);
+    std::unordered_map<OSMID, std::string>::const_iterator it2 = (database.OSMID_wayType).find((database.POIs[i]).id);
+    
+    if(include){
+        if (it != database.OSMID_nodeType.end() && (it->second == "hospital" || it->second == "clinic" || it->second == "dentist" || it->second == "doctors")){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
+        }
+        if (it2 != (database.OSMID_nodeType).end() && (it2->second == "aerodrome")){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
+        }
+        if (it2 != database.OSMID_nodeType.end() && (it2->second == "helipad")){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/helipad.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
+        }
+        if (it2 != database.OSMID_wayType.end() && (it2->second == "subway_entrance")){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
+        }
+    }
 }
 
 void draw_POIs_nonAmenity(ezgl::renderer *g, double font){    

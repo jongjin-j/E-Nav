@@ -150,8 +150,18 @@ void displayIntersections(GtkWidget*, ezgl::application *application){
             for(int i = 0; i < findIntersectionsOfTwoStreets(resultStreets).size(); i++){
                 database.intersections[findIntersectionsOfTwoStreets(resultStreets)[i]].highlight = 1;
             }
+            
+             //set new scope
+             //get the point of the intersection and set new scope with that as center
+            
+            
+             //ezgl::rectangle scope = g->get_visible_world();
+             //double scope_length = scope.m_second.x - scope.m_first.x;
+             //double scope_height = scope.m_second.y - scope.m_first.y;
+             //std::cout << scope_length << "  " << scope_height << std::endl;  
     }
-     
+    
+    
     application->refresh_drawing();
     
 }

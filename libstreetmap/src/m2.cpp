@@ -325,7 +325,8 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
         
 }
 
-void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i){
+void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i, ezgl::color colorChoice){
+    g->set_color(colorChoice);
     if(tempInfo.numCurvePoints == 0){
          g->draw_line({database.streets[i].start_x, database.streets[i].start_y}, {database.streets[i].end_x, database.streets[i].end_y});
     }   
@@ -390,7 +391,7 @@ void draw_main_canvas(ezgl::renderer *g) {
             colourWidthSetter(g, 6, ezgl::WHITE);
             StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
             //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
-            drawSegment(g, tempInfo, i);
+            drawSegment(g, tempInfo, i, ezgl::WHITE);
             
             //introduce bordered streets if scope within approx 2000
             if (scope_length < 2000 && scope_height < 1700) {
@@ -409,7 +410,7 @@ void draw_main_canvas(ezgl::renderer *g) {
                     g->set_line_width(18);
                 }
                 //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
-                drawSegment(g,tempInfo, i);
+                drawSegment(g,tempInfo, i, ezgl::WHITE);
                 //then draw the street in white
                 colourWidthSetter(g, 4, ezgl::WHITE);
                 if(scope_length < 1000){
@@ -425,14 +426,14 @@ void draw_main_canvas(ezgl::renderer *g) {
                     g->set_line_width(17);
                 }
                 //g->draw_line({streets[i].start_x, streets[i].start_y},{streets[i].end_x, streets[i].end_y});
-                drawSegment(g, tempInfo, i);
+                drawSegment(g, tempInfo, i, ezgl::WHITE);
             }  
         }
         
         if (scope_length < 65000 && scope_height < 60000){
             StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
             std::unordered_map<OSMID, std::string>::const_iterator it = database.OSMID_wayType.find(tempInfo.wayOSMID);
-            if (it != database.OSMID_wayType.end() && it->second == "motorway"){
+            if (it != database.OSMID_wayType.end() && (it->second == "motorway" || it->second == "motorway_link")){
                 g->set_line_width(4);
                 if(scope_length < 2700){
                     g->set_line_width(8);
@@ -446,15 +447,15 @@ void draw_main_canvas(ezgl::renderer *g) {
                 if(scope_length < 600){
                     g->set_line_width(24);
                 }
-                g->set_color(ezgl::ORANGE);
+                //g->set_color(ezgl::ORANGE);
                 //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
-                drawSegment(g, tempInfo, i);
+                drawSegment(g, tempInfo, i, ezgl::ORANGE);
             }
             if (it != database.OSMID_wayType.end() && (it->second == "primary" || it->second == "secondary")){
                 g->set_line_width(1.5);
-                g->set_color(ezgl::WHITE);
+                //g->set_color(ezgl::WHITE);
                 //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
-                drawSegment(g, tempInfo, i);
+                drawSegment(g, tempInfo, i, ezgl::WHITE);
             }
         }
         

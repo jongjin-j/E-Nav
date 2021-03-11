@@ -85,7 +85,7 @@ void initial_setup(ezgl::application *application, bool /*new_window*/);
 void draw_POI_function(ezgl::renderer *g, ezgl::point2d center_point, double font, ezgl::surface *p, std::string name);
 void draw_important_POIs(ezgl::renderer *g, int i, double font);
 void draw_POIs(ezgl::renderer *g, int i, double font);
-void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i);
+void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i, ezgl::color colorChoice);
 void writeStreetName(ezgl::renderer *g, ezgl::point2d center, StreetSegmentInfo segInfo, std::string name, int i);
 void draw_main_canvas(ezgl::renderer *g);
 void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x, double y);

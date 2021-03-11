@@ -21,6 +21,7 @@
 #include <iostream>
 #include "m1.h"
 #include "StreetsDatabaseAPI.h"
+#include "OSMDatabaseAPI.h"
 #include <string.h>
 #include <math.h>
 #include <algorithm>
@@ -42,78 +43,100 @@
 // name of the ".osm.bin" file that matches your map -- just change 
 // ".streets" to ".osm" in the map_streets_database_filename to get the proper
 // name.
-std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
-std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;
-std::vector<std::vector<StreetIdx>> streetID_intersections;
-std::vector<double> street_segment_travelTime;
-std::multimap<std::string, StreetIdx> streetName_and_streetID;
 
-bool loadMap(std::string map_streets_database_filename) {
-    bool load_successful = false; //Indicates whether the map has loaded 
-    //successfully
 
-    std::cout << "loadMap: " << map_streets_database_filename << std::endl;
+//declare database
+databases database;
 
-    // Load your map related data structures here.
+float avg_lat;
+double max_lat;
+double min_lat; 
+double max_lon; 
+double min_lon; 
 
-    load_successful = loadStreetsDatabaseBIN(map_streets_database_filename);
-    
-    if(load_successful == false){
-        return false;
-    }
-    
-    //create a MultiMap of simplified street names and their indexes
+
+//implementing conversion functions
+double x_from_lon(double lon) {
+    double x = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * (lon);
+    return x;
+}
+
+double y_from_lat(double lat) {
+    double y = kEarthRadiusInMeters * kDegreeToRadian * lat;
+    return y;
+}
+
+double lon_from_x(double x) {
+    double lon = x / (kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat));
+    return lon;
+}
+
+double lat_from_y(double y) {
+    double lat = y / (kEarthRadiusInMeters * kDegreeToRadian);
+    return lat;
+}
+
+//helper functions that create databases
+//create a MultiMap of simplified street names and their indexes
+void simplifiedStreetNames_streetIdx (){
     for(int i = 0; i < getNumStreets(); i++){
         std::string streetName = getStreetName(i);
         
         //remove blank spaces and change to lowercase 
         streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
         std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
-        streetName_and_streetID.insert(std::make_pair(streetName,i)); 
+        (database.streetName_and_streetID).insert(std::make_pair(streetName,i)); 
     }    
-    
-    //create a 2D vector to store corresponding street segment IDs for each intersection 
-    intersection_street_segments.resize(getNumIntersections());
+}
+
+//create a 2D vector to store corresponding street segment IDs for each intersection 
+void intersections_streetSegments (){
+    (database.intersection_street_segments).resize(getNumIntersections());
 
     for (int intersection = 0; intersection < getNumIntersections(); ++intersection) {
         for (int i = 0; i < getNumIntersectionStreetSegment(intersection); ++i) {
             int ss_id = getIntersectionStreetSegment(intersection, i);
-            intersection_street_segments[intersection].push_back(ss_id);
+            database.intersection_street_segments[intersection].push_back(ss_id);
         }
     }
+}
 
-    //create a 2D vector to store corresponding street segment IDs for each street 
-    streetID_street_segments.resize(getNumStreets());
+//create a 2D vector to store corresponding street segment IDs for each street 
+void streetID_streetSegments(){
+    (database.streetID_street_segments).resize(getNumStreets());
 
     for (int i = 0; i < getNumStreetSegments(); i++) {
         StreetSegmentInfo temp_segment = getStreetSegmentInfo(i);
         int temp_street_id = temp_segment.streetID;
-        streetID_street_segments[temp_street_id].push_back(i);
+        (database.streetID_street_segments)[temp_street_id].push_back(i);
     }
+}
 
-    //create a 2D vector to store corresponding intersection IDs for each street 
-    streetID_intersections.resize(getNumStreets());
+//create a 2D vector to store corresponding intersection IDs for each street 
+void streetID_Intersections(){
+    (database.streetID_intersections).resize(getNumStreets());
 
     for (int i = 0; i < getNumStreets(); i++) {
-        for (auto it = streetID_street_segments[i].begin(); it != streetID_street_segments[i].end(); it++) {
+        for (auto it = database.streetID_street_segments[i].begin(); it != database.streetID_street_segments[i].end(); it++) {
             StreetSegmentIdx ss_idx = *it;
             StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_idx);
-            streetID_intersections[i].push_back(ss_info.from);
-            streetID_intersections[i].push_back(ss_info.to);
+            database.streetID_intersections[i].push_back(ss_info.from);
+            database.streetID_intersections[i].push_back(ss_info.to);
         }
 
         //erase duplicates
         std::unordered_set<int> s;
-        for (auto j : streetID_intersections[i]) {
+        for (auto j : database.streetID_intersections[i]) {
             s.insert(j);
         }
-        streetID_intersections[i].assign(s.begin(), s.end());
+        database.streetID_intersections[i].assign(s.begin(), s.end());
 
-        std::copy(s.begin(), s.end(), streetID_intersections[i].begin());
+        std::copy(s.begin(), s.end(), database.streetID_intersections[i].begin());
     }
-    
-    
-    //create a vector to store the time taken to travel each street segment  
+}
+
+//create a vector to store the time taken to travel each street segment  
+void streetSegment_travelTime(){
     for (int streetSegNum = 0; streetSegNum < getNumStreetSegments(); streetSegNum++) {
         double totalStreetSegmentLength = 0, firstSegmentLength = 0, lastSegmentLength = 0, curveSegmentLength = 0;
         StreetSegmentInfo street_segment = getStreetSegmentInfo(streetSegNum);
@@ -153,10 +176,211 @@ bool loadMap(std::string map_streets_database_filename) {
             delete[] segmentCurvePoints;
         }
         double speed = street_segment.speedLimit;
-        street_segment_travelTime.push_back(totalStreetSegmentLength / speed);
+        database.street_segment_travelTime.push_back(totalStreetSegmentLength / speed);
+    }
+}
+
+void set_MaxMinLatLon_avgLat(){
+    
+    max_lat = getIntersectionPosition(0).latitude();
+    min_lat = max_lat;
+    max_lon = getIntersectionPosition(0).longitude();
+    min_lon = max_lon;
+    
+    
+    for (int i = 0; i < getNumIntersections(); i++) {
+        //database.intersections[i].name = getIntersectionName(i);
+
+        max_lat = std::max(max_lat, getIntersectionPosition(i).latitude());
+        min_lat = std::min(min_lat, getIntersectionPosition(i).latitude());
+        max_lon = std::max(max_lon, getIntersectionPosition(i).longitude());
+        min_lon = std::min(min_lon, getIntersectionPosition(i).longitude());
+    }
+
+    //average lat for Cartesian transformation
+    avg_lat = (min_lat + max_lat) / 2;
+}
+
+void intersections_database(){
+    //set intersections database
+    database.intersections.resize(getNumIntersections());
+    
+    //change intersection points to Cartesian coordinates
+    for (int i = 0; i < getNumIntersections(); i++) {
+        database.intersections[i].name = getIntersectionName(i);
+        database.intersections[i].x = x_from_lon(getIntersectionPosition(i).longitude());
+        database.intersections[i].y = y_from_lat(getIntersectionPosition(i).latitude());
+    }
+}
+
+//set POI database
+void POI_database(){
+    database.POIs.resize(getNumPointsOfInterest());
+
+    for (int i = 0; i < getNumPointsOfInterest(); i++) {
+        database.POIs[i].name = getPOIName(i);
+        database.POIs[i].x = x_from_lon(getPOIPosition(i).longitude());
+        database.POIs[i].y = y_from_lat(getPOIPosition(i).latitude());
+        database.POIs[i].id = getPOIOSMNodeID(i);
+    }
+}
+
+//set streets database
+void streets_database(){
+    database.streets.resize(getNumStreetSegments());
+
+    for (int i = 0; i < getNumStreetSegments(); i++) {
+
+        //for each street segment, obtain its intersection IDs "from" and "to"
+        //obtain each intersection ID's position via calling getIntersectionPosition (type LatLon)
+        LatLon startingSeg = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).from).latitude(), getIntersectionPosition(getStreetSegmentInfo(i).from).longitude());
+        LatLon endingSeg = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude(), getIntersectionPosition(getStreetSegmentInfo(i).to).longitude());
+
+        //convert LatLon into Cartesian coord and draw line for each segment
+        database.streets[i].start_x = x_from_lon(startingSeg.longitude());
+        database.streets[i].start_y = y_from_lat(startingSeg.latitude());
+        database.streets[i].end_x = x_from_lon(endingSeg.longitude());
+        database.streets[i].end_y = y_from_lat(endingSeg.latitude());
+        database.streets[i].mid_x = 0.5 * (database.streets[i].start_x + database.streets[i].end_x);
+        database.streets[i].mid_y = 0.5 * (database.streets[i].start_y + database.streets[i].end_y);
+
+        
+        double start_x = database.streets[i].start_x, start_y = database.streets[i].start_y;
+        double end_x = database.streets[i].end_x, end_y = database.streets[i].end_y;
+        
+        //set rotation of names
+        double rotation = 0;
+
+        //if the x coordinates of start and end are equal
+        if (end_x == start_x) {
+            rotation = 90;
+            
+            //if end y and start y are in reverse
+            if (end_y < start_y){
+                database.streets[i].reverse = true;
+            }
+        } 
+        else {
+            rotation = std::atan(abs((end_y - start_y) / (end_x - start_x))) / kDegreeToRadian;
+        }
+        
+        //setting the correct rotations of the names and figuring out the directions of the ways
+        //when from is seen as the origin and to is in first quadrant 
+        if (end_x > start_x && end_y > start_y) {
+            database.streets[i].angle = rotation;
+        } 
+        
+        //to is in second quadrant
+        if (end_x < start_x && end_y > start_y){
+            database.streets[i].angle = -1 * rotation;
+            database.streets[i].reverse = true;
+        }
+        
+        //to is in third quadrant
+        if (end_x < start_x && end_y < start_y){
+            database.streets[i].angle = rotation;
+            database.streets[i].reverse = true;
+        }
+        
+        //to is in fourth quadrant
+        if (end_x > start_x && end_y < start_y){
+            database.streets[i].angle = -1 * rotation;
+        }
+        
+        //to is on positive x axis
+        if (end_x > start_x && end_y == start_y){
+            database.streets[i].angle = rotation;
+        }
+        
+        //to is on negative x axis
+        if (end_x < start_x && end_y == start_y){
+            database.streets[i].angle = rotation;
+            database.streets[i].reverse = true;
+        }
+        
+        //set name of the street
+        database.streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
+        
+        //set one way boolean
+        database.streets[i].oneWay = getStreetSegmentInfo(i).oneWay;
+    }
+}
+
+//creating an unordered map for OSMID and way pointer   
+void OSMID_wayValue(){
+    for (int i = 0; i < getNumberOfWays(); i++){
+            
+        //get the way pointer and OSMID
+        const OSMWay* OSMWay_ptr = getWayByIndex (i);
+        OSMID WayID = OSMWay_ptr->id();
+        
+        std::string key, value;
+
+        //loop through the tags and push into unordered map when key is highway
+        for (int j = 0; j < getTagCount(OSMWay_ptr); j++) {
+            
+            std::tie(key, value) = getTagPair(OSMWay_ptr, j);
+            
+            if (key == "highway" || key == "railway")
+                database.OSMID_wayType[WayID] = value;
+        }
+    }
+}
+
+void OSMID_nodeValue(){
+    for (int i = 0; i < getNumberOfNodes(); i++){
+            
+        //get the node pointer and OSMID
+        const OSMNode* OSMNode_ptr = getNodeByIndex(i);
+        OSMID NodeID = OSMNode_ptr->id();
+        
+        std::string key, value;
+
+        //loop through the tags and push into unordered map when key is amenity or shop
+        for (int j = 0; j < getTagCount(OSMNode_ptr); j++) {
+            
+            std::tie(key, value) = getTagPair(OSMNode_ptr, j);
+            
+            if(key == "amenity" || key == "aeroway" || key == "shop"){
+                database.OSMID_nodeType[NodeID] = value;
+            }
+        }
+    }
+}
+
+
+bool loadMap(std::string map_streets_database_filename) {
+    bool load_successful = false; //Indicates whether the map has loaded 
+    //successfully
+
+    std::cout << "loadMap: " << map_streets_database_filename << std::endl;
+
+    // Load your map related data structures here.
+
+    load_successful = loadStreetsDatabaseBIN(map_streets_database_filename);
+    
+    
+    
+    if(load_successful == false){
+        return false;
     }
     
-
+    //declare database
+    set_MaxMinLatLon_avgLat();
+    
+    //load databases
+    simplifiedStreetNames_streetIdx();
+    intersections_streetSegments();
+    streetID_streetSegments();
+    streetID_Intersections();
+    streetSegment_travelTime();
+    intersections_database();
+    POI_database();
+    streets_database();
+    OSMID_wayValue();
+    OSMID_nodeValue();
+    
+  
     load_successful = true; //Make sure this is updated to reflect whether
     //loading the map succeeded or failed
 
@@ -166,11 +390,11 @@ bool loadMap(std::string map_streets_database_filename) {
 void closeMap() {
 
     //Delete the three vectors created to free memory
-    std::vector<std::vector < StreetSegmentIdx >> ().swap(intersection_street_segments);
-    std::vector<std::vector < StreetSegmentIdx >> ().swap(streetID_street_segments);
-    std::vector<std::vector < StreetIdx >> ().swap(streetID_intersections);
-    std::vector<double>().swap(street_segment_travelTime);
-    std::multimap<std::string, StreetIdx> ().swap(streetName_and_streetID);
+    std::vector<std::vector < StreetSegmentIdx >> ().swap(database.intersection_street_segments);
+    std::vector<std::vector < StreetSegmentIdx >> ().swap(database.streetID_street_segments);
+    std::vector<std::vector < StreetIdx >> ().swap(database.streetID_intersections);
+    std::vector<double>().swap(database.street_segment_travelTime);
+    std::multimap<std::string, StreetIdx> ().swap(database.streetName_and_streetID);
 
     closeStreetDatabase();
 }
@@ -186,7 +410,7 @@ double findDistanceBetweenTwoPoints(std::pair<LatLon, LatLon> points) {
 
 double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
     //obtain time taken to travel the segment via the data structure created in loadMap
-    double segmentTravelTime = street_segment_travelTime[street_segment_id];
+    double segmentTravelTime = database.street_segment_travelTime[street_segment_id];
     
     //obtain length by multiplying time with speed
     double segmentLength = segmentTravelTime * (getStreetSegmentInfo(street_segment_id).speedLimit);
@@ -196,7 +420,7 @@ double findStreetSegmentLength(StreetSegmentIdx street_segment_id) {
 
 double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id) {
     //obtain travel time via the precomputed vector
-    return street_segment_travelTime[street_segment_id];
+    return database.street_segment_travelTime[street_segment_id];
 }
 
 int findClosestIntersection(LatLon my_position) {
@@ -220,7 +444,7 @@ int findClosestIntersection(LatLon my_position) {
 
 std::vector<StreetSegmentIdx> findStreetSegmentsOfIntersection(IntersectionIdx intersection_id) {
     //use intersection_street_segments vector created at load
-    return intersection_street_segments[intersection_id];
+    return database.intersection_street_segments[intersection_id];
 }
 
 std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersection_id) {
@@ -231,7 +455,7 @@ std::vector<std::string> findStreetNamesOfIntersection(IntersectionIdx intersect
 
     //loop through the street segment IDs attached to the intersection
     for (int i = 0; i < ss_num; i++) {
-        int ss_id = intersection_street_segments[intersection_id][i];
+        int ss_id = database.intersection_street_segments[intersection_id][i];
         
         //find the street name using the segment info and add to the vector
         StreetSegmentInfo ss_info = getStreetSegmentInfo(ss_id);
@@ -288,7 +512,7 @@ std::vector<IntersectionIdx> findAdjacentIntersections(IntersectionIdx intersect
 
 std::vector<IntersectionIdx> findIntersectionsOfStreet(StreetIdx street_id) {
     //return the corresponding intersections using streetID_intersections database
-    return streetID_intersections[street_id];
+    return database.streetID_intersections[street_id];
 }
 
 std::vector<IntersectionIdx> findIntersectionsOfTwoStreets(std::pair<StreetIdx, StreetIdx> street_ids) {
@@ -324,10 +548,10 @@ std::vector<StreetIdx> findStreetIdsFromPartialStreetName(std::string street_pre
     std::transform(street_prefix.begin(), street_prefix.end(), street_prefix.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
     
     //find the first instance of the prefix 
-    auto itLow = streetName_and_streetID.lower_bound(street_prefix);
+    auto itLow = database.streetName_and_streetID.lower_bound(street_prefix);
     
     //loop through the multi-map while prefix matches and push into vector 
-    while (itLow != streetName_and_streetID.end() && ((itLow -> first).compare(0, street_prefix.size(), street_prefix)) == 0){
+    while (itLow != database.streetName_and_streetID.end() && ((itLow -> first).compare(0, street_prefix.size(), street_prefix)) == 0){
         matchingStreetIds.push_back(itLow -> second);
         itLow++;
     }
@@ -340,8 +564,8 @@ double findStreetLength(StreetIdx street_id) {
     double StreetLength = 0;
 
     //loop through the street segments
-    for (auto it = 0; it < streetID_street_segments[street_id].size(); it++) {
-        StreetSegmentIdx segment = streetID_street_segments[street_id][it];
+    for (auto it = 0; it < database.streetID_street_segments[street_id].size(); it++) {
+        StreetSegmentIdx segment = database.streetID_street_segments[street_id][it];
         //add the segment length after each iteration
         StreetLength += findStreetSegmentLength(segment);
     }

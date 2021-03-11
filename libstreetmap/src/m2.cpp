@@ -17,74 +17,9 @@
 #include <string>
 #include <unordered_map>
 
-struct intersection_data {
-    std::string name;
-    double x = 0;
-    double y = 0;
-    bool highlight = false;
-};
 
-struct POI_data {
-    std::string name;
-    OSMID id;
-    double x = 0;
-    double y = 0;
-};
+extern struct databases database;
 
-struct street_data {
-    std::string name;
-    double start_x = 0;
-    double start_y = 0;
-    double end_x = 0;
-    double end_y = 0;
-    double angle = 0;
-    double mid_x = 0;
-    double mid_y = 0;
-    bool oneWay;
-    bool reverse = false;
-    std::string street_type;
-};
-
-float avg_lat;
-
-double x_from_lon(double lon);
-double y_from_lat(double lat);
-double lon_from_x(double x);
-double lat_from_y(double y);
-const ezgl::color chooseFeatureColour(FeatureType x); 
-void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice);
-void searchFirstStreet(GtkWidget *widget, ezgl::application *application);
-void searchSecondStreet(GtkWidget *widget, ezgl::application *application);
-void displayIntersections(GtkWidget *widget, ezgl::application *application);
-void initial_setup(ezgl::application *application, bool /*new_window*/);
-void draw_POI_function(ezgl::renderer *g, ezgl::point2d center_point, double font, ezgl::surface *p, std::string name);
-void draw_important_POIs(ezgl::renderer *g, int i, double font);
-void draw_POIs(ezgl::renderer *g, int i, double font);
-void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i);
-void writeStreetName(ezgl::renderer *g, ezgl::point2d center, StreetSegmentInfo segInfo, std::string name, int i);
-void draw_main_canvas(ezgl::renderer *g);
-void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x, double y);
-
-
-double x_from_lon(double lon) {
-    double x = kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat) * (lon);
-    return x;
-}
-
-double y_from_lat(double lat) {
-    double y = kEarthRadiusInMeters * kDegreeToRadian * lat;
-    return y;
-}
-
-double lon_from_x(double x) {
-    double lon = x / (kEarthRadiusInMeters * kDegreeToRadian * std::cos(kDegreeToRadian * avg_lat));
-    return lon;
-}
-
-double lat_from_y(double y) {
-    double lat = y / (kEarthRadiusInMeters * kDegreeToRadian);
-    return lat;
-}
 
 //helper function to choose colour from feature type
 
@@ -124,15 +59,9 @@ const ezgl::color chooseFeatureColour(FeatureType x) {
 
 }
 
-std::vector<intersection_data> intersections;
-std::vector<POI_data> POIs;
-std::vector<std::vector<StreetSegmentIdx>> streetSegments;
-std::vector<street_data> streets;
+
 std::vector<StreetIdx> results1; //stores the results from user search street 1
 std::vector<StreetIdx> results2; //stores the results from user search street 2
-std::unordered_map<OSMID, std::string> OSMID_wayType;
-std::unordered_map<OSMID, std::string> OSMID_nodeType;
-
 
 void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice){
     x->set_line_width(width);
@@ -171,10 +100,10 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
     const char* street1 = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet1"));
     
     //results1 is the vector of matching streets
-    results1 = findStreetIdsFromPartialStreetName(street1);
+    database.results1 = findStreetIdsFromPartialStreetName(street1);
     
     //check if vector empty
-    if(results1.size() == 0){
+    if(database.results1.size() == 0){
         std::cout << "No matching results found" << std::endl;
     }else{
         //else, give the list of results for the user to choose from
@@ -184,8 +113,8 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
         }
          */
         //test code, ignore
-        resultStreets.first = results1[0];
-        std::cout << results1[0] << std::endl;
+        resultStreets.first = database.results1[0];
+        std::cout << database.results1[0] << std::endl;
         
         
         //save the user's choice into the pair
@@ -231,10 +160,10 @@ void searchSecondStreet(GtkWidget *widget, ezgl::application *application){
     const char* street2 = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet2"));
     
     //results2 stores the vector of results
-    results2 = findStreetIdsFromPartialStreetName(street2);
+    database.results2 = findStreetIdsFromPartialStreetName(street2);
     
     //check if vector empty
-    if(results2.size() == 0){
+    if(database.results2.size() == 0){
         //display error message in results box
         std::cout << "No matching results found" << std::endl;
     }else{
@@ -245,8 +174,8 @@ void searchSecondStreet(GtkWidget *widget, ezgl::application *application){
         }
         */
         //test code, ignore
-        resultStreets.second = results2[0];
-        std::cout << results2[0] << std::endl;
+        resultStreets.second = database.results2[0];
+        std::cout << database.results2[0] << std::endl;
         
         std:: cout << resultStreets.second << std::endl;
         
@@ -298,32 +227,32 @@ void draw_important_POIs(ezgl::renderer *g, int i, double font){
     double scope_min_y = scope.m_first.y;
     double scope_max_y = scope.m_second.y;
 
-    ezgl::point2d center_point(POIs[i].x, POIs[i].y + 2);
+    ezgl::point2d center_point((database.POIs[i]).x, (database.POIs[i]).y + 2);
     bool include = false;
         
-    if(POIs[i].x > scope_min_x  && POIs[i].x < scope_max_x && POIs[i].y > scope_min_y  && POIs[i].y < scope_max_y){
+    if((database.POIs[i]).x > scope_min_x  && (database.POIs[i]).x < scope_max_x && (database.POIs[i]).y > scope_min_y  && (database.POIs[i]).y < scope_max_y){
         include = true;
     }
         
-    std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_nodeType.find(POIs[i].id);
-    std::unordered_map<OSMID, std::string>::const_iterator it2 = OSMID_wayType.find(POIs[i].id);
+    std::unordered_map<OSMID, std::string>::const_iterator it = (database.OSMID_nodeType).find((database.POIs[i]).id);
+    std::unordered_map<OSMID, std::string>::const_iterator it2 = (database.OSMID_wayType).find((database.POIs[i]).id);
     
     if(include){
-        if (it != OSMID_nodeType.end() && (it->second == "hospital")){
+        if (it != (database.OSMID_nodeType).end() && (it->second == "hospital")){
              ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
-            draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+            draw_POI_function(g, center_point, font, png_surface, (database.POIs[i]).name);
         }
-        if (it2 != OSMID_nodeType.end() && (it2->second == "aerodrome")){
+        if (it2 != (database.OSMID_nodeType).end() && (it2->second == "aerodrome")){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
-            draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        if (it2 != OSMID_nodeType.end() && (it2->second == "helipad")){
+        if (it2 != database.OSMID_nodeType.end() && (it2->second == "helipad")){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/helipad.png");
-            draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        if (it2 != OSMID_wayType.end() && (it2->second == "subway_entrance")){
+        if (it2 != database.OSMID_wayType.end() && (it2->second == "subway_entrance")){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
-            draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
     }
 }
@@ -341,56 +270,56 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
         double scope_min_y = scope.m_first.y;
         double scope_max_y = scope.m_second.y;
 
-        ezgl::point2d center_point(POIs[i].x, POIs[i].y + 2);
+        ezgl::point2d center_point(database.POIs[i].x, database.POIs[i].y + 2);
         bool include = false;
         
-        if(POIs[i] .x > scope_min_x  && POIs[i].x < scope_max_x && POIs[i].y > scope_min_y  && POIs[i].y < scope_max_y){
+        if(database.POIs[i] .x > scope_min_x  && database.POIs[i].x < scope_max_x && database.POIs[i].y > scope_min_y  && database.POIs[i].y < scope_max_y){
             include = true;
         }
         
-        std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_nodeType.find(POIs[i].id);
-        std::unordered_map<OSMID, std::string>::const_iterator it2 = OSMID_wayType.find(POIs[i].id);
+        std::unordered_map<OSMID, std::string>::const_iterator it = database.OSMID_nodeType.find(database.POIs[i].id);
+        std::unordered_map<OSMID, std::string>::const_iterator it2 = database.OSMID_wayType.find(database.POIs[i].id);
         
         if(include){
-            if (it != OSMID_nodeType.end() && it->second == "restaurant"){
+            if (it != database.OSMID_nodeType.end() && it->second == "restaurant"){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (it != OSMID_nodeType.end() && (it->second == "school")){
+            if (it != database.OSMID_nodeType.end() && (it->second == "school")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/school.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (it != OSMID_nodeType.end() && (it->second == "cafe")){
+            if (it != database.OSMID_nodeType.end() && (it->second == "cafe")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/cafe.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (it != OSMID_nodeType.end() && (it->second == "bank")){
+            if (it != database.OSMID_nodeType.end() && (it->second == "bank")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bank.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (it != OSMID_nodeType.end() && (it->second == "bus_station")){
+            if (it != database.OSMID_nodeType.end() && (it->second == "bus_station")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bus_station.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (it != OSMID_nodeType.end() && (it->second == "supermarket")){
+            if (it != database.OSMID_nodeType.end() && (it->second == "supermarket")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/supermarket.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (it != OSMID_nodeType.end() && (it->second == "hospital")){
+            if (it != database.OSMID_nodeType.end() && (it->second == "hospital")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (it2 != OSMID_nodeType.end() && (it2->second == "aerodrome")){
+            if (it2 != database.OSMID_nodeType.end() && (it2->second == "aerodrome")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (it2 != OSMID_nodeType.end() && (it2->second == "helipad")){
+            if (it2 != database.OSMID_nodeType.end() && (it2->second == "helipad")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/helipad.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
-            if (it2 != OSMID_wayType.end() && (it2->second == "subway_entrance")){
+            if (it2 != database.OSMID_wayType.end() && (it2->second == "subway_entrance")){
                 ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
-                draw_POI_function(g, center_point, font, png_surface, POIs[i].name);
+                draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
             }
         }
         
@@ -398,7 +327,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
 
 void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i){
     if(tempInfo.numCurvePoints == 0){
-         g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
+         g->draw_line({database.streets[i].start_x, database.streets[i].start_y}, {database.streets[i].end_x, database.streets[i].end_y});
     }   
     else{
             int curvePoints = tempInfo.numCurvePoints;
@@ -502,8 +431,8 @@ void draw_main_canvas(ezgl::renderer *g) {
         
         if (scope_length < 65000 && scope_height < 60000){
             StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
-            std::unordered_map<OSMID, std::string>::const_iterator it = OSMID_wayType.find(tempInfo.wayOSMID);
-            if (it != OSMID_wayType.end() && it->second == "motorway"){
+            std::unordered_map<OSMID, std::string>::const_iterator it = database.OSMID_wayType.find(tempInfo.wayOSMID);
+            if (it != database.OSMID_wayType.end() && it->second == "motorway"){
                 g->set_line_width(4);
                 if(scope_length < 2700){
                     g->set_line_width(8);
@@ -521,7 +450,7 @@ void draw_main_canvas(ezgl::renderer *g) {
                 //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
                 drawSegment(g, tempInfo, i);
             }
-            if (it != OSMID_wayType.end() && (it->second == "primary" || it->second == "secondary")){
+            if (it != database.OSMID_wayType.end() && (it->second == "primary" || it->second == "secondary")){
                 g->set_line_width(1.5);
                 g->set_color(ezgl::WHITE);
                 //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
@@ -530,12 +459,12 @@ void draw_main_canvas(ezgl::renderer *g) {
         }
         
         if (scope_length < 1500 && scope_height < 1200) {
-            if (findStreetSegmentLength(i) > 70 && scope.m_first.x < streets[i].mid_x && scope.m_second.x > streets[i].mid_x && scope.m_first.y < streets[i].mid_y && scope.m_second.y > streets[i].mid_y) {
-                ezgl::point2d centerPoint(streets[i].mid_x, streets[i].mid_y);
+            if (findStreetSegmentLength(i) > 70 && scope.m_first.x < database.streets[i].mid_x && scope.m_second.x > database.streets[i].mid_x && scope.m_first.y < database.streets[i].mid_y && scope.m_second.y > database.streets[i].mid_y) {
+                ezgl::point2d centerPoint(database.streets[i].mid_x, database.streets[i].mid_y);
                 StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
                 
                 //display the street names
-                g->set_text_rotation(streets[i].angle);
+                g->set_text_rotation(database.streets[i].angle);
                 g->set_font_size(8);
                 g->set_color(ezgl::BLACK);
                 
@@ -543,19 +472,19 @@ void draw_main_canvas(ezgl::renderer *g) {
                     g->set_font_size(12);
                 }
                 
-                if (streets[i].oneWay){
-                    if (streets[i].reverse){
+                if (database.streets[i].oneWay){
+                    if (database.streets[i].reverse){
                        //g->draw_text(centerPoint, "< " + streets[i].name + " <");
-                       writeStreetName(g, centerPoint, tempInfo, "< " + streets[i].name + " <", i);
+                       writeStreetName(g, centerPoint, tempInfo, "< " + database.streets[i].name + " <", i);
                     }
                     else {
                        //g->draw_text(centerPoint, "> " + streets[i].name + " >");
-                       writeStreetName(g, centerPoint, tempInfo, "> " + streets[i].name + " >", i);
+                       writeStreetName(g, centerPoint, tempInfo, "> " + database.streets[i].name + " >", i);
                     }
                 }
                 else {
                     //g->draw_text(centerPoint, streets[i].name);
-                    writeStreetName(g, centerPoint, tempInfo, streets[i].name, i);
+                    writeStreetName(g, centerPoint, tempInfo, database.streets[i].name, i);
                     
                 }
             }
@@ -631,7 +560,7 @@ void draw_main_canvas(ezgl::renderer *g) {
     }
 
     //drawing POIs
-    for (int i = 0; i < POIs.size(); i++) {
+    for (int i = 0; i < database.POIs.size(); i++) {
 
         if (scope_length < 85 && scope_height < 70) {
             draw_POIs(g, i, 16);
@@ -651,28 +580,28 @@ void draw_main_canvas(ezgl::renderer *g) {
     }
 
     //drawing intersections
-    for (int id = 0; id < intersections.size(); id++) {
-        float x = intersections[id].x;
-        float y = intersections[id].y;
+    for (int id = 0; id < database.intersections.size(); id++) {
+        float x = database.intersections[id].x;
+        float y = database.intersections[id].y;
         float radius = 1;
         if(scope_length < 1800 && scope_length > 800){
             radius = 1.5;
         }
 
-        if (intersections[id].highlight && scope_length < 800) {
+        if (database.intersections[id].highlight && scope_length < 800) {
             //print name of intersection
             ezgl::point2d center_point(x, y + 5);
             g->set_color(ezgl::BLACK);
             g->set_font_size(13);
-            g->draw_text(center_point, intersections[id].name);
-            std::cout << "Closest Intersection: " << intersections[id].name << "\n";
+            g->draw_text(center_point, database.intersections[id].name);
+            std::cout << "Closest Intersection: " << database.intersections[id].name << "\n";
 
             //set color for intersection icon 
             g->set_color(ezgl::RED);
             ezgl::point2d center(x, y);
             g->fill_arc(center, radius, 0, 360);
         } 
-        else if(intersections[id].highlight == false && scope_length < 800){
+        else if(database.intersections[id].highlight == false && scope_length < 800){
             g->set_color(ezgl::GREY_55);
             ezgl::point2d center(x, y);
             g->fill_arc(center, radius, 0, 360);
@@ -688,10 +617,10 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x,
     LatLon pos = LatLon(lat_from_y(y), lon_from_x(x));
     int id = findClosestIntersection(pos);
 
-    if (intersections[id].highlight == true)
-        intersections[id].highlight = false;
+    if (database.intersections[id].highlight == true)
+        database.intersections[id].highlight = false;
     else
-        intersections[id].highlight = true;
+        database.intersections[id].highlight = true;
 
     app -> refresh_drawing();
 }
@@ -704,163 +633,6 @@ void drawMap() {
     settings.canvas_identifier = "MainCanvas";
 
     ezgl::application application(settings);
-
-    //set intersections database
-    double max_lat = getIntersectionPosition(0).latitude();
-    double min_lat = max_lat;
-    double max_lon = getIntersectionPosition(0).longitude();
-    double min_lon = max_lon;
-
-    intersections.resize(getNumIntersections());
-
-    //set name in database and find the max and min lat, lon
-    for (int i = 0; i < getNumIntersections(); i++) {
-        intersections[i].name = getIntersectionName(i);
-
-        max_lat = std::max(max_lat, getIntersectionPosition(i).latitude());
-        min_lat = std::min(min_lat, getIntersectionPosition(i).latitude());
-        max_lon = std::max(max_lon, getIntersectionPosition(i).longitude());
-        min_lon = std::min(min_lon, getIntersectionPosition(i).longitude());
-    }
-
-    //average lat for Cartesian transformation
-    avg_lat = (min_lat + max_lat) / 2;
-
-    //change intersection points to Cartesian coordinates
-    for (int i = 0; i < getNumIntersections(); i++) {
-        intersections[i].x = x_from_lon(getIntersectionPosition(i).longitude());
-        intersections[i].y = y_from_lat(getIntersectionPosition(i).latitude());
-    }
-
-    
-    //set POI database
-    POIs.resize(getNumPointsOfInterest());
-
-    for (int i = 0; i < getNumPointsOfInterest(); i++) {
-        POIs[i].name = getPOIName(i);
-        POIs[i].x = x_from_lon(getPOIPosition(i).longitude());
-        POIs[i].y = y_from_lat(getPOIPosition(i).latitude());
-        POIs[i].id = getPOIOSMNodeID(i);
-    }
-
-    
-    //set streets database
-    streets.resize(getNumStreetSegments());
-
-    for (int i = 0; i < getNumStreetSegments(); i++) {
-
-        //for each street segment, obtain its intersection IDs "from" and "to"
-        //obtain each intersection ID's position via calling getIntersectionPosition (type LatLon)
-        LatLon startingSeg = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).from).latitude(), getIntersectionPosition(getStreetSegmentInfo(i).from).longitude());
-        LatLon endingSeg = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude(), getIntersectionPosition(getStreetSegmentInfo(i).to).longitude());
-
-        //convert LatLon into Cartesian coord and draw line for each segment
-        streets[i].start_x = x_from_lon(startingSeg.longitude());
-        streets[i].start_y = y_from_lat(startingSeg.latitude());
-        streets[i].end_x = x_from_lon(endingSeg.longitude());
-        streets[i].end_y = y_from_lat(endingSeg.latitude());
-        streets[i].mid_x = 0.5 * (streets[i].start_x + streets[i].end_x);
-        streets[i].mid_y = 0.5 * (streets[i].start_y + streets[i].end_y);
-
-        
-        double start_x = streets[i].start_x, start_y = streets[i].start_y;
-        double end_x = streets[i].end_x, end_y = streets[i].end_y;
-        
-        //set rotation of names
-        double rotation = 0;
-
-        //if the x coordinates of start and end are equal
-        if (end_x == start_x) {
-            rotation = 90;
-            
-            //if end y and start y are in reverse
-            if (end_y < start_y){
-                streets[i].reverse = true;
-            }
-        } 
-        else {
-            rotation = std::atan(abs((end_y - start_y) / (end_x - start_x))) / kDegreeToRadian;
-        }
-        
-        //setting the correct rotations of the names and figuring out the directions of the ways
-        //when from is seen as the origin and to is in first quadrant 
-        if (end_x > start_x && end_y > start_y) {
-            streets[i].angle = rotation;
-        } 
-        
-        //to is in second quadrant
-        if (end_x < start_x && end_y > start_y){
-            streets[i].angle = -1 * rotation;
-            streets[i].reverse = true;
-        }
-        
-        //to is in third quadrant
-        if (end_x < start_x && end_y < start_y){
-            streets[i].angle = rotation;
-            streets[i].reverse = true;
-        }
-        
-        //to is in fourth quadrant
-        if (end_x > start_x && end_y < start_y){
-            streets[i].angle = -1 * rotation;
-        }
-        
-        //to is on positive x axis
-        if (end_x > start_x && end_y == start_y){
-            streets[i].angle = rotation;
-        }
-        
-        //to is on negative x axis
-        if (end_x < start_x && end_y == start_y){
-            streets[i].angle = rotation;
-            streets[i].reverse = true;
-        }
-        
-        //set name of the street
-        streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
-        
-        //set one way boolean
-        streets[i].oneWay = getStreetSegmentInfo(i).oneWay;
-    }
-    
-    
-    //creating an unordered map for OSMID and way pointer         
-    for (int i = 0; i < getNumberOfWays(); i++){
-            
-        //get the way pointer and OSMID
-        const OSMWay* OSMWay_ptr = getWayByIndex (i);
-        OSMID WayID = OSMWay_ptr->id();
-        
-        std::string key, value;
-
-        //loop through the tags and push into unordered map when key is highway
-        for (int j = 0; j < getTagCount(OSMWay_ptr); j++) {
-            
-            std::tie(key, value) = getTagPair(OSMWay_ptr, j);
-            
-            if (key == "highway" || key == "railway")
-                OSMID_wayType[WayID] = value;
-        }
-    }
-    
-    for (int i = 0; i < getNumberOfNodes(); i++){
-            
-        //get the node pointer and OSMID
-        const OSMNode* OSMNode_ptr = getNodeByIndex(i);
-        OSMID NodeID = OSMNode_ptr->id();
-        
-        std::string key, value;
-
-        //loop through the tags and push into unordered map when key is amenity or shop
-        for (int j = 0; j < getTagCount(OSMNode_ptr); j++) {
-            
-            std::tie(key, value) = getTagPair(OSMNode_ptr, j);
-            
-            if(key == "amenity" || key == "aeroway" || key == "shop"){
-                OSMID_nodeType[NodeID] = value;
-            }
-        }
-    }
 
     ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)},
     {

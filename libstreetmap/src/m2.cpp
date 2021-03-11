@@ -163,6 +163,10 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
     application->refresh_drawing();
 }
 
+GtkListStore* resultList = gtk_list_store_new(1, G_TYPE_STRING);
+
+
+
 void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(searchFirstStreet), application);
     g_signal_connect(application->get_object("SearchStreet2"), "activate", G_CALLBACK(searchSecondStreet), application);
@@ -225,7 +229,6 @@ void draw_important_POIs(ezgl::renderer *g, int i, double font){
 
 //function to draw POIs
 void draw_POIs(ezgl::renderer *g, int i, double font){
-        float radius = 3;
 
         g->set_color(ezgl::BLUE);
         g->set_text_rotation(0);
@@ -580,12 +583,8 @@ void draw_main_canvas(ezgl::renderer *g) {
             g->draw_text(center_point, database.intersections[id].name);
             std::cout << "Closest Intersection: " << database.intersections[id].name << "\n";
 
-            //set color for intersection icon 
-            //g->set_color(ezgl::RED);
             ezgl::point2d center(x, y);
-            //g->fill_arc(center, radius, 0, 360);
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/redpin.png");
-            
             g->draw_surface(png_surface, {center.x - 20, center.y + 38});
             ezgl::renderer::free_surface(png_surface);
             

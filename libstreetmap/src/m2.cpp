@@ -68,27 +68,7 @@ void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice)
     x->set_color(colorChoice);
 }
 
-/*void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data){
 
-    std::cout << "response is ";
-        switch(response_id) {
-            case GTK_RESPONSE_ACCEPT:
-                std::cout << "GTK_RESPONSE_ACCEPT ";
-                break;
-            case GTK_RESPONSE_DELETE_EVENT:
-                std::cout << "GTK_RESPONSE_DELETE_EVENT (i.e. ’X’ button) ";
-                break;
-            case GTK_RESPONSE_REJECT:
-                std::cout << "GTK_RESPONSE_REJECT ";
-                break;
-            default:
-                std::cout << "UNKNOWN ";
-                break;
-        }
-    std::cout << "(" << response_id << ")\n";
-    gtk_widget_destroy(GTK_WIDGET (dialog));
-    
-}*/
 
 //std pair to store the two chosen streets; this is passed onto the findIntersections function
 std::pair<StreetIdx, StreetIdx> resultStreets;

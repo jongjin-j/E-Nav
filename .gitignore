@@ -25,3 +25,16 @@ build
 mapper
 libstreetmap.a
 test_libstreetmap
+/libstreetmap/tests/m1_func_street_saint_helena_public.cpp
+/libstreetmap/tests/m1_func_intersection_toronto_canada_public.cpp
+/libstreetmap/tests/m1_perf_intersection_toronto_canada_public.cpp
+/libstreetmap/tests/m1_func_spatial_saint_helena_public.cpp
+/libstreetmap/tests/m1_perf_distance-time_toronto_canada_public.cpp
+/libstreetmap/tests/m1_func_distance-time_saint_helena_public.cpp
+/libstreetmap/tests/m1_perf_street_toronto_canada_public.cpp
+/libstreetmap/tests/m1_func_distance-time_toronto_canada_public.cpp
+/libstreetmap/tests/m1_load_maps_public.cpp
+/libstreetmap/tests/m1_func_spatial_toronto_canada_public.cpp
+/libstreetmap/tests/m1_func_intersection_saint_helena_public.cpp
+/libstreetmap/tests/m1_func_street_toronto_canada_public.cpp
+/libstreetmap/tests/unit_test_util.h

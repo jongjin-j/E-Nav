@@ -138,8 +138,8 @@ void displayIntersections(GtkWidget*, ezgl::application *application){
     
     //consider case where pressed without a valid pair
     //if valid pair, display the intersections
-    std::cout << "Find button clicked" << std::endl;
-    std:: cout << "The pair of streetIds are: " << resultStreets.first << " and " << resultStreets.second << std::endl;
+    std::cout << "The pair of streetIds are: " << resultStreets.first << " and " << resultStreets.second << std::endl;
+    std::cout << "The street names are: " << getStreetName(resultStreets.first) << " and " << getStreetName(resultStreets.second) << std::endl; 
     
     std::cout << findIntersectionsOfTwoStreets(resultStreets).size() << std::endl;      //of type IntersectionIdx vector
     

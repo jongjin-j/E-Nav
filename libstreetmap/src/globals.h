@@ -20,6 +20,8 @@
 
 extern struct databases database;
 
+extern const char* cityName;
+
 struct intersection_data {
     std::string name;
     double x = 0;

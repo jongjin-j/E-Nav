@@ -170,7 +170,7 @@ void loadCityWeatherData(std::string cityFile) {
             boost::property_tree::read_json(issJsonData, ptRoot);
 
             // Parsing and printing the data
-            cout << "Loading Weather Data in  " << cityName << ": " << endl;
+            cout << "Loading Weather Data in " << cityName << ": " << endl;
             
             double temp = ptRoot.get<double>("main.temp") - 273.15;
             double feels_like = ptRoot.get<double>("main.feels_like") - 273.15;

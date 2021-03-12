@@ -199,7 +199,7 @@ void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("DarkModeButton"), "clicked", G_CALLBACK(switchDarkMode), application);
     
     GtkListStore* resultList = gtk_list_store_new(3, G_TYPE_STRING);
-    g_signal_connect(application->get_object("nk"), "clicked", G_CALLBACK(switchDarkMode), application);
+    //g_signal_connect(application->get_object("nk"), "clicked", G_CALLBACK(switchDarkMode), application);
 
     
     //g_signal_connect(application->get_object(),"",G_CALLBACK(),application);

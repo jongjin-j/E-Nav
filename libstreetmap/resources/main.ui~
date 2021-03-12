@@ -2,6 +2,8 @@
 <!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
+  <object class="GtkListStore"/>
+  <object class="GtkEntryCompletion" id="entrycompletion1"/>
   <object class="GtkWindow" id="MainWindow">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -12,17 +14,29 @@
       <placeholder/>
     </child>
     <child>
-      <object class="GtkGrid" id="OuterGrid">
+      <object class="GtkOverlay">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
+          <object class="GtkDrawingArea" id="MainCanvas">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
+          </object>
+          <packing>
+            <property name="index">-1</property>
+          </packing>
+        </child>
+        <child type="overlay">
           <object class="GtkGrid" id="InnerGrid">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="halign">end</property>
             <child>
               <object class="GtkButton" id="UpButton">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <child>
                   <object class="GtkArrow" id="UpArrow">
@@ -40,7 +54,7 @@
             <child>
               <object class="GtkButton" id="DownButton">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <child>
                   <object class="GtkArrow" id="DownArrow">
@@ -58,7 +72,7 @@
             <child>
               <object class="GtkButton" id="LeftButton">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <child>
                   <object class="GtkArrow" id="LeftArrow">
@@ -76,7 +90,7 @@
             <child>
               <object class="GtkButton" id="RightButton">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <child>
                   <object class="GtkArrow" id="RightArrow">
@@ -94,7 +108,7 @@
               <object class="GtkButton" id="ZoomInButton">
                 <property name="label" translatable="yes">+</property>
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
               </object>
               <packing>
@@ -106,7 +120,7 @@
               <object class="GtkButton" id="ZoomOutButton">
                 <property name="label" translatable="yes">-</property>
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
               </object>
               <packing>
@@ -118,7 +132,7 @@
               <object class="GtkButton" id="ZoomFitButton">
                 <property name="label" translatable="yes">Fit</property>
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
               </object>
               <packing>
@@ -130,7 +144,7 @@
               <object class="GtkButton" id="ProceedButton">
                 <property name="label" translatable="yes">Exit</property>
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
               </object>
               <packing>
@@ -201,6 +215,7 @@
                 <property name="primary_icon_activatable">False</property>
                 <property name="primary_icon_sensitive">False</property>
                 <property name="placeholder_text" translatable="yes">Enter Street 1</property>
+                <property name="completion">entrycompletion1</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -327,29 +342,6 @@
               <placeholder/>
             </child>
           </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkDrawingArea" id="MainCanvas">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">0</property>
-            <property name="height">3</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
         </child>
       </object>
     </child>

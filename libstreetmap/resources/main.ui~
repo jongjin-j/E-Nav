@@ -4,17 +4,11 @@
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkListStore" id="ResultsList">
     <columns>
-      <!-- column-name gchararray1 -->
+      <!-- column-name Matching Streets -->
       <column type="gchararray"/>
+      <!-- column-name Street ID -->
+      <column type="gint"/>
     </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">Bloor</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes"/>
-      </row>
-    </data>
     <signal name="notify" handler="SearchStreet1" swapped="no"/>
   </object>
   <object class="GtkEntryCompletion" id="entrycompletion1">

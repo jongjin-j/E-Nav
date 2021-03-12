@@ -169,14 +169,40 @@ void reloadMap(GtkWidget*, ezgl::application *application){
     std::cout << "Map reloaded" << std::endl;
 }
 
-void switchDarkMode(GtkWidget*, ezgl::application *application){
-    std::cout << " Dark mode active" << std::endl; 
+void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data){
+    gtk_widget_destroy(GTK_WIDGET (dialog));
+}
+
+void displayWeather(GtkWidget*, ezgl::application *application){
     
-    if(darkMode == false){
-        darkMode = true;
-    }else if(darkMode == true){
-        darkMode = false;
-    }
+    std::cout<<"Displaying Weather" << std::endl;
+    
+    GObject *window;
+    GtkWidget *content_area;
+    GtkWidget *label;
+    GtkWidget* dialog;
+    
+    window = application -> get_object(application->get_main_window_id().c_str());
+    
+    dialog = gtk_dialog_new_with_buttons(
+            "Weather Conditions",
+            (GtkWindow*) window,
+            GTK_DIALOG_MODAL,
+            ("Close"),
+            GTK_RESPONSE_ACCEPT
+            );
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    label = gtk_label_new("Temperature:\nFeels like:\nHumidity:\nPressure:\n");
+    gtk_container_add(GTK_CONTAINER(content_area), label);
+    
+    gtk_widget_show_all(dialog);
+    
+    g_signal_connect(
+        GTK_DIALOG(dialog),
+        "response",
+        G_CALLBACK(on_dialog_response),
+        NULL
+    );
     application -> refresh_drawing();
     
 }
@@ -200,7 +226,7 @@ void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("ResetButton"), "clicked", G_CALLBACK(resetIntersections), application);
     //g_signal_connect(selectCity)--used to select the city to reload
     g_signal_connect(application->get_object("GoButton"), "clicked", G_CALLBACK(reloadMap), application);
-    g_signal_connect(application->get_object("DarkModeButton"), "clicked", G_CALLBACK(switchDarkMode), application);
+    g_signal_connect(application->get_object("WeatherButton"), "clicked", G_CALLBACK(displayWeather), application);
     
     //g_signal_connect(application->get_object(),"",G_CALLBACK(),application);
 }

@@ -165,14 +165,16 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
 //GtkListStore* resultList = gtk_list_store_new(1, G_TYPE_STRING);
 
 void reloadMap(GtkWidget*, ezgl::application *application){
+    bool foundMatch = false;
+    
     //reset and close database
-    closeMap();
-    closeOSMDatabase();
+    //closeMap();
+    //closeOSMDatabase();
     
     //cityName is a char array that holds user input --> can use to call a new map
     //should check for invalid inputs
     const char* cityNameChar = gtk_entry_get_text((GtkEntry*) application -> get_object("LoadCity"));
-    std::cout << cityNameChar << std::endl;
+    //std::cout << cityNameChar << std::endl;
    
     std::string cityName(cityNameChar);
         
@@ -183,6 +185,13 @@ void reloadMap(GtkWidget*, ezgl::application *application){
     //load OSM database
     for (int i = 0; i < fileNames.size(); i++){
         if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("osm.bin") != std::string::npos){
+            //found a matching city name
+            foundMatch = true;
+            
+            //close current map
+            closeMap();
+            closeOSMDatabase();
+            
             bool loadSucess = loadOSMDatabaseBIN("/cad2/ece297s/public/maps/" + fileNames[i]);
             if (loadSucess) {
                 std::cout << "successfully loaded OSM" << std::endl; 
@@ -205,21 +214,23 @@ void reloadMap(GtkWidget*, ezgl::application *application){
         }
     }
     
-    ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)},
-    {
+    //if the input name is valid
+    if (foundMatch){
+        //set the new dimensions
+        ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)},
+        {
         x_from_lon(max_lon), y_from_lat(max_lat)
-    });
+        });
     
-    application->change_canvas_world_coordinates("MainCanvas", initial_world);
-    
-    //application->add_canvas("MainCanvas", draw_main_canvas, initial_world, ezgl::color(230,230,230,230));
+        application->change_canvas_world_coordinates("MainCanvas", initial_world);
 
-    //application->run(initial_setup, act_on_mouse_click, nullptr, nullptr);
-   
-    application -> refresh_drawing();
-    cityName = gtk_entry_get_text((GtkEntry*) application -> get_object("LoadCity"));
-    std::cout << cityName << std::endl;
-    
+        //refresh the drawing
+        application -> refresh_drawing();
+        
+       
+        cityName = gtk_entry_get_text((GtkEntry*) application -> get_object("LoadCity"));
+        std::cout << cityName << std::endl;
+    }
 }
 
 void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data){
@@ -735,9 +746,9 @@ void drawMap() {
     }
     
     //printing out the directory names
-    for (int i=0; i<fileNames.size(); i++){
-        std::cout << (fileNames[i]) << std::endl;
-    }
+    //for (int i=0; i<fileNames.size(); i++){
+        //std::cout << (fileNames[i]) << std::endl;
+    //}
     
     
     ezgl::application::settings settings;

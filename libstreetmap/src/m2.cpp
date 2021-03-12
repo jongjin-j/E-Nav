@@ -669,6 +669,12 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x,
 
 void drawMap() {
     loadCityWeatherData();
+    
+    for (int i=0; i<fileNames.size(); i++){
+        std::cout << (fileNames[i]) << std::endl;
+    }
+    
+    
     ezgl::application::settings settings;
     settings.main_ui_resource = "libstreetmap/resources/main.ui";
     settings.window_identifier = "MainWindow";
@@ -725,22 +731,3 @@ void changeMap(ezgl::application* app){
 
 
 //path: /cad2/ece297s/public/maps
-//code from https://www.systutorials.com/how-to-iterate-all-dirs-and-files-in-a-dir-in-c/
-int ListDir(const std::string& path) {
-    struct dirent *entry;
-    DIR *dp;
-
-    dp = ::opendir(path.c_str());
-    if (dp == NULL) {
-        perror("opendir: Path does not exist or could not be read.");
-        return -1;
-    }
-
-    while ((entry = ::readdir(dp))) {
-        //std::cout << entry->d_name << std::endl;
-        fileNames.push_back(entry->d_name);
-    }
-
-    ::closedir(dp);
-    return 0;
-}

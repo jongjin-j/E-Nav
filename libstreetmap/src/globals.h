@@ -76,6 +76,8 @@ extern double max_lon;
 
 extern std::vector<std::string> fileNames;
 
+extern std::string path;
+
 double x_from_lon(double lon);
 double y_from_lat(double lat);
 double lon_from_x(double x);

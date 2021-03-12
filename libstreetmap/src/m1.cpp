@@ -54,6 +54,8 @@ double min_lat;
 double max_lon; 
 double min_lon; 
 
+std::string path; 
+
 
 //implementing conversion functions
 double x_from_lon(double lon) {
@@ -384,6 +386,26 @@ void POIDatabase_nonAmenity(){
     }
 }
 
+//code from https://www.systutorials.com/how-to-iterate-all-dirs-and-files-in-a-dir-in-c/
+int ListDir(std::string path) {
+    struct dirent *entry;
+    DIR *dp;
+
+    dp = ::opendir(path.c_str());
+    if (dp == NULL) {
+        perror("opendir: Path does not exist or could not be read.");
+        return -1;
+    }
+
+    while ((entry = ::readdir(dp))) {
+        //std::cout << entry->d_name << std::endl;
+        fileNames.push_back(entry->d_name);
+    }
+
+    ::closedir(dp);
+    return 0;
+}
+
         
 bool loadMap(std::string map_streets_database_filename) {
     bool load_successful = false; //Indicates whether the map has loaded 
@@ -415,6 +437,7 @@ bool loadMap(std::string map_streets_database_filename) {
     streets_database();
     OSMID_wayValue();
     POIDatabase_nonAmenity();
+    ListDir("/cad2/ece297s/public/maps");
     
   
     load_successful = true; //Make sure this is updated to reflect whether

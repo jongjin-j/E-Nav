@@ -86,16 +86,15 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
     if(results1.size() == 0){
         std::cout << "No matching results found" << std::endl;
     }
-    /*
+    
     //retrieve object
     auto resultsList = (GtkListStore *)(application->get_object("ResultsList"));
     gtk_list_store_clear(resultsList);
     //iterator to go over the list
     GtkTreeIter iter;
-   
     
-    //else, give the list of results for the user to choose from
-    for(int i = 0; i < results1.size() && i < 5; i++){
+    //give the list of results for the user to choose from
+    for(int i = 0; i < results1.size() && i < 20; i++){
         //display all these into a list  
         gtk_list_store_append(resultsList, &iter);
         gtk_list_store_set(resultsList, &iter, 
@@ -103,8 +102,6 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
                             -1);
         
     }
-    */
-    //gtk_show("ResultsList");
 }
 
 //callback function of searching the second street
@@ -120,21 +117,23 @@ void searchSecondStreet(GtkWidget*, ezgl::application *application){
     if(results2.size() == 0){
         //display error message in results box
         std::cout << "No matching results found" << std::endl;
-    }else{
-        //else, give the list of results for the user to choose from
-        
-        for(int i = 0; i < results2.size(); i++){
-            std::cout << getStreetName(results2[i]) << std::endl;
-        }
-                //resultStreets.second = results2[0];        
-        //std:: cout << resultStreets.second << std::endl;
-        
-        //std::cout << findIntersectionsOfTwoStreets(resultStreets)[0] << std::endl;
-                
-        
-        //save the user's choice into the pair
-        //chosen = resultStreets.first (type StreetIdx)
     }
+        //retrieve object
+    auto resultsList = (GtkListStore *)(application->get_object("ResultsList"));
+    gtk_list_store_clear(resultsList);
+    //iterator to go over the list
+    GtkTreeIter iter;
+    
+    //give the list of results for the user to choose from
+    for(int i = 0; i < results2.size() && i < 20; i++){
+        //display all these into a list  
+        gtk_list_store_append(resultsList, &iter);
+        gtk_list_store_set(resultsList, &iter, 
+                            0, getStreetName(results2[i]).c_str(),
+                            -1);
+        
+    }
+
 }
 
 void displayIntersections(GtkWidget*, ezgl::application *application){
@@ -305,7 +304,6 @@ void displayResults(GtkWidget*, ezgl::application *application){
 void initial_setup(ezgl::application *application, bool /*new_window*/){
     //street 1 search bar changing and when enter key pressed
     g_signal_connect(application->get_object("SearchStreet1"), "changed", G_CALLBACK(searchFirstStreet), application);
-    //g_signal_connect(application->get_object("SearchStreet1"), "activate", G_);
     //street 2 search bar changing
     g_signal_connect(application->get_object("SearchStreet2"), "changed", G_CALLBACK(searchSecondStreet), application);
     //find intersection button

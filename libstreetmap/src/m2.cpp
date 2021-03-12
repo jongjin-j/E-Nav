@@ -69,6 +69,9 @@ void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice)
     x->set_color(colorChoice);
 }
 
+std::vector<StreetIdx> firstStreetResults = database.results;
+std::vector<StreetIdx> secondStreetResults = database.results;
+
 std::vector<StreetIdx> results1; //stores the results from user search street 1
 std::vector<StreetIdx> results2; //stores the results from user search street 2
 std::pair<StreetIdx, StreetIdx> resultStreets; //std pair to store the two chosen streets; this is passed onto the findIntersections function
@@ -184,16 +187,20 @@ void displayIntersections(GtkWidget*, ezgl::application *application){
     if(findIntersectionsOfTwoStreets(resultStreets).size() == 0){
         std::cout << "No intersections found between the streets "<< std::endl;
     }else if(getStreetName(resultStreets.first) == "<unknown>" || getStreetName(resultStreets.second) == "<unknown>"){
-        std::cout << "One input is an unknown street, please try again." << std::endl;
+        std::cout << "One or more inputs are unknown streets, please try again." << std::endl;
     }else if(findIntersectionsOfTwoStreets(resultStreets).size() > 0){
         for(int i = 0; i < findIntersectionsOfTwoStreets(resultStreets).size(); i++){
             database.intersections[findIntersectionsOfTwoStreets(resultStreets)[i]].highlight = 1;
         }
         std::cout << "Total number of intersections: " << findIntersectionsOfTwoStreets(resultStreets).size() << std::endl;
     }
-    ezgl::rectangle r({0,1000},{2000,1000});
-    //ezgl::camera::set_world(r);
     
+    ezgl::rectangle initial_world({x_from_lon(getIntersectionPosition(findIntersectionsOfTwoStreets(resultStreets)[0]).longitude()-200), y_from_lat(getIntersectionPosition(findIntersectionsOfTwoStreets(resultStreets)[0]).latitude())-400},
+        {
+        x_from_lon(getIntersectionPosition(findIntersectionsOfTwoStreets(resultStreets)[0]).longitude()+200), y_from_lat(getIntersectionPosition(findIntersectionsOfTwoStreets(resultStreets)[0]).latitude())
+        });    
+        
+        
     application->refresh_drawing();
 }
 

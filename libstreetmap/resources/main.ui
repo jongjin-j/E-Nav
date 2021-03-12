@@ -12,7 +12,15 @@
     <signal name="notify" handler="SearchStreet1" swapped="no"/>
   </object>
   <object class="GtkEntryCompletion" id="entrycompletion1">
+    <property name="model">ResultsList</property>
+    <property name="text_column">0</property>
     <signal name="notify" handler="SearchStreet1" swapped="no"/>
+    <child>
+      <object class="GtkCellRendererText"/>
+      <attributes>
+        <attribute name="text">0</attribute>
+      </attributes>
+    </child>
   </object>
   <object class="GtkWindow" id="MainWindow">
     <property name="visible">True</property>

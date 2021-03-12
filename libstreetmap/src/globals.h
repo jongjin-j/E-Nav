@@ -21,6 +21,8 @@
 extern struct databases database;
 
 
+extern int cityNums;
+
 struct intersection_data {
     std::string name;
     double x = 0;

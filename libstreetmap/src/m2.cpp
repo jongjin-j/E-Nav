@@ -25,6 +25,8 @@ extern struct databases database;
 std::vector<std::string> fileNames;
 
 
+int cityNums = 0;
+
 //helper function to choose colour from feature type
 const ezgl::color chooseFeatureColour(FeatureType x) {
 
@@ -83,13 +85,26 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
     //check if vector empty
     if(results1.size() == 0){
         std::cout << "No matching results found" << std::endl;
-    }else{
-        //else, give the list of results for the user to choose from
-        for(int i = 0; i < results1.size(); i++){
-            std::cout << getStreetName(results1[i]) << std::endl;
-            //display all these into a list  
-        }
     }
+    /*
+    //retrieve object
+    auto resultsList = (GtkListStore *)(application->get_object("ResultsList"));
+    gtk_list_store_clear(resultsList);
+    //iterator to go over the list
+    GtkTreeIter iter;
+   
+    
+    //else, give the list of results for the user to choose from
+    for(int i = 0; i < results1.size() && i < 5; i++){
+        //display all these into a list  
+        gtk_list_store_append(resultsList, &iter);
+        gtk_list_store_set(resultsList, &iter, 
+                            0, getStreetName(results1[i]).c_str(),
+                            -1);
+        
+    }
+    */
+    //gtk_show("ResultsList");
 }
 
 //callback function of searching the second street
@@ -255,8 +270,8 @@ void displayWeather(GtkWidget*, ezgl::application *application){
             );
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
-    std::string displayText1 = "Temperature: " + std::to_string(weatherData[0]) + " (C)\nFeels Like: " + std::to_string(weatherData[1]) + " (C)\nPressure: " + std::to_string(weatherData[2]) + " (hPA)\nHumidity: "; 
-    std::string displayText2 = std::to_string(weatherData[3]) + " (g/m^3)\nWind Speed: " + std::to_string(weatherData[4]) + " (m/s)\nWind Degrees: " + std::to_string(weatherData[5]) + " (degrees)";
+    std::string displayText1 = "Temperature: " + std::to_string(weatherData[0+cityNums]) + " (C)\nFeels Like: " + std::to_string(weatherData[1+cityNums]) + " (C)\nPressure: " + std::to_string(weatherData[2+cityNums]) + " (hPA)\nHumidity: "; 
+    std::string displayText2 = std::to_string(weatherData[3+cityNums]) + " (g/m^3)\nWind Speed: " + std::to_string(weatherData[4+cityNums]) + " (m/s)\nWind Degrees: " + std::to_string(weatherData[5+cityNums]) + " (degrees)";
     std::string displayText = displayText1 + displayText2;
     char displayCharArray[displayText.length()+1];
     strcpy(displayCharArray,displayText.c_str());
@@ -277,20 +292,19 @@ void displayWeather(GtkWidget*, ezgl::application *application){
     application -> refresh_drawing();
     
 }
-
+/*
 void displayResults(GtkWidget*, ezgl::application *application){
     
     GtkWidget* dialog = gtk_dialog_new();
     
     gtk_widget_show(dialog);
-}
+}*/
 
 
 void initial_setup(ezgl::application *application, bool /*new_window*/){
-    //street 1 search bar changing
+    //street 1 search bar changing and when enter key pressed
     g_signal_connect(application->get_object("SearchStreet1"), "changed", G_CALLBACK(searchFirstStreet), application);
-    //street 1 search bar enter pressed
-    g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(displayResults), application);
+    //g_signal_connect(application->get_object("SearchStreet1"), "activate", G_);
     //street 2 search bar changing
     g_signal_connect(application->get_object("SearchStreet2"), "changed", G_CALLBACK(searchSecondStreet), application);
     //find intersection button

@@ -501,7 +501,7 @@ void draw_main_canvas(ezgl::renderer *g) {
             }  
         }
         
-        if (scope_length < 65000 && scope_height < 60000){
+        if (scope_length < 100000){
             StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
             std::unordered_map<OSMID, std::string>::const_iterator it = database.OSMID_wayType.find(tempInfo.wayOSMID);
             if (it != database.OSMID_wayType.end() && (it->second == "motorway" || it->second == "motorway_link")){

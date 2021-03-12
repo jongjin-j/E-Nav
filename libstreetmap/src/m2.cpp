@@ -18,6 +18,7 @@
 #include <string.h>
 #include <unordered_map>
 #include "libcurl.h"
+#include <iomanip>
 
 
 extern struct databases database;
@@ -240,24 +241,16 @@ void displayWeather(GtkWidget*, ezgl::application *application){
             GTK_RESPONSE_ACCEPT
             );
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+
+    std::string displayText1 = "Temperature: " + std::to_string(weatherData[0]) + " (C)\nFeels Like: " + std::to_string(weatherData[1]) + " (C)\nPressure: " + std::to_string(weatherData[2]) + " (hPA)\nHumidity: "; 
+    std::string displayText2 = std::to_string(weatherData[3]) + " (g/m^3)\nWind Speed: " + std::to_string(weatherData[4]) + " (m/s)\nWind Degrees: " + std::to_string(weatherData[5]) + " (degrees)";
+    std::string displayText = displayText1 + displayText2;
+    char displayCharArray[displayText.length()+1];
+    strcpy(displayCharArray,displayText.c_str());
     
-    
-    //convert string to char array
-    char *myCharArray = new char[std::to_string(weatherData[0]).length()+1];
-    strcpy(myCharArray,std::to_string(weatherData[0]).c_str());
-    
-    std::cout << myCharArray << std::endl;
-    
-    //char *displayText = new char[]
-    //std::string displayText = "Temperature: " + std::to_string(weatherData[0]) + "(C)\nFeels Like: " + std::to_string(weatherData[1]) + ;
-    //char displayCharArray[displayText.length()+1];
-    //strcpy(displayCharArray,displayText.c_str());
-    
-    
-    //label = gtk_label_new(displayCharArray);
+    label = gtk_label_new(displayCharArray);
     //temperature (celsius) 0, feels like (celsius) 1, pressure (hPa) 2, humidity (g/m^3) 3, wind speed (m/s) 4, wind degrees (deg) 5
     
-    delete [] myCharArray;
     gtk_container_add(GTK_CONTAINER(content_area), label);
     
     gtk_widget_show_all(dialog);

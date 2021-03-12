@@ -15,6 +15,8 @@ using boost::property_tree::read_json;
 std::vector<int> weatherData;
 std::string currentWeather;
 
+std::string chooseCity(std::string fileName);
+
 typedef struct MyCustomStruct {
     char *url = NULL;
     unsigned int size = 0;
@@ -23,7 +25,9 @@ typedef struct MyCustomStruct {
 
 static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
     cout << "In my own custom callback function" << endl;
-
+    
+    size = 0;
+    
     if (buffer && nmemb && userp) {
         MyCustomStruct *pMyStruct = (MyCustomStruct *)userp;
 
@@ -112,6 +116,7 @@ std::string chooseCity(std::string fileName){
     if(fileName == "hamilton_canada.streets.bin"){
         return "Hamilton";
     }
+    return "Toronto";
 }
 
 void loadCityWeatherData(std::string cityFile) {

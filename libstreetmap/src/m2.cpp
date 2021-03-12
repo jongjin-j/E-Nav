@@ -27,6 +27,18 @@ std::vector<std::string> fileNames;
 
 int cityNums = 0;
 
+void setFirstStreet(GtkWidget*, ezgl::application *application);
+
+void setSecondStreet(GtkWidget*, ezgl::application *application);
+
+void resetIntersections(GtkWidget*, ezgl::application *application);
+
+void on_dialog_response(GtkDialog *dialog);
+
+void reloadMap(GtkWidget*, ezgl::application *application);
+
+void displayWeather(GtkWidget*, ezgl::application *application);
+
 //helper function to choose colour from feature type
 const ezgl::color chooseFeatureColour(FeatureType x) {
 
@@ -61,7 +73,7 @@ const ezgl::color chooseFeatureColour(FeatureType x) {
         //streams return stronger blue (steel blue)
         return ezgl::color(100, 149, 237);
     }
-
+    return ezgl::color(0,0,0,0);
 }
 
 void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice){
@@ -835,7 +847,7 @@ void draw_main_canvas(ezgl::renderer *g) {
 
 }
 
-void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x, double y) {
+void act_on_mouse_click(ezgl::application* app, GdkEventButton* , double x, double y) {
 
     LatLon pos = LatLon(lat_from_y(y), lon_from_x(x));
     int id = findClosestIntersection(pos);

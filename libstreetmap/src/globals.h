@@ -81,10 +81,7 @@ extern std::vector<std::string> fileNames;
 
 extern std::string path;
 
-double x_from_lon(double lon);
-double y_from_lat(double lat);
-double lon_from_x(double x);
-double lat_from_y(double y);
+//m2.cpp function declaration
 const ezgl::color chooseFeatureColour(FeatureType x); 
 void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice);
 void searchFirstStreet(GtkWidget *widget, ezgl::application *application);
@@ -99,6 +96,22 @@ void writeStreetName(ezgl::renderer *g, ezgl::point2d center, StreetSegmentInfo 
 void draw_main_canvas(ezgl::renderer *g);
 void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x, double y);
 
+//m1.cpp function declaration
+double x_from_lon(double lon);
+double y_from_lat(double lat);
+double lon_from_x(double x);
+double lat_from_y(double y);
+void simplifiedStreetNames_streetIdx ();
+void intersections_streetSegments ();
+void streetID_streetSegments();
+void streetID_Intersections();
+void streetSegment_travelTime();
+void set_MaxMinLatLon_avgLat();
+void intersections_database();
+void POI_database();
+void streets_database();
+void OSMID_wayValue();
+void POIDatabase_nonAmenity();
 int createFileList(std::string directoryPath);
 
 extern std::vector<int> weatherData;

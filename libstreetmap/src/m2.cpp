@@ -418,48 +418,52 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
     //std::unordered_map<OSMID, std::string>::const_iterator it2 = database.OSMID_wayType.find(database.POIs[i].id);
         
     if(include){
-        if (database.POIs[i].type == "restaurant"){
+        if (database.POIs[i].type == "restaurant" || database.POIs[i].type == "fast_food" || database.POIs[i].type == "bar"){
         ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/restaurant.png");
         draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        if (database.POIs[i].type == "school"){
+        else if (database.POIs[i].type == "school"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/school.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        if (database.POIs[i].type == "cafe"){
+        else if (database.POIs[i].type == "cafe"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/cafe.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        if (database.POIs[i].type == "bank"){
+        else if (database.POIs[i].type == "bank"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bank.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        if (database.POIs[i].type == "hospital" || database.POIs[i].type == "clinic"){
+        else if (database.POIs[i].type == "hospital" || database.POIs[i].type == "clinic"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/hospital.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        if (database.POIs[i].type == "subway_entrance"){
+        else if (database.POIs[i].type == "subway_entrance"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        if (database.POIs[i].type == "bus_station"){
+        else if (database.POIs[i].type == "bus_station"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bus_station.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        if (database.POIs[i].type == "bus_stop"){
+        else if (database.POIs[i].type == "bus_stop"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bus_station.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        if (database.POIs[i].type == "aerodrome"){
+        else if (database.POIs[i].type == "aerodrome"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/aerodrome.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        if (database.POIs[i].type == "supermarket"){
+        else if (database.POIs[i].type == "supermarket"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/supermarket.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        if (database.POIs[i].type == "wholesale"){
+        else if (database.POIs[i].type == "wholesale"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/supermarket.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
+        }
+        else {
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/BlackPin.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
     }

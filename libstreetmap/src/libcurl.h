@@ -16,7 +16,7 @@
 
 #include <string.h>
 
-void loadCityWeatherData(std::string city);
+void loadCityWeatherData(std::string cityFile);
 
 #endif /* LIBCURL_H */
 

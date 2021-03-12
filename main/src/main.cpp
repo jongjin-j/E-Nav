@@ -24,6 +24,7 @@
 #include "m1.h"
 #include "m2.h"
 #include "OSMDatabaseAPI.h"
+#include "libcurl.h"
 
 //Program exit codes
 constexpr int SUCCESS_EXIT_CODE = 0;        //Everyting went OK
@@ -71,6 +72,7 @@ int main(int argc, char** argv) {
         return ERROR_EXIT_CODE;
     }
     
+    loadCityWeatherData(map_path);
 
     std::cout << "Successfully loaded map '" << map_path << "'\n";
     std::cout << "Successfully loaded OSM map '" << map_name << "'\n";

@@ -57,12 +57,65 @@ static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
     return nmemb;
 }
 
-void loadCityWeatherData(std::string city) {
-    std::string cityName = "Toronto";
-    if(city == "toronto"){
-        cityName = "Toronto";
+std::string chooseCity(std::string fileName){
+    if(fileName == "/cad2/ece297s/public/maps/toronto_canada.streets.bin" || "toronto_canada.streets.bin"){
+        return "Toronto";
     }
-    
+    if(fileName == "singapore.streets.bin"){
+        return "Singapore";
+    }
+    if(fileName == "interlaken_switzerland.streets.bin"){
+        return "Interlaken";
+    }
+    if(fileName == "iceland.streets.bin"){
+        return "Iceleand";
+    }
+    if(fileName == "beijing_china.streets.bin"){
+        return "Beijing";
+    }
+    if(fileName == "moscow_russia.streets.bin"){
+        return "Moscow";
+    }
+    if(fileName == "cape-town_south-africa.streets.bin"){
+        return "Cape Town";
+    }
+    if(fileName == "sydney_australia.streets.bin"){
+        return "Sydney";
+    }
+    if(fileName == "london_england.streets.bin"){
+        return "London";
+    }
+    if(fileName == "tehran_iran.streets.bin"){
+        return "Tehran";
+    }
+    if(fileName == "rio-de-janeiro.streets.bin"){
+        return "Rio de Janeiro";
+    }
+    if(fileName == "cairo_egypt.streets.bin"){
+        return "Cairo";
+    }
+    if(fileName == "hong-kong_china.streets.bin"){
+        return "Hong Kong";
+    }
+    if(fileName == "saint-helena.streets.bin"){
+        return "Saint Helena";
+    }
+    if(fileName == "new-york_usa.streets.bin"){
+        return "New York";
+    }
+    if(fileName == "new-delhi_india.streets.bin"){
+        return "New Delhi";
+    }
+    if(fileName == "tokyo_japan.streets.bin"){
+        return "Tokyo";
+    }
+    if(fileName == "hamilton_canada.streets.bin"){
+        return "Hamilton";
+    }
+}
+
+void loadCityWeatherData(std::string cityFile) {
+    std::string cityName = chooseCity(cityFile);
     
     CURLcode res = curl_global_init(CURL_GLOBAL_ALL);
     if (res != CURLE_OK) {

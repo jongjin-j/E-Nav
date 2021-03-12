@@ -69,37 +69,6 @@ std::vector<StreetIdx> results1; //stores the results from user search street 1
 std::vector<StreetIdx> results2; //stores the results from user search street 2
 std::pair<StreetIdx, StreetIdx> resultStreets; //std pair to store the two chosen streets; this is passed onto the findIntersections function
 
-GtkWidget * gtk_dialog_new_with_buttons(
-        const gchar *title,
-        GtkWindow *parent,
-        GtkDialogFlags flags,
-        const gchar *first_button_text
-        );
-
-void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data) {
-std::cout << "response is ";
-switch (response_id) {
-    case GTK_RESPONSE_ACCEPT:
-        std::cout << "GTK_RESPONSE_ACCEPT ";
-        break;
-    case GTK_RESPONSE_DELETE_EVENT:
-        std::cout << "GTK_RESPONSE_DELETE_EVENT (i.e. ’X’ button) ";
-        break;
-    case GTK_RESPONSE_REJECT:
-        std::cout << "GTK_RESPONSE_REJECT ";
-        break;
-    default:
-        std::cout << "UNKNOWN ";
-        break;
-}
-std::cout << "(" << response_id << ")\n";
-// This will cause the dialog to be destroyed and close.
-// without this line the dialog remains open unless the
-// response_id is GTK_RESPONSE_DELETE_EVENT which
-// automatically closes the dialog without the following line.
-gtk_widget_destroy(GTK_WIDGET(dialog));
-}
-
 //callback function of searching the first street
 void searchFirstStreet(GtkWidget *, ezgl::application *application){
     
@@ -116,6 +85,9 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
         //else, give the list of results for the user to choose from
         for(int i = 0; i < results1.size(); i++){
             std::cout << getStreetName(results1[i]) << std::endl;
+            
+            
+            
         }
         
         //resultStreets.first = database.results1[0];
@@ -127,36 +99,7 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
     }
     //GtkWidget *gtk_event_box_new(void);
     
-    GObject *window; // the parent window over which to add the dialog
-    GtkWidget *content_area; // the content area of the dialog
-    GtkWidget *label; // the label we will create to display a message in the content
-    GtkWidget *dialog; // the dialog box we will create
     
-    window = application->get_object(application->get_main_window_id().c_str());
-    
-    dialog = gtk_dialog_new_with_buttons(
-            "Test Dialog",
-            (GtkWindow*) window,
-            GTK_DIALOG_MODAL,
-            ("OK"),
-            GTK_RESPONSE_ACCEPT,
-            ("CANCEL"),
-            GTK_RESPONSE_REJECT,
-            NULL
-            );
-    
-    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-    label = gtk_label_new("Simple Dialog With a Label. Press OK or CANCEL too close.");
-    gtk_container_add(GTK_CONTAINER(content_area), label);
-    
-    gtk_widget_show_all(dialog);
-    
-    g_signal_connect(
-            GTK_DIALOG(dialog),
-            "response",
-            G_CALLBACK(on_dialog_response),
-            NULL
-            );
 
 }
 
@@ -191,6 +134,7 @@ void searchSecondStreet(GtkWidget*, ezgl::application *application){
         //chosen = resultStreets.first (type StreetIdx)
     }
     //application->refresh_drawing();
+    //GtkListStore* newList = gtk_list_store_new(3, G_TYPE_STRING);
 }
 
 void displayIntersections(GtkWidget*, ezgl::application *application){
@@ -252,8 +196,10 @@ void switchDarkMode(GtkWidget*, ezgl::application *application){
 }
 
 void initial_setup(ezgl::application *application, bool /*new_window*/){
-    g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(searchFirstStreet), application);
-    g_signal_connect(application->get_object("SearchStreet2"), "activate", G_CALLBACK(searchSecondStreet), application);
+    g_signal_connect(application->get_object("SearchStreet1"), "changed", G_CALLBACK(searchFirstStreet), application);
+    g_signal_connect(application->get_object("SearchStreet2"), "changed", G_CALLBACK(searchSecondStreet), application);
+    //g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(searchFirstStreet), application);
+    //g_signal_connect(application->get_object("SearchStreet2"), "activate", G_CALLBACK(searchSecondStreet), application);
     g_signal_connect(application->get_object("FindButton"), "clicked", G_CALLBACK(displayIntersections), application);
     g_signal_connect(application->get_object("ResetButton"), "clicked", G_CALLBACK(resetIntersections), application);
     //g_signal_connect(selectCity)--used to select the city to reload

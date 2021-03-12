@@ -20,7 +20,7 @@
 
 
 extern struct databases database;
-
+std::vector<std::string> fileNames;
 
 //helper function to choose colour from feature type
 bool darkMode = false;
@@ -659,3 +659,62 @@ void drawMap() {
     application.run(initial_setup, act_on_mouse_click, nullptr, nullptr);
 }
 
+void changeMap(ezgl::application* app){
+    closeMap();
+    
+    //clear the global variables (done in close map?)
+    
+    
+    std::string cityName;
+    std::cin >> cityName;
+    cityName.erase(std::remove(cityName.begin(), cityName.end(), ' '), cityName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
+    std::transform(cityName.begin(), cityName.end(), cityName.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
+            
+    //load OSM database
+    for (int i=0; fileNames.size(); i++){
+        if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("osm") != std::string::npos){
+            loadOSMDatabaseBIN(fileNames[i]);
+        }
+    }
+    
+    //load streets database
+    for (int i=0; fileNames.size(); i++){
+        if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("streets") != std::string::npos){
+            loadOSMDatabaseBIN(fileNames[i]);
+        }
+    }
+    
+    /*
+    //parse the map path
+    std::string filename = "something";
+    int lastSlash = filename.find_last_of("/");
+    filename.erase(0, lastSlash);
+    
+    int firstPeriod = filename.find_first_of(".");
+    filename.erase(firstPeriod, filename.length() - 1);
+    */
+   
+    app -> refresh_drawing();
+}
+
+
+//path: /cad2/ece297s/public/maps
+//code from https://www.systutorials.com/how-to-iterate-all-dirs-and-files-in-a-dir-in-c/
+int ListDir(const std::string& path) {
+    struct dirent *entry;
+    DIR *dp;
+
+    dp = ::opendir(path.c_str());
+    if (dp == NULL) {
+        perror("opendir: Path does not exist or could not be read.");
+        return -1;
+    }
+
+    while ((entry = ::readdir(dp))) {
+        //std::cout << entry->d_name << std::endl;
+        fileNames.push_back(entry->d_name);
+    }
+
+    ::closedir(dp);
+    return 0;
+}

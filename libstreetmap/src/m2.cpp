@@ -754,9 +754,9 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x,
 
 void drawMap() {
     
-    for(int i = 0; i < weatherData.size(); i++){
+    /*for(int i = 0; i < weatherData.size(); i++){
         std::cout << weatherData[i] << std::endl;
-    }
+    }*/
    
     ezgl::application::settings settings;
     settings.main_ui_resource = "libstreetmap/resources/main.ui";

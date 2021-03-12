@@ -116,7 +116,7 @@ std::string chooseCity(std::string fileName){
 
 void loadCityWeatherData(std::string cityFile) {
     std::string cityName = chooseCity(cityFile);
-    cout << cityName << endl;
+    //cout << cityName << endl;
     
     CURLcode res = curl_global_init(CURL_GLOBAL_ALL);
     if (res != CURLE_OK) {
@@ -161,7 +161,6 @@ void loadCityWeatherData(std::string cityFile) {
             res = curl_easy_perform(curlHandle);
         }
 
-        cout << endl << endl;
         if (res == CURLE_OK) {
             // Create an empty proper tree
             ptree ptRoot;

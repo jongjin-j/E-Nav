@@ -20,7 +20,7 @@
 
 extern struct databases database;
 
-extern const char* cityName;
+extern std::string cityName;
 
 struct intersection_data {
     std::string name;

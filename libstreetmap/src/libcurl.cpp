@@ -57,8 +57,12 @@ static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
     return nmemb;
 }
 
-void loadCityWeatherData() {
-    string cityName = "Toronto";
+void loadCityWeatherData(std::string city) {
+    std::string cityName = "Toronto";
+    if(city == "toronto"){
+        cityName = "Toronto";
+    }
+    
     
     CURLcode res = curl_global_init(CURL_GLOBAL_ALL);
     if (res != CURLE_OK) {

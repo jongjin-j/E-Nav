@@ -2,8 +2,14 @@
 #include <string.h>
 #include "libcurl.h"
 #include <curl/curl.h>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
+#include <string>
 
 using namespace std;
+using boost::property_tree::ptree;
+using boost::property_tree::read_json;
 
 typedef struct MyCustomStruct {
     char *url = NULL;
@@ -58,7 +64,27 @@ static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
     return nmemb;
 }
 
+void PrintWeatherInfo(ptree &ptRoot) {
+    double temp = 0;
+    double feels_like = 0;
+    //double longitude = 0, latitude = 0;
+    
+    /*ptree &main = ptRoot.get_child("main");
+    BOOST_FOREACH(auto &child, main){
+        if("temp" == child.second.data()){
+            temp = child.second.get<double>("temp");
+        }
+    }*/
+    
+    temp = ptRoot.get<double>("main.temp");
+    cout << temp << endl;
+
+    return;
+}
+
 bool loadCityWeatherData() {
+    string cityName = "Toronto";
+    
     CURLcode res = curl_global_init(CURL_GLOBAL_ALL);
     if (res != CURLE_OK) {
         cout << "ERROR: Unable to initialize libcurl" << endl;
@@ -67,11 +93,13 @@ bool loadCityWeatherData() {
     }
 
     CURL *curlHandle = curl_easy_init();
-    if ( !curlHandle ) {
+    if (!curlHandle ) {
         cout << "ERROR: Unable to get easy handle" << endl;
         return 0;
-    } else {
+    } 
+    else {
         char errbuf[CURL_ERROR_SIZE] = {0};
+        //string cityName = "Toronto";
         char targetURL[] = "http://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=69d3de6a38e4f0c9aa59c4235f670765";
         MyCustomStruct myStruct;
 
@@ -94,16 +122,29 @@ bool loadCityWeatherData() {
 
         cout << endl << endl;
         if (res == CURLE_OK) {
-            cout << "Back in main" << endl;
-            cout << "Received buffer within struct is " <<
-                myStruct.size << " bytes:" << endl;
-            cout << "====================" << endl << endl;
-            cout << myStruct.response << endl << endl;
-            cout << "====================" << endl;
-            cout << "End of buffer reached" << endl << endl;
+            // Create an empty proper tree
+            ptree ptRoot;
+            
+            istringstream issJsonData(myStruct.response);
+            boost::property_tree::read_json(issJsonData, ptRoot);
 
-            cout << "All good! res == CURLE_OK!" << endl;
-        } else {
+            // Parsing and printing the data
+            cout << "Current weather in " << cityName << ": " << endl;
+            cout << "====================" << endl << endl;
+            
+            double temp = ptRoot.get<double>("main.temp") - 273.15;
+            double feels_like = ptRoot.get<double>("main.feels_like") - 273.15;
+            double pressure = ptRoot.get<double>("main.pressure");
+            double humidity = ptRoot.get<double>("main.humidity");
+  
+            cout << temp << endl;
+            cout << feels_like << endl;
+            cout << pressure << endl;
+            cout << humidity << endl;
+            
+            cout << endl << "====================" << endl;
+        }
+        else {
             cout << "ERROR: res == " << res << endl;
             cout << errbuf << endl;
         }

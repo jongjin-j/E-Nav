@@ -81,21 +81,17 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
     
     //results1 is the vector of matching streets
     results1 = findStreetIdsFromPartialStreetName(street1);
-    
-    //check if vector empty
-    if(results1.size() == 0){
-        std::cout << "No matching results found" << std::endl;
-    }
-    
+
     //retrieve object
     auto resultsList = (GtkListStore *)(application->get_object("ResultsList"));
+    //reset the list
     gtk_list_store_clear(resultsList);
     //iterator to go over the list
     GtkTreeIter iter;
     
     //give the list of results for the user to choose from
     for(int i = 0; i < results1.size() && i < 20; i++){
-        //display all these into a list  
+        ///append to the list as you go
         gtk_list_store_append(resultsList, &iter);
         gtk_list_store_set(resultsList, &iter, 
                             0, getStreetName(results1[i]).c_str(),
@@ -113,20 +109,16 @@ void searchSecondStreet(GtkWidget*, ezgl::application *application){
     //results2 stores the vector of results
     results2 = findStreetIdsFromPartialStreetName(street2);
     
-    //check if vector empty
-    if(results2.size() == 0){
-        //display error message in results box
-        std::cout << "No matching results found" << std::endl;
-    }
-        //retrieve object
+    //retrieve object
     auto resultsList = (GtkListStore *)(application->get_object("ResultsList"));
+    //reset the list
     gtk_list_store_clear(resultsList);
     //iterator to go over the list
     GtkTreeIter iter;
     
     //give the list of results for the user to choose from
     for(int i = 0; i < results2.size() && i < 20; i++){
-        //display all these into a list  
+        //append to the list as you go
         gtk_list_store_append(resultsList, &iter);
         gtk_list_store_set(resultsList, &iter, 
                             0, getStreetName(results2[i]).c_str(),
@@ -136,32 +128,68 @@ void searchSecondStreet(GtkWidget*, ezgl::application *application){
 
 }
 
+void setFirstStreet(GtkWidget*, ezgl::application *application){
+    //this executes when the user hits enter; hence check if it's a valid street
+    //otherwise prompt the user for a complete input
+    std::string firstStreet = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet1"));
+    
+    bool foundStreet = false;
+    int matchingStreetID = -1;
+    
+    for(int i = 0; i < getNumStreets(); i++){
+        if(findStreetIdsFromPartialStreetName(firstStreet).size() == 0){
+            break;
+        }else if(firstStreet == getStreetName(i) || getStreetName(findStreetIdsFromPartialStreetName(firstStreet)[0]) == getStreetName(i)){
+            matchingStreetID = i;
+            foundStreet = true;
+            break;
+        }
+    }
+    if(foundStreet == false){
+        std::cout << "The street does not exist" << std::endl;
+    }else if(foundStreet == true){
+        resultStreets.first = matchingStreetID;
+        std::cout << "Street 1 is " << getStreetName(resultStreets.first) << "." << std::endl;
+    }
+}
+
+void setSecondStreet(GtkWidget*, ezgl::application *application){
+    //this executes when the user hits enter; hence check if it's a valid street
+    //otherwise prompt the user for a complete input
+    std::string secondStreet = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet2"));
+    
+    bool foundStreet = false;
+    int matchingStreetID = -1;
+    
+    for(int i = 0; i < getNumStreets(); i++){
+        if(findStreetIdsFromPartialStreetName(secondStreet).size() == 0){
+            break;
+        }else if(secondStreet == getStreetName(i) || getStreetName(findStreetIdsFromPartialStreetName(secondStreet)[0]) == getStreetName(i)){
+            matchingStreetID = i;
+            foundStreet = true;
+            break;
+        }
+    }
+    if(foundStreet == false){
+        std::cout << "The street does not exist" << std::endl;
+    }else if(foundStreet == true){
+        resultStreets.second = matchingStreetID;
+        std::cout << "Street 2 is " << getStreetName(resultStreets.second) << "." << std::endl;
+    }
+
+}
+
 void displayIntersections(GtkWidget*, ezgl::application *application){
     
-    //check for boundary conditions
     if(findIntersectionsOfTwoStreets(resultStreets).size() == 0){
-    std::cout << "No intersections found between the streets" << std::endl;
+        std::cout << "No intersections found between the streets "<< std::endl;
     }else if(getStreetName(resultStreets.first) == "<unknown>" || getStreetName(resultStreets.second) == "<unknown>"){
-        //consider case when only one street is entered
-        std::cout << "Please enter two valid streets" << std::endl;
-    }else{
-            //if valid pair, display the intersections
-            std::cout << "The pair of streetIds are: " << resultStreets.first << " and " << resultStreets.second << std::endl;
-            std::cout << "The street names are: " << getStreetName(resultStreets.first) << " and " << getStreetName(resultStreets.second) << std::endl; 
-            std::cout << findIntersectionsOfTwoStreets(resultStreets).size() << std::endl;      //of type IntersectionIdx vector
-
-            for(int i = 0; i < findIntersectionsOfTwoStreets(resultStreets).size(); i++){
-                database.intersections[findIntersectionsOfTwoStreets(resultStreets)[i]].highlight = 1;
-            }
-            
-             //set new scope
-             //get the point of the intersection and set new scope with that as center
-            
-            
-             //ezgl::rectangle scope = g->get_visible_world();
-             //double scope_length = scope.m_second.x - scope.m_first.x;
-             //double scope_height = scope.m_second.y - scope.m_first.y;
-             //std::cout << scope_length << "  " << scope_height << std::endl;  
+        std::cout << "One input is an unknown street, please try again." << std::endl;
+    }else if(findIntersectionsOfTwoStreets(resultStreets).size() > 0){
+        for(int i = 0; i < findIntersectionsOfTwoStreets(resultStreets).size(); i++){
+            database.intersections[findIntersectionsOfTwoStreets(resultStreets)[i]].highlight = 1;
+        }
+        std::cout << "Total number of intersections: " << findIntersectionsOfTwoStreets(resultStreets).size() << std::endl;
     }
     application->refresh_drawing();
 }
@@ -306,10 +334,14 @@ void displayResults(GtkWidget*, ezgl::application *application){
 
 
 void initial_setup(ezgl::application *application, bool /*new_window*/){
-    //street 1 search bar changing and when enter key pressed
+    //searching street 1 and street 2
     g_signal_connect(application->get_object("SearchStreet1"), "changed", G_CALLBACK(searchFirstStreet), application);
-    //street 2 search bar changing
     g_signal_connect(application->get_object("SearchStreet2"), "changed", G_CALLBACK(searchSecondStreet), application);
+    
+    //asserting search term by pressing enter
+    g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(setFirstStreet), application);
+    g_signal_connect(application->get_object("SearchStreet2"), "activate", G_CALLBACK(setSecondStreet), application);
+
     //find intersection button
     g_signal_connect(application->get_object("FindButton"), "clicked", G_CALLBACK(displayIntersections), application);
     //reset intersection button
@@ -318,7 +350,7 @@ void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("LoadCity"), "activate", G_CALLBACK(reloadMap), application);
     //display weather button
     g_signal_connect(application->get_object("WeatherButton"), "clicked", G_CALLBACK(displayWeather), application);
-    }
+}
 
 
 //function to draw a POI
@@ -731,7 +763,7 @@ void draw_main_canvas(ezgl::renderer *g) {
             g->set_color(ezgl::BLACK);
             g->set_font_size(13);
             g->draw_text(center_point, database.intersections[id].name);
-            std::cout << "Closest Intersection: " << database.intersections[id].name << std::endl;
+            //std::cout << "Closest Intersection: " << database.intersections[id].name << std::endl;
             
             
         } 

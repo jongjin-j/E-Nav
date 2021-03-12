@@ -16,6 +16,7 @@
 #include <typeinfo>
 #include <string>
 #include <unordered_map>
+#include "libcurl.h"
 
 
 extern struct databases database;
@@ -648,6 +649,7 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x,
 
 
 void drawMap() {
+    loadCityWeatherData();
     ezgl::application::settings settings;
     settings.main_ui_resource = "libstreetmap/resources/main.ui";
     settings.window_identifier = "MainWindow";

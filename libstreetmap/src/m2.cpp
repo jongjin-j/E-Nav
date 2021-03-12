@@ -86,9 +86,7 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
         //else, give the list of results for the user to choose from
         for(int i = 0; i < results1.size(); i++){
             std::cout << getStreetName(results1[i]) << std::endl;
-            //display all these into a list
-            
-            
+            //display all these into a list  
         }
     }
 }
@@ -212,7 +210,7 @@ void displayWeather(GtkWidget*, ezgl::application *application){
     
 }
 
-void displayWindow(GtkWidget*, ezgl::application *application){
+void displayResults(GtkWidget*, ezgl::application *application){
     
     GtkWidget* dialog = gtk_dialog_new();
     
@@ -221,16 +219,21 @@ void displayWindow(GtkWidget*, ezgl::application *application){
 
 
 void initial_setup(ezgl::application *application, bool /*new_window*/){
+    //street 1 search bar changing
     g_signal_connect(application->get_object("SearchStreet1"), "changed", G_CALLBACK(searchFirstStreet), application);
-    g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(displayWindow), application);
+    //street 1 search bar enter pressed
+    g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(displayResults), application);
+    //street 2 search bar changing
     g_signal_connect(application->get_object("SearchStreet2"), "changed", G_CALLBACK(searchSecondStreet), application);
+    //find intersection button
     g_signal_connect(application->get_object("FindButton"), "clicked", G_CALLBACK(displayIntersections), application);
+    //reset intersection button
     g_signal_connect(application->get_object("ResetButton"), "clicked", G_CALLBACK(resetIntersections), application);
+    //loading new city button
     g_signal_connect(application->get_object("LoadCity"), "activate", G_CALLBACK(reloadMap), application);
+    //display weather button
     g_signal_connect(application->get_object("WeatherButton"), "clicked", G_CALLBACK(displayWeather), application);
-    
-    //g_signal_connect(application->get_object(),"",G_CALLBACK(),application);
-}
+    }
 
 
 //function to draw a POI

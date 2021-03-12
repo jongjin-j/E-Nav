@@ -674,6 +674,7 @@ void drawMap() {
         std::cout << weatherData[i] << std::endl;
     }
     
+    //printing out the directory names
     for (int i=0; i<fileNames.size(); i++){
         std::cout << (fileNames[i]) << std::endl;
     }
@@ -697,6 +698,7 @@ void drawMap() {
 
 void changeMap(ezgl::application* app){
     closeMap();
+    closeOSMDatabase();
     
     //clear the global variables (done in close map?)
     
@@ -708,15 +710,15 @@ void changeMap(ezgl::application* app){
             
     //load OSM database
     for (int i=0; fileNames.size(); i++){
-        if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("osm") != std::string::npos){
+        if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("osm.bin") != std::string::npos){
             loadOSMDatabaseBIN(fileNames[i]);
         }
     }
     
     //load streets database
     for (int i=0; fileNames.size(); i++){
-        if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("streets") != std::string::npos){
-            loadOSMDatabaseBIN(fileNames[i]);
+        if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("streets.bin") != std::string::npos){
+            loadMap(fileNames[i]);
         }
     }
     

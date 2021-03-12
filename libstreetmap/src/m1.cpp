@@ -387,11 +387,11 @@ void POIDatabase_nonAmenity(){
 }
 
 //code from https://www.systutorials.com/how-to-iterate-all-dirs-and-files-in-a-dir-in-c/
-int ListDir(std::string path) {
+int ListDir(std::string directoryPath) {
     struct dirent *entry;
     DIR *dp;
 
-    dp = ::opendir(path.c_str());
+    dp = ::opendir(directoryPath.c_str());
     if (dp == NULL) {
         perror("opendir: Path does not exist or could not be read.");
         return -1;
@@ -454,6 +454,16 @@ void closeMap() {
     std::vector<std::vector < StreetIdx >> ().swap(database.streetID_intersections);
     std::vector<double>().swap(database.street_segment_travelTime);
     std::multimap<std::string, StreetIdx> ().swap(database.streetName_and_streetID);
+    
+    std::vector<intersection_data> ().swap(database.intersections);
+    std::vector<POI_data> ().swap(database.POIs);
+    std::vector<std::vector<StreetSegmentIdx>> ().swap(database.streetSegments);
+    std::vector<street_data> ().swap(database.streets);
+    std::vector<StreetIdx> ().swap(database.results1); //stores the results from user search street 1
+    std::vector<StreetIdx> ().swap(database.results2); //stores the results from user search street 2
+    std::unordered_map<OSMID, std::string> ().swap(database.OSMID_wayType);
+    std::unordered_map<OSMID, std::string> ().swap(database.OSMID_nodeType);
+    std::unordered_map<OSMID, const OSMNode*> ().swap(database.OSMID_nodePtr);
 
     closeStreetDatabase();
 }

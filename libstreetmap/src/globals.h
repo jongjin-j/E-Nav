@@ -63,8 +63,7 @@ struct databases {
     std::vector<POI_data> POIs;
     std::vector<std::vector<StreetSegmentIdx>> streetSegments;
     std::vector<street_data> streets;
-    std::vector<StreetIdx> results1; //stores the results from user search street 1
-    std::vector<StreetIdx> results2; //stores the results from user search street 2
+    std::vector<StreetIdx> results; //stores the results from user search street 1
     std::unordered_map<OSMID, std::string> OSMID_wayType;
     //std::unordered_map<OSMID, std::string> OSMID_nodeType;
     //std::unordered_map<OSMID, const OSMNode*> OSMID_nodePtr;

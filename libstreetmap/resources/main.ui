@@ -2,8 +2,18 @@
 <!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkListStore"/>
-  <object class="GtkEntryCompletion" id="entrycompletion1"/>
+  <object class="GtkListStore" id="ResultsList">
+    <columns>
+      <!-- column-name Matching Streets -->
+      <column type="gchararray"/>
+      <!-- column-name Street ID -->
+      <column type="gint"/>
+    </columns>
+    <signal name="notify" handler="SearchStreet1" swapped="no"/>
+  </object>
+  <object class="GtkEntryCompletion" id="entrycompletion1">
+    <signal name="notify" handler="SearchStreet1" swapped="no"/>
+  </object>
   <object class="GtkWindow" id="MainWindow">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -211,6 +221,7 @@
               <object class="GtkSearchEntry" id="SearchStreet1">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="shadow_type">none</property>
                 <property name="primary_icon_name">edit-find-symbolic</property>
                 <property name="primary_icon_activatable">False</property>
                 <property name="primary_icon_sensitive">False</property>

@@ -86,22 +86,11 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
         //else, give the list of results for the user to choose from
         for(int i = 0; i < results1.size(); i++){
             std::cout << getStreetName(results1[i]) << std::endl;
-            
+            //display all these into a list
             
             
         }
-        
-        //resultStreets.first = database.results1[0];
-        //std::cout << database.results1[0] << std::endl;
-        
-        
-        //save the user's choice into the pair
-        //chosen = resultStreets.first (type StreetIdx)
     }
-    //GtkWidget *gtk_event_box_new(void);
-    
-    
-
 }
 
 //callback function of searching the second street
@@ -123,9 +112,7 @@ void searchSecondStreet(GtkWidget*, ezgl::application *application){
         for(int i = 0; i < results2.size(); i++){
             std::cout << getStreetName(results2[i]) << std::endl;
         }
-        
-        //test code, ignore
-        //resultStreets.second = results2[0];        
+                //resultStreets.second = results2[0];        
         //std:: cout << resultStreets.second << std::endl;
         
         //std::cout << findIntersectionsOfTwoStreets(resultStreets)[0] << std::endl;
@@ -134,15 +121,13 @@ void searchSecondStreet(GtkWidget*, ezgl::application *application){
         //save the user's choice into the pair
         //chosen = resultStreets.first (type StreetIdx)
     }
-    //application->refresh_drawing();
-    //GtkListStore* newList = gtk_list_store_new(3, G_TYPE_STRING);
 }
 
 void displayIntersections(GtkWidget*, ezgl::application *application){
     
     //check for boundary conditions
     if(findIntersectionsOfTwoStreets(resultStreets).size() == 0){
-        std::cout << "No intersections found between the streets" << std::endl;
+    std::cout << "No intersections found between the streets" << std::endl;
     }else if(getStreetName(resultStreets.first) == "<unknown>" || getStreetName(resultStreets.second) == "<unknown>"){
         //consider case when only one street is entered
         std::cout << "Please enter two valid streets" << std::endl;
@@ -196,19 +181,27 @@ void switchDarkMode(GtkWidget*, ezgl::application *application){
     
 }
 
+void displayWindow(GtkWidget*, ezgl::application *application){
+    
+    GtkWidget* dialog = gtk_dialog_new();
+    
+    gtk_widget_show(dialog);
+}
+
+
 void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("SearchStreet1"), "changed", G_CALLBACK(searchFirstStreet), application);
+    
+    g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(displayWindow), application);
+
     g_signal_connect(application->get_object("SearchStreet2"), "changed", G_CALLBACK(searchSecondStreet), application);
-    //g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(searchFirstStreet), application);
-    //g_signal_connect(application->get_object("SearchStreet2"), "activate", G_CALLBACK(searchSecondStreet), application);
+    
     g_signal_connect(application->get_object("FindButton"), "clicked", G_CALLBACK(displayIntersections), application);
     g_signal_connect(application->get_object("ResetButton"), "clicked", G_CALLBACK(resetIntersections), application);
     //g_signal_connect(selectCity)--used to select the city to reload
     g_signal_connect(application->get_object("GoButton"), "clicked", G_CALLBACK(reloadMap), application);
     g_signal_connect(application->get_object("DarkModeButton"), "clicked", G_CALLBACK(switchDarkMode), application);
     
-    //g_signal_connect(application->get_object("nk"), "clicked", G_CALLBACK(switchDarkMode), application);
-
     //g_signal_connect(application->get_object(),"",G_CALLBACK(),application);
 }
 

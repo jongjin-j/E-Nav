@@ -341,7 +341,7 @@ void POIDatabase_nonAmenity(){
         //get the node pointer and OSMID
         const OSMNode* OSMNode_ptr = getNodeByIndex(i);
         OSMID nodeID = OSMNode_ptr->id();
-        std::string name, type;
+        std::string name, type = "not found";
         
         std::string key, value;
 
@@ -356,32 +356,29 @@ void POIDatabase_nonAmenity(){
                 
                 //save the type
                 type = value;
-                
-                for (int k = 0; k < getTagCount(OSMNode_ptr); k++) {
-            
-                    std::tie(key, value) = getTagPair(OSMNode_ptr, k);
-                    
-                    //save the name 
-                    if (key == "name"){
-                        name = value;
-                    }
-                    
-                    //convert coordinates
-                    LatLon position = getNodeCoords(OSMNode_ptr);
-                    double pos_x = x_from_lon(position.longitude());
-                    double pos_y = y_from_lat(position.latitude());
-                    
-                    //create data and push 
-                    struct POI_data data;
-                    data.name = name;
-                    data.type = type;
-                    data.x = pos_x;
-                    data.y = pos_y;
-                    data.id = nodeID;
-                    
-                    database.POIs.push_back(data);
-                }
             }
+                
+            //save the name 
+            if (key == "name"){
+                name = value;
+            }
+        }
+        
+        if (type != "not found"){
+            //convert coordinates
+            LatLon position = getNodeCoords(OSMNode_ptr);
+            double pos_x = x_from_lon(position.longitude());
+            double pos_y = y_from_lat(position.latitude());
+                    
+            //create data and push 
+            struct POI_data data;
+            data.name = name;
+            data.type = type;
+            data.x = pos_x;
+            data.y = pos_y;
+            data.id = nodeID;
+                    
+            database.POIs.push_back(data);
         }
     }
 }

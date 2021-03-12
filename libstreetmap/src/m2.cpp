@@ -207,7 +207,10 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
     application->refresh_drawing();
 }
 
-//GtkListStore* resultList = gtk_list_store_new(1, G_TYPE_STRING);
+//for closing the dialog
+void on_dialog_response(GtkDialog *dialog) {
+gtk_widget_destroy(GTK_WIDGET(dialog));
+}
 
 void reloadMap(GtkWidget*, ezgl::application *application){
     //true if city name is found in the directory
@@ -283,11 +286,32 @@ void reloadMap(GtkWidget*, ezgl::application *application){
     }
     else{
         std::cout << "Invalid city name! Please re-enter." << std::endl; 
+        
+        GObject *window = application->get_object(application->get_main_window_id().c_str());
+        GtkWidget *content_area; // the content area of the dialog
+        GtkWidget *label; // the label we will create to display a message in the content
+        GtkWidget *dialog; // the dialog box we will create
+                
+        dialog = gtk_dialog_new_with_buttons(
+                "Load Error",
+                (GtkWindow*) window,
+                GTK_DIALOG_MODAL,
+                ("OK")
+                );
+        content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+        label = gtk_label_new("Invalid map name entered. Please exit and try again.");
+        gtk_container_add(GTK_CONTAINER(content_area), label);
+        
+        gtk_widget_show_all(dialog);
+        
+        g_signal_connect(
+                GTK_DIALOG(dialog),
+                "response",
+                G_CALLBACK(on_dialog_response),
+                NULL
+                );
+        
     }
-}
-
-void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data){
-    gtk_widget_destroy(GTK_WIDGET (dialog));
 }
 
 void displayWeather(GtkWidget*, ezgl::application *application){

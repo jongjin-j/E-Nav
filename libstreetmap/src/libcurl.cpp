@@ -6,6 +6,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include <string>
+#include <vector>
 
 using namespace std;
 using boost::property_tree::ptree;
@@ -17,15 +18,6 @@ typedef struct MyCustomStruct {
     char *response = NULL;
 } MyCustomStruct;
 
-/* buffer holds the data received from curl_easy_perform()
- * size is always 1
- * nmemb is the number of bytes in buffer
- * userp is a pointer to user data (i.e. myStruct from main)
- *
- * Should return same value as nmemb, else it will signal an error to libcurl
- * and curl_easy_perform() will return an error (CURLE_WRITE_ERROR). This is
- * useful if you want to signal an error has occured during processing.
- */
 static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
     cout << "In my own custom callback function" << endl;
 
@@ -33,10 +25,8 @@ static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
         MyCustomStruct *pMyStruct = (MyCustomStruct *)userp;
 
         // Reads from struct passed in from main
-        cout << "Sucessfully queried page at URL: " << pMyStruct->url << endl;
+        cout << "Successfully queried page at URL: " << pMyStruct->url << endl;
 
-        // Writes to struct passed in from main
-        cout << "Storing received buffer into custom struct..." << endl;
         if (pMyStruct->response == NULL) {
             // Case when first time write_data() is invoked
             pMyStruct->response = new char[nmemb + 1];
@@ -64,38 +54,19 @@ static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
     return nmemb;
 }
 
-void PrintWeatherInfo(ptree &ptRoot) {
-    double temp = 0;
-    double feels_like = 0;
-    //double longitude = 0, latitude = 0;
-    
-    /*ptree &main = ptRoot.get_child("main");
-    BOOST_FOREACH(auto &child, main){
-        if("temp" == child.second.data()){
-            temp = child.second.get<double>("temp");
-        }
-    }*/
-    
-    temp = ptRoot.get<double>("main.temp");
-    cout << temp << endl;
-
-    return;
-}
-
-bool loadCityWeatherData() {
+void loadCityWeatherData() {
     string cityName = "Toronto";
+    std::vector<string> weather_data;
     
     CURLcode res = curl_global_init(CURL_GLOBAL_ALL);
     if (res != CURLE_OK) {
         cout << "ERROR: Unable to initialize libcurl" << endl;
         cout << curl_easy_strerror(res) << endl;
-        return 0;
     }
 
     CURL *curlHandle = curl_easy_init();
     if (!curlHandle ) {
         cout << "ERROR: Unable to get easy handle" << endl;
-        return 0;
     } 
     else {
         char errbuf[CURL_ERROR_SIZE] = {0};
@@ -129,20 +100,25 @@ bool loadCityWeatherData() {
             boost::property_tree::read_json(issJsonData, ptRoot);
 
             // Parsing and printing the data
-            cout << "Current weather in " << cityName << ": " << endl;
-            cout << "====================" << endl << endl;
+            cout << "Loading Weather Data in  " << cityName << ": " << endl;
             
             double temp = ptRoot.get<double>("main.temp") - 273.15;
             double feels_like = ptRoot.get<double>("main.feels_like") - 273.15;
             double pressure = ptRoot.get<double>("main.pressure");
             double humidity = ptRoot.get<double>("main.humidity");
   
-            cout << temp << endl;
-            cout << feels_like << endl;
-            cout << pressure << endl;
-            cout << humidity << endl;
+            std::string temp_string = to_string(temp);
+            std::string feels_like_string = to_string(feels_like);
+            std::string pressure_string = to_string(pressure);
+            std::string humidity_string = to_string(humidity);
             
-            cout << endl << "====================" << endl;
+            weather_data.push_back(temp_string);
+            weather_data.push_back(feels_like_string);
+            weather_data.push_back(pressure_string);
+            weather_data.push_back(humidity_string);
+            
+            cout << temp_string << endl;
+            
         }
         else {
             cout << "ERROR: res == " << res << endl;
@@ -157,6 +133,4 @@ bool loadCityWeatherData() {
     }
 
     curl_global_cleanup();
-
-    return 0;
 }

@@ -14,7 +14,9 @@
 #ifndef LIBCURL_H
 #define LIBCURL_H
 
-bool loadCityWeatherData();
+#include <string.h>
+
+void loadCityWeatherData();
 
 #endif /* LIBCURL_H */
 

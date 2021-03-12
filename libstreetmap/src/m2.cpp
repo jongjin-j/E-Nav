@@ -572,7 +572,7 @@ void draw_main_canvas(ezgl::renderer *g) {
     double scope_length = scope.m_second.x - scope.m_first.x;
     double scope_height = scope.m_second.y - scope.m_first.y;
     //std::cout << scope_length << "  " << scope_height << std::endl;
-     
+
     //drawing features
     for (int i = 0; i < getNumFeatures(); i++) {
 

@@ -24,6 +24,7 @@
 extern struct databases database;
 std::vector<std::string> fileNames;
 
+//number of cities loaded so far (needed in libcurl)
 int cityNums = 0;
 
 void setFirstStreet(GtkWidget*, ezgl::application *application);
@@ -520,6 +521,7 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
     }
 }
 
+//function to draw more significant POIs
 void draw_important_POIs(ezgl::renderer *g, int i, double font){
     g->set_text_rotation(0);
         
@@ -552,6 +554,7 @@ void draw_important_POIs(ezgl::renderer *g, int i, double font){
 }
 
 
+//drawing segments of streets
 void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i, ezgl::color colorChoice){
     g->set_color(colorChoice);
     if(tempInfo.numCurvePoints == 0){
@@ -581,6 +584,7 @@ void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i, ezgl::col
     }
 }
 
+//function to label street segments
 void writeStreetName(ezgl::renderer *g, ezgl::point2d center, StreetSegmentInfo segInfo, std::string name, int i){
     if (name != "<unknown>"){
         if (name == "> <unknown> >" || name == "< <unknown> <"){
@@ -614,13 +618,13 @@ void writeStreetName(ezgl::renderer *g, ezgl::point2d center, StreetSegmentInfo 
     }
 }
 
+//main canvas
 void draw_main_canvas(ezgl::renderer *g) {
     g->draw_rectangle({0, 0}, {1000, 1000});
 
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;
     double scope_height = scope.m_second.y - scope.m_first.y;
-    //std::cout << scope_length << "  " << scope_height << std::endl;
 
     //drawing features
     for (int i = 0; i < getNumFeatures(); i++) {

@@ -209,9 +209,9 @@ void reloadMap(GtkWidget*, ezgl::application *application){
     
     application->change_canvas_world_coordinates("MainCanvas", initial_world);
     
-    application->add_canvas("MainCanvas", draw_main_canvas, initial_world, ezgl::color(230,230,230,230));
+    //application->add_canvas("MainCanvas", draw_main_canvas, initial_world, ezgl::color(230,230,230,230));
 
-    application->run(initial_setup, act_on_mouse_click, nullptr, nullptr);
+    //application->run(initial_setup, act_on_mouse_click, nullptr, nullptr);
    
     application -> refresh_drawing();
     cityName = gtk_entry_get_text((GtkEntry*) application -> get_object("LoadCity"));

@@ -462,8 +462,8 @@ void closeMap() {
     std::vector<StreetIdx> ().swap(database.results1); //stores the results from user search street 1
     std::vector<StreetIdx> ().swap(database.results2); //stores the results from user search street 2
     std::unordered_map<OSMID, std::string> ().swap(database.OSMID_wayType);
-    std::unordered_map<OSMID, std::string> ().swap(database.OSMID_nodeType);
-    std::unordered_map<OSMID, const OSMNode*> ().swap(database.OSMID_nodePtr);
+    //std::unordered_map<OSMID, std::string> ().swap(database.OSMID_nodeType);
+    //std::unordered_map<OSMID, const OSMNode*> ().swap(database.OSMID_nodePtr);
 
     closeStreetDatabase();
 }

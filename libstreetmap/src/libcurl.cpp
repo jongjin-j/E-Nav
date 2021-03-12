@@ -24,14 +24,10 @@ typedef struct MyCustomStruct {
 } MyCustomStruct;
 
 static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
-    cout << "In my own custom callback function" << endl;
-    
-    size = 0;
-    
     if (buffer && nmemb && userp) {
         MyCustomStruct *pMyStruct = (MyCustomStruct *)userp;
 
-        // Reads from struct passed in from main
+        // Reads from struct passed in from loadCityWeatherData
         cout << "Successfully queried page at URL: " << pMyStruct->url << endl;
 
         if (pMyStruct->response == NULL) {
@@ -42,7 +38,6 @@ static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
         else {
             // Case when second or subsequent time write_data() is invoked
             char *oldResp = pMyStruct->response;
-
             pMyStruct->response = new char[pMyStruct->size + nmemb + 1];
 
             // Copy old data
@@ -50,7 +45,7 @@ static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
 
             // Append new data
             strncpy(pMyStruct->response + pMyStruct->size, (char *)buffer, nmemb);
-
+            
             delete []oldResp;
         }
 
@@ -116,10 +111,13 @@ std::string chooseCity(std::string fileName){
     if(fileName == "hamilton_canada.streets.bin"){
         return "Hamilton";
     }
-    return "Toronto";
+    else{
+        return "Toronto";
+    }
 }
 
 void loadCityWeatherData(std::string cityFile) {
+    // Receive cityName from function chooseCity
     std::string cityName = chooseCity(cityFile);
     
     CURLcode res = curl_global_init(CURL_GLOBAL_ALL);
@@ -135,16 +133,15 @@ void loadCityWeatherData(std::string cityFile) {
     else {
         char errbuf[CURL_ERROR_SIZE] = {0};
         
-        std::string firstPart = "http://api.openweathermap.org/data/2.5/weather?q=";
-        std::string secondPart = "&appid=69d3de6a38e4f0c9aa59c4235f670765";
-        std::string finalURL = firstPart + cityName + secondPart;
+        // Edit the URL with cityName received earlier
+        std::string firstPartOfURL = "http://api.openweathermap.org/data/2.5/weather?q=";
+        std::string secondPartOfURL = "&appid=69d3de6a38e4f0c9aa59c4235f670765";
+        std::string finalURL = firstPartOfURL + cityName + secondPartOfURL;
         
         char targetURL[finalURL.length()];
         for(int i = 0; i < finalURL.length() + 1; i++){
             targetURL[i] = finalURL[i];
         }
-        
-        //char targetURL[] = "http://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=69d3de6a38e4f0c9aa59c4235f670765";
         
         MyCustomStruct myStruct;
 
@@ -172,9 +169,11 @@ void loadCityWeatherData(std::string cityFile) {
             istringstream issJsonData(myStruct.response);
             boost::property_tree::read_json(issJsonData, ptRoot);
 
-            // Parsing and printing the data
+            // Obtaining the data from the JSON file
             cout << "Loading Weather Data in " << cityName << ": " << endl;
             
+            // Set temperature, feels-like temperature, pressure
+            // humidity, wind speed, and wind direction
             double temp = ptRoot.get<double>("main.temp") - 273.15;
             double feels_like = ptRoot.get<double>("main.feels_like") - 273.15;
             int pressure = ptRoot.get<int>("main.pressure");
@@ -182,14 +181,13 @@ void loadCityWeatherData(std::string cityFile) {
             double windSpeed = ptRoot.get<double>("wind.speed");
             int windDegree = ptRoot.get<double>("wind.deg");
             
+            // Store into vector weatherData
             weatherData.push_back(temp);
             weatherData.push_back(feels_like);
             weatherData.push_back(pressure);
             weatherData.push_back(humidity);
             weatherData.push_back(windSpeed);
             weatherData.push_back(windDegree);
-            
-            //currentWeather = ptRoot.get<string>("weather.main");
             
         }
         else {

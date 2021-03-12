@@ -46,8 +46,8 @@ const ezgl::color chooseFeatureColour(FeatureType x) {
         //rivers return sky blue
         return ezgl::color(0, 177, 235);
     } else if (x == ISLAND) {
-        //islands return green
-        return ezgl::color(60, 179, 113);
+        //islands return grey
+        return ezgl::color(230,230,230);
     } else if (x == BUILDING) {
         //buildings return dark grey
             return ezgl::color(169, 169, 169);

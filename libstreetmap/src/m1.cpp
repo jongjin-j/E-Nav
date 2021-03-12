@@ -215,13 +215,19 @@ void intersections_database(){
 
 //set POI database
 void POI_database(){
-    database.POIs.resize(getNumPointsOfInterest());
-
+    struct POI_data data;
+    
     for (int i = 0; i < getNumPointsOfInterest(); i++) {
-        database.POIs[i].name = getPOIName(i);
-        database.POIs[i].x = x_from_lon(getPOIPosition(i).longitude());
-        database.POIs[i].y = y_from_lat(getPOIPosition(i).latitude());
-        database.POIs[i].id = getPOIOSMNodeID(i);
+        
+        //make the data of POI of index i
+        data.name = getPOIName(i);
+        data.type = getPOIType(i);
+        data.x = x_from_lon(getPOIPosition(i).longitude());
+        data.y = y_from_lat(getPOIPosition(i).latitude());
+        data.id = getPOIOSMNodeID(i);
+        
+        //push back data into vector
+        database.POIs.push_back(data);
     }
 }
 
@@ -327,54 +333,58 @@ void OSMID_wayValue(){
     }
 }
 
-void OSMID_nodeValue(){
+void POIDatabase_nonAmenity(){
     for (int i = 0; i < getNumberOfNodes(); i++){
             
         //get the node pointer and OSMID
         const OSMNode* OSMNode_ptr = getNodeByIndex(i);
-        OSMID NodeID = OSMNode_ptr->id();
+        OSMID nodeID = OSMNode_ptr->id();
+        std::string name, type;
         
         std::string key, value;
 
-        //loop through the tags and push into unordered map when key is amenity or shop
+        //loop through the tags and push node info into vector when key is certain value
         for (int j = 0; j < getTagCount(OSMNode_ptr); j++) {
             
             std::tie(key, value) = getTagPair(OSMNode_ptr, j);
             
             if ((key == "railway" && value == "subway_entrance") || (key == "highway" && value == "bus_stop") || 
-                (key == "aeroway" && value == "aerodrome") || (key == "shop" && value == "supermarket")){
-                database.OSMID_nodeType[NodeID] = value;
+                (key == "aeroway" && value == "aerodrome") || (key == "shop" && value == "supermarket") ||
+                (key == "aeroway" && value == "helipad") || (key == "shop" && value == "wholesale")){
+                
+                //save the type
+                type = value;
+                
+                for (int k = 0; k < getTagCount(OSMNode_ptr); k++) {
+            
+                    std::tie(key, value) = getTagPair(OSMNode_ptr, k);
+                    
+                    //save the name 
+                    if (key == "name"){
+                        name = value;
+                    }
+                    
+                    //convert coordinates
+                    LatLon position = getNodeCoords(OSMNode_ptr);
+                    double pos_x = x_from_lon(position.longitude());
+                    double pos_y = y_from_lat(position.latitude());
+                    
+                    //create data and push 
+                    struct POI_data data;
+                    data.name = name;
+                    data.type = type;
+                    data.x = pos_x;
+                    data.y = pos_y;
+                    data.id = nodeID;
+                    
+                    database.POIs.push_back(data);
+                }
             }
         }
     }
 }
 
-//set an unordered_map of OSMID and pointer of non-amenities
-void OSMID_nodePointer(){
-    for (int i = 0; i < getNumberOfNodes(); i++){
-            
-        //get the node pointer and OSMID
-        const OSMNode* OSMNode_ptr = getNodeByIndex(i);
-        OSMID NodeID = OSMNode_ptr->id();
         
-        std::string key, value;
-
-        //loop through the tags and push into unordered map when key is amenity or shop
-        for (int j = 0; j < getTagCount(OSMNode_ptr); j++) {
-            
-            std::tie(key, value) = getTagPair(OSMNode_ptr, j);
-            
-            
-            if ((key == "railway" && value == "subway_entrance") || (key == "highway" && value == "bus_stop") || 
-                (key == "aeroway" && value == "aerodrome") || (key == "shop" && value == "supermarket")){                
-                //std::cout << key << " " << value << std::endl;
-                database.OSMID_nodePtr[NodeID] = OSMNode_ptr;
-            }
-        }
-    }
-}
-
-
 bool loadMap(std::string map_streets_database_filename) {
     bool load_successful = false; //Indicates whether the map has loaded 
     //successfully
@@ -404,8 +414,7 @@ bool loadMap(std::string map_streets_database_filename) {
     POI_database();
     streets_database();
     OSMID_wayValue();
-    OSMID_nodeValue();
-    OSMID_nodePointer();
+    POIDatabase_nonAmenity();
     
   
     load_successful = true; //Make sure this is updated to reflect whether

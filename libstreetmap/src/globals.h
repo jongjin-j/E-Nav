@@ -29,6 +29,7 @@ struct intersection_data {
 
 struct POI_data {
     std::string name;
+    std::string type;
     OSMID id;
     double x = 0;
     double y = 0;

@@ -166,7 +166,12 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
 //GtkListStore* resultList = gtk_list_store_new(1, G_TYPE_STRING);
 
 void reloadMap(GtkWidget*, ezgl::application *application){
-    std::cout << "Map reloaded" << std::endl;
+    
+    //cityName is a char array that holds user input --> can use to call a new map
+    //should check for invalid inputs
+    const char* cityName = gtk_entry_get_text((GtkEntry*) application -> get_object("LoadCity"));
+    std::cout << cityName << std::endl;
+    
 }
 
 void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data){
@@ -217,15 +222,11 @@ void displayWindow(GtkWidget*, ezgl::application *application){
 
 void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("SearchStreet1"), "changed", G_CALLBACK(searchFirstStreet), application);
-    
     g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(displayWindow), application);
-
     g_signal_connect(application->get_object("SearchStreet2"), "changed", G_CALLBACK(searchSecondStreet), application);
-    
     g_signal_connect(application->get_object("FindButton"), "clicked", G_CALLBACK(displayIntersections), application);
     g_signal_connect(application->get_object("ResetButton"), "clicked", G_CALLBACK(resetIntersections), application);
-    //g_signal_connect(selectCity)--used to select the city to reload
-    g_signal_connect(application->get_object("GoButton"), "clicked", G_CALLBACK(reloadMap), application);
+    g_signal_connect(application->get_object("LoadCity"), "activate", G_CALLBACK(reloadMap), application);
     g_signal_connect(application->get_object("WeatherButton"), "clicked", G_CALLBACK(displayWeather), application);
     
     //g_signal_connect(application->get_object(),"",G_CALLBACK(),application);

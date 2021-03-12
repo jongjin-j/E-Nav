@@ -99,6 +99,8 @@ void writeStreetName(ezgl::renderer *g, ezgl::point2d center, StreetSegmentInfo 
 void draw_main_canvas(ezgl::renderer *g);
 void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x, double y);
 
+int createFileList(std::string directoryPath);
+
 extern std::vector<double> weatherData;
 
 #endif /* GLOBALS_H */

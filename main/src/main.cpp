@@ -25,6 +25,7 @@
 #include "m2.h"
 #include "OSMDatabaseAPI.h"
 #include "libcurl.h"
+#include "globals.h"
 
 //Program exit codes
 constexpr int SUCCESS_EXIT_CODE = 0;        //Everyting went OK
@@ -71,6 +72,9 @@ int main(int argc, char** argv) {
         std::cerr << "Failed to load map '" << map_path << "'\n";
         return ERROR_EXIT_CODE;
     }
+    
+    //create a list of files in map directory
+    createFileList("/cad2/ece297s/public/maps");
     
     loadCityWeatherData(map_path);
 

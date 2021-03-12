@@ -387,7 +387,7 @@ void POIDatabase_nonAmenity(){
 }
 
 //code from https://www.systutorials.com/how-to-iterate-all-dirs-and-files-in-a-dir-in-c/
-int ListDir(std::string directoryPath) {
+int createFileList(std::string directoryPath) {
     struct dirent *entry;
     DIR *dp;
 
@@ -437,7 +437,7 @@ bool loadMap(std::string map_streets_database_filename) {
     streets_database();
     OSMID_wayValue();
     POIDatabase_nonAmenity();
-    ListDir("/cad2/ece297s/public/maps");
+    //ListDir("/cad2/ece297s/public/maps");
     
   
     load_successful = true; //Make sure this is updated to reflect whether

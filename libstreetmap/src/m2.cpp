@@ -179,11 +179,8 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
 //GtkListStore* resultList = gtk_list_store_new(1, G_TYPE_STRING);
 
 void reloadMap(GtkWidget*, ezgl::application *application){
-    //bool foundMatch = false;
-    
-    //reset and close database
-    closeMap();
-    closeOSMDatabase();
+    //true if city name is found in the directory
+    bool foundMatch = false;
     
     //cityName is a char array that holds user input --> can use to call a new map
     //should check for invalid inputs
@@ -192,32 +189,38 @@ void reloadMap(GtkWidget*, ezgl::application *application){
    
     std::string cityName(cityNameChar);
         
+    //make the input lowercase and erase white spaces
     cityName.erase(std::remove(cityName.begin(), cityName.end(), ' '), cityName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
     std::transform(cityName.begin(), cityName.end(), cityName.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
             
     
     //load OSM database
     for (int i = 0; i < fileNames.size(); i++){
-        if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("osm.bin") != std::string::npos){
-            //found a matching city name
-            //foundMatch = true;
+        
+        //if found a matching city name
+        if ((fileNames[i].find(cityName) != std::string::npos) && (fileNames[i].find("osm.bin") != std::string::npos)){
+            
+            foundMatch = true;
             
             //close current map
-            //closeOSMDatabase();
-            //closeMap();
+            closeOSMDatabase();
+            closeMap();
             
+            //load OSMDatabase
             bool loadSuccess = loadOSMDatabaseBIN("/cad2/ece297s/public/maps/" + fileNames[i]);
             if (loadSuccess) {
-                std::cout << "successfully loaded OSM" << std::endl; 
+                std::cout << "successfully loaded OSM database" << std::endl; 
             }
         }
     }
     
     //load streets database
     for (int i = 0; i < fileNames.size(); i++){
-        //std::cout << "/cad2/ece297s/public/maps/" + fileNames[i] << std::endl; 
-        if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("streets.bin") != std::string::npos){
-            //std::cout << "/cad2/ece297s/public/maps/" + fileNames[i] << std::endl; 
+        
+        //if found a matching city name 
+        if ((fileNames[i].find(cityName) != std::string::npos) && (fileNames[i].find("streets.bin") != std::string::npos)){
+            
+            //load the new map
             bool loadMapSuccess = loadMap("/cad2/ece297s/public/maps/" + fileNames[i]);
             if (loadMapSuccess) {
                 std::cout << "successfully loaded map" << std::endl; 
@@ -230,7 +233,8 @@ void reloadMap(GtkWidget*, ezgl::application *application){
     }
     
     //if the input name is valid
-    //if (foundMatch){
+    if (foundMatch){
+        
         //set the new dimensions
         ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)},
         {
@@ -244,8 +248,8 @@ void reloadMap(GtkWidget*, ezgl::application *application){
         
        
         cityName = gtk_entry_get_text((GtkEntry*) application -> get_object("LoadCity"));
-        std::cout << cityName << std::endl;
-    //}
+        //std::cout << cityName << std::endl;
+    }
 }
 
 void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data){
@@ -374,6 +378,10 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
         }
         if (database.POIs[i].type == "subway_entrance"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/subway_entrance.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
+        }
+        if (database.POIs[i].type == "bus_station"){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bus_station.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
         if (database.POIs[i].type == "bus_stop"){

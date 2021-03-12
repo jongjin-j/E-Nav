@@ -68,12 +68,7 @@ void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice)
     x->set_line_width(width);
     x->set_color(colorChoice);
 }
-
-std::vector<StreetIdx> firstStreetResults = database.results;
-std::vector<StreetIdx> secondStreetResults = database.results;
-
-std::vector<StreetIdx> results1; //stores the results from user search street 1
-std::vector<StreetIdx> results2; //stores the results from user search street 2
+std::vector<StreetIdx> results1, results2; //stores the results from user search street 1 and 22
 std::pair<StreetIdx, StreetIdx> resultStreets; //std pair to store the two chosen streets; this is passed onto the findIntersections function
 
 //callback function of searching the first street

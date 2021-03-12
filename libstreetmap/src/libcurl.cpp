@@ -11,6 +11,8 @@
 using namespace std;
 using boost::property_tree::ptree;
 using boost::property_tree::read_json;
+std::vector<double> weatherData;
+std::string currentWeather;
 
 typedef struct MyCustomStruct {
     char *url = NULL;
@@ -56,7 +58,6 @@ static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
 
 void loadCityWeatherData() {
     string cityName = "Toronto";
-    std::vector<string> weather_data;
     
     CURLcode res = curl_global_init(CURL_GLOBAL_ALL);
     if (res != CURLE_OK) {
@@ -104,20 +105,19 @@ void loadCityWeatherData() {
             
             double temp = ptRoot.get<double>("main.temp") - 273.15;
             double feels_like = ptRoot.get<double>("main.feels_like") - 273.15;
-            double pressure = ptRoot.get<double>("main.pressure");
-            double humidity = ptRoot.get<double>("main.humidity");
-  
-            std::string temp_string = to_string(temp);
-            std::string feels_like_string = to_string(feels_like);
-            std::string pressure_string = to_string(pressure);
-            std::string humidity_string = to_string(humidity);
+            int pressure = ptRoot.get<int>("main.pressure");
+            int humidity = ptRoot.get<int>("main.humidity");
+            double windSpeed = ptRoot.get<double>("wind.speed");
+            int windDegree = ptRoot.get<double>("wind.deg");
             
-            weather_data.push_back(temp_string);
-            weather_data.push_back(feels_like_string);
-            weather_data.push_back(pressure_string);
-            weather_data.push_back(humidity_string);
+            weatherData.push_back(temp);
+            weatherData.push_back(feels_like);
+            weatherData.push_back(pressure);
+            weatherData.push_back(humidity);
+            weatherData.push_back(windSpeed);
+            weatherData.push_back(windDegree);
             
-            cout << temp_string << endl;
+            //currentWeather = ptRoot.get<string>("weather.main");
             
         }
         else {

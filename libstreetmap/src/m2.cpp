@@ -670,6 +670,9 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x,
 
 void drawMap() {
     loadCityWeatherData();
+    for(int i = 0; i < weatherData.size(); i++){
+        std::cout << weatherData[i] << std::endl;
+    }
     
     for (int i=0; i<fileNames.size(); i++){
         std::cout << (fileNames[i]) << std::endl;

@@ -179,11 +179,11 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
 //GtkListStore* resultList = gtk_list_store_new(1, G_TYPE_STRING);
 
 void reloadMap(GtkWidget*, ezgl::application *application){
-    bool foundMatch = false;
+    //bool foundMatch = false;
     
     //reset and close database
-    //closeMap();
-    //closeOSMDatabase();
+    closeMap();
+    closeOSMDatabase();
     
     //cityName is a char array that holds user input --> can use to call a new map
     //should check for invalid inputs
@@ -200,11 +200,11 @@ void reloadMap(GtkWidget*, ezgl::application *application){
     for (int i = 0; i < fileNames.size(); i++){
         if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("osm.bin") != std::string::npos){
             //found a matching city name
-            foundMatch = true;
+            //foundMatch = true;
             
             //close current map
-            closeOSMDatabase();
-            closeMap();
+            //closeOSMDatabase();
+            //closeMap();
             
             bool loadSuccess = loadOSMDatabaseBIN("/cad2/ece297s/public/maps/" + fileNames[i]);
             if (loadSuccess) {
@@ -230,7 +230,7 @@ void reloadMap(GtkWidget*, ezgl::application *application){
     }
     
     //if the input name is valid
-    if (foundMatch){
+    //if (foundMatch){
         //set the new dimensions
         ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)},
         {
@@ -245,7 +245,7 @@ void reloadMap(GtkWidget*, ezgl::application *application){
        
         cityName = gtk_entry_get_text((GtkEntry*) application -> get_object("LoadCity"));
         std::cout << cityName << std::endl;
-    }
+    //}
 }
 
 void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data){

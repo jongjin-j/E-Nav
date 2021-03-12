@@ -58,7 +58,7 @@ static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
 }
 
 std::string chooseCity(std::string fileName){
-    if(fileName == "/cad2/ece297s/public/maps/toronto_canada.streets.bin" || "toronto_canada.streets.bin"){
+    if(fileName == "/cad2/ece297s/public/maps/toronto_canada.streets.bin" || fileName == "toronto_canada.streets.bin"){
         return "Toronto";
     }
     if(fileName == "singapore.streets.bin"){
@@ -68,7 +68,7 @@ std::string chooseCity(std::string fileName){
         return "Interlaken";
     }
     if(fileName == "iceland.streets.bin"){
-        return "Iceleand";
+        return "Iceland";
     }
     if(fileName == "beijing_china.streets.bin"){
         return "Beijing";

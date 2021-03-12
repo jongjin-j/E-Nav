@@ -178,29 +178,39 @@ void reloadMap(GtkWidget*, ezgl::application *application){
     cityName.erase(std::remove(cityName.begin(), cityName.end(), ' '), cityName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
     std::transform(cityName.begin(), cityName.end(), cityName.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
             
+    
     //load OSM database
-    for (int i=0; fileNames.size(); i++){
+    for (int i = 0; i < fileNames.size(); i++){
         if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("osm.bin") != std::string::npos){
-            loadOSMDatabaseBIN(fileNames[i]);
+            bool loadSucess = loadOSMDatabaseBIN("/cad2/ece297s/public/maps/" + fileNames[i]);
+            if (loadSucess) {
+                std::cout << "successfully loaded OSM" << std::endl; 
+            }
         }
     }
     
     //load streets database
-    for (int i=0; fileNames.size(); i++){
+    for (int i = 0; i < fileNames.size(); i++){
+        //std::cout << "/cad2/ece297s/public/maps/" + fileNames[i] << std::endl; 
         if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("streets.bin") != std::string::npos){
-            loadMap(fileNames[i]);
+            //std::cout << "/cad2/ece297s/public/maps/" + fileNames[i] << std::endl; 
+            bool loadMapSuccess = loadMap("/cad2/ece297s/public/maps/" + fileNames[i]);
+            if (loadMapSuccess) {
+                std::cout << "successfully loaded map" << std::endl; 
+            }
         }
     }
     
-    /*
-    //parse the map path
-    std::string filename = "something";
-    int lastSlash = filename.find_last_of("/");
-    filename.erase(0, lastSlash);
+    ezgl::rectangle initial_world({x_from_lon(min_lon), y_from_lat(min_lat)},
+    {
+        x_from_lon(max_lon), y_from_lat(max_lat)
+    });
     
-    int firstPeriod = filename.find_first_of(".");
-    filename.erase(firstPeriod, filename.length() - 1);
-    */
+    application->change_canvas_world_coordinates("MainCanvas", initial_world);
+    
+    application->add_canvas("MainCanvas", draw_main_canvas, initial_world, ezgl::color(230,230,230,230));
+
+    application->run(initial_setup, act_on_mouse_click, nullptr, nullptr);
    
     application -> refresh_drawing();
     

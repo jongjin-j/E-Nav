@@ -19,7 +19,6 @@
           <object class="GtkGrid" id="InnerGrid">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">135</property>
             <child>
               <object class="GtkButton" id="UpButton">
                 <property name="visible">True</property>
@@ -302,6 +301,12 @@
                 <property name="top_attach">12</property>
                 <property name="width">3</property>
               </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
             </child>
             <child>
               <placeholder/>

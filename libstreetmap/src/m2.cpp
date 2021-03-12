@@ -67,9 +67,7 @@ void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice)
 
 std::vector<StreetIdx> results1; //stores the results from user search street 1
 std::vector<StreetIdx> results2; //stores the results from user search street 2
-
-//std pair to store the two chosen streets; this is passed onto the findIntersections function
-std::pair<StreetIdx, StreetIdx> resultStreets;
+std::pair<StreetIdx, StreetIdx> resultStreets; //std pair to store the two chosen streets; this is passed onto the findIntersections function
 
 //callback function of searching the first street
 void searchFirstStreet(GtkWidget *, ezgl::application *application){
@@ -135,13 +133,13 @@ void searchSecondStreet(GtkWidget*, ezgl::application *application){
 
 void displayIntersections(GtkWidget*, ezgl::application *application){
     
+    //check for boundary conditions
     if(findIntersectionsOfTwoStreets(resultStreets).size() == 0){
         std::cout << "No intersections found between the streets" << std::endl;
     }else if(getStreetName(resultStreets.first) == "<unknown>" || getStreetName(resultStreets.second) == "<unknown>"){
+        //consider case when only one street is entered
         std::cout << "Please enter two valid streets" << std::endl;
     }else{
-        
-            //consider case where pressed without a valid pair
             //if valid pair, display the intersections
             std::cout << "The pair of streetIds are: " << resultStreets.first << " and " << resultStreets.second << std::endl;
             std::cout << "The street names are: " << getStreetName(resultStreets.first) << " and " << getStreetName(resultStreets.second) << std::endl; 
@@ -160,10 +158,7 @@ void displayIntersections(GtkWidget*, ezgl::application *application){
              //double scope_height = scope.m_second.y - scope.m_first.y;
              //std::cout << scope_length << "  " << scope_height << std::endl;  
     }
-    
-    
     application->refresh_drawing();
-    
 }
 
 void resetIntersections(GtkWidget*, ezgl::application *application){
@@ -202,6 +197,10 @@ void initial_setup(ezgl::application *application, bool /*new_window*/){
     //g_signal_connect(selectCity)--used to select the city to reload
     g_signal_connect(application->get_object("GoButton"), "clicked", G_CALLBACK(reloadMap), application);
     g_signal_connect(application->get_object("DarkModeButton"), "clicked", G_CALLBACK(switchDarkMode), application);
+    
+    GtkListStore* resultList = gtk_list_store_new(3, G_TYPE_STRING);
+    g_signal_connect(application->get_object("nk"), "clicked", G_CALLBACK(switchDarkMode), application);
+
     
     //g_signal_connect(application->get_object(),"",G_CALLBACK(),application);
 }
@@ -654,8 +653,7 @@ void drawMap() {
     {
         x_from_lon(max_lon), y_from_lat(max_lat)
     });
-    ezgl::color standardColor = ezgl::color(230,230,230,230);
-    application.add_canvas("MainCanvas", draw_main_canvas, initial_world, standardColor);
+    application.add_canvas("MainCanvas", draw_main_canvas, initial_world, ezgl::color(230,230,230,230));
 
     application.run(initial_setup, act_on_mouse_click, nullptr, nullptr);
 }

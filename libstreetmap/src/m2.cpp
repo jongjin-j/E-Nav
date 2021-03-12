@@ -207,8 +207,8 @@ void reloadMap(GtkWidget*, ezgl::application *application){
             closeOSMDatabase();
             closeMap();
             
-            bool loadSucess = loadOSMDatabaseBIN("/cad2/ece297s/public/maps/" + fileNames[i]);
-            if (loadSucess) {
+            bool loadSuccess = loadOSMDatabaseBIN("/cad2/ece297s/public/maps/" + fileNames[i]);
+            if (loadSuccess) {
                 std::cout << "successfully loaded OSM" << std::endl; 
             }
         }

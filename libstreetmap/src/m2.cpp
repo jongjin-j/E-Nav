@@ -191,6 +191,9 @@ void displayIntersections(GtkWidget*, ezgl::application *application){
         }
         std::cout << "Total number of intersections: " << findIntersectionsOfTwoStreets(resultStreets).size() << std::endl;
     }
+    ezgl::rectangle r({0,1000},{2000,1000});
+    //ezgl::camera::set_world(r);
+    
     application->refresh_drawing();
 }
 

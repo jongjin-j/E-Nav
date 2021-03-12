@@ -744,13 +744,7 @@ void drawMap() {
     for(int i = 0; i < weatherData.size(); i++){
         std::cout << weatherData[i] << std::endl;
     }
-    
-    //printing out the directory names
-    //for (int i=0; i<fileNames.size(); i++){
-        //std::cout << (fileNames[i]) << std::endl;
-    //}
-    
-    
+   
     ezgl::application::settings settings;
     settings.main_ui_resource = "libstreetmap/resources/main.ui";
     settings.window_identifier = "MainWindow";

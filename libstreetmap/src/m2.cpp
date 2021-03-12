@@ -69,6 +69,37 @@ std::vector<StreetIdx> results1; //stores the results from user search street 1
 std::vector<StreetIdx> results2; //stores the results from user search street 2
 std::pair<StreetIdx, StreetIdx> resultStreets; //std pair to store the two chosen streets; this is passed onto the findIntersections function
 
+GtkWidget * gtk_dialog_new_with_buttons(
+        const gchar *title,
+        GtkWindow *parent,
+        GtkDialogFlags flags,
+        const gchar *first_button_text
+        );
+
+void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data) {
+std::cout << "response is ";
+switch (response_id) {
+    case GTK_RESPONSE_ACCEPT:
+        std::cout << "GTK_RESPONSE_ACCEPT ";
+        break;
+    case GTK_RESPONSE_DELETE_EVENT:
+        std::cout << "GTK_RESPONSE_DELETE_EVENT (i.e. ’X’ button) ";
+        break;
+    case GTK_RESPONSE_REJECT:
+        std::cout << "GTK_RESPONSE_REJECT ";
+        break;
+    default:
+        std::cout << "UNKNOWN ";
+        break;
+}
+std::cout << "(" << response_id << ")\n";
+// This will cause the dialog to be destroyed and close.
+// without this line the dialog remains open unless the
+// response_id is GTK_RESPONSE_DELETE_EVENT which
+// automatically closes the dialog without the following line.
+gtk_widget_destroy(GTK_WIDGET(dialog));
+}
+
 //callback function of searching the first street
 void searchFirstStreet(GtkWidget *, ezgl::application *application){
     
@@ -76,26 +107,57 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
     const char* street1 = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet1"));
     
     //results1 is the vector of matching streets
-    database.results1 = findStreetIdsFromPartialStreetName(street1);
+    results1 = findStreetIdsFromPartialStreetName(street1);
     
     //check if vector empty
-    if(database.results1.size() == 0){
+    if(results1.size() == 0){
         std::cout << "No matching results found" << std::endl;
     }else{
         //else, give the list of results for the user to choose from
-        /*
         for(int i = 0; i < results1.size(); i++){
             std::cout << getStreetName(results1[i]) << std::endl;
         }
-         */
-        //test code, ignore
-        resultStreets.first = database.results1[0];
-        std::cout << database.results1[0] << std::endl;
+        
+        //resultStreets.first = database.results1[0];
+        //std::cout << database.results1[0] << std::endl;
         
         
         //save the user's choice into the pair
         //chosen = resultStreets.first (type StreetIdx)
     }
+    //GtkWidget *gtk_event_box_new(void);
+    
+    GObject *window; // the parent window over which to add the dialog
+    GtkWidget *content_area; // the content area of the dialog
+    GtkWidget *label; // the label we will create to display a message in the content
+    GtkWidget *dialog; // the dialog box we will create
+    
+    window = application->get_object(application->get_main_window_id().c_str());
+    
+    dialog = gtk_dialog_new_with_buttons(
+            "Test Dialog",
+            (GtkWindow*) window,
+            GTK_DIALOG_MODAL,
+            ("OK"),
+            GTK_RESPONSE_ACCEPT,
+            ("CANCEL"),
+            GTK_RESPONSE_REJECT,
+            NULL
+            );
+    
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    label = gtk_label_new("Simple Dialog With a Label. Press OK or CANCEL too close.");
+    gtk_container_add(GTK_CONTAINER(content_area), label);
+    
+    gtk_widget_show_all(dialog);
+    
+    g_signal_connect(
+            GTK_DIALOG(dialog),
+            "response",
+            G_CALLBACK(on_dialog_response),
+            NULL
+            );
+
 }
 
 //callback function of searching the second street
@@ -105,22 +167,22 @@ void searchSecondStreet(GtkWidget*, ezgl::application *application){
     const char* street2 = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet2"));
     
     //results2 stores the vector of results
-    database.results2 = findStreetIdsFromPartialStreetName(street2);
+    results2 = findStreetIdsFromPartialStreetName(street2);
     
     //check if vector empty
-    if(database.results2.size() == 0){
+    if(results2.size() == 0){
         //display error message in results box
         std::cout << "No matching results found" << std::endl;
     }else{
         //else, give the list of results for the user to choose from
-        /*
+        
         for(int i = 0; i < results2.size(); i++){
             std::cout << getStreetName(results2[i]) << std::endl;
         }
-        */
+        
         //test code, ignore
-        resultStreets.second = database.results2[0];        
-        std:: cout << resultStreets.second << std::endl;
+        //resultStreets.second = results2[0];        
+        //std:: cout << resultStreets.second << std::endl;
         
         //std::cout << findIntersectionsOfTwoStreets(resultStreets)[0] << std::endl;
                 
@@ -198,10 +260,8 @@ void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("GoButton"), "clicked", G_CALLBACK(reloadMap), application);
     g_signal_connect(application->get_object("DarkModeButton"), "clicked", G_CALLBACK(switchDarkMode), application);
     
-    GtkListStore* resultList = gtk_list_store_new(3, G_TYPE_STRING);
     //g_signal_connect(application->get_object("nk"), "clicked", G_CALLBACK(switchDarkMode), application);
 
-    
     //g_signal_connect(application->get_object(),"",G_CALLBACK(),application);
 }
 
@@ -379,7 +439,7 @@ void writeStreetName(ezgl::renderer *g, ezgl::point2d center, StreetSegmentInfo 
 }
 
 void draw_main_canvas(ezgl::renderer *g) {
-    g->draw_rectangle({0, 0}, {000, 1000});
+    g->draw_rectangle({0, 0}, {1000, 1000});
 
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;

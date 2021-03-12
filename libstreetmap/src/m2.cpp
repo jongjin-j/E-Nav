@@ -24,7 +24,6 @@
 extern struct databases database;
 std::vector<std::string> fileNames;
 
-std::string cityName;
 
 //helper function to choose colour from feature type
 const ezgl::color chooseFeatureColour(FeatureType x) {
@@ -199,6 +198,9 @@ void reloadMap(GtkWidget*, ezgl::application *application){
             bool loadMapSuccess = loadMap("/cad2/ece297s/public/maps/" + fileNames[i]);
             if (loadMapSuccess) {
                 std::cout << "successfully loaded map" << std::endl; 
+                
+                //load weather
+                loadCityWeatherData(fileNames[i]);
             }
         }
     }
@@ -727,7 +729,7 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x,
 
 
 void drawMap() {
-    loadCityWeatherData(cityName);
+    
     for(int i = 0; i < weatherData.size(); i++){
         std::cout << weatherData[i] << std::endl;
     }

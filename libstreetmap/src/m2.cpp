@@ -281,6 +281,9 @@ void reloadMap(GtkWidget*, ezgl::application *application){
         cityName = gtk_entry_get_text((GtkEntry*) application -> get_object("LoadCity"));
         //std::cout << cityName << std::endl;
     }
+    else{
+        std::cout << "Invalid city name! Please re-enter." << std::endl; 
+    }
 }
 
 void on_dialog_response(GtkDialog *dialog, gint response_id, gpointer user_data){

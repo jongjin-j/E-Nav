@@ -332,8 +332,8 @@ void displayWeather(GtkWidget*, ezgl::application *application){
             );
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
-    std::string displayText1 = "Temperature: " + std::to_string(weatherData[0+cityNums]) + " (C)\nFeels Like: " + std::to_string(weatherData[1+cityNums]) + " (C)\nPressure: " + std::to_string(weatherData[2+cityNums]) + " (hPA)\nHumidity: "; 
-    std::string displayText2 = std::to_string(weatherData[3+cityNums]) + " (g/m^3)\nWind Speed: " + std::to_string(weatherData[4+cityNums]) + " (m/s)\nWind Degrees: " + std::to_string(weatherData[5+cityNums]) + " (degrees)";
+    std::string displayText1 = "Temperature: " + std::to_string(weatherData[0+cityNums]) + " (°C)\nFeels Like: " + std::to_string(weatherData[1+cityNums]) + " (°C)\nPressure: " + std::to_string(weatherData[2+cityNums]) + " (hPA)\nHumidity: "; 
+    std::string displayText2 = std::to_string(weatherData[3+cityNums]) + " (Rh)\nWind Speed: " + std::to_string(weatherData[4+cityNums]) + " (m/s)\nWind Direction: " + std::to_string(weatherData[5+cityNums]) + " (°)";
     std::string displayText = displayText1 + displayText2;
     char displayCharArray[displayText.length()+1];
     strcpy(displayCharArray,displayText.c_str());
@@ -820,11 +820,6 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x,
 
 
 void drawMap() {
-    
-    /*for(int i = 0; i < weatherData.size(); i++){
-        std::cout << weatherData[i] << std::endl;
-    }*/
-   
     ezgl::application::settings settings;
     settings.main_ui_resource = "libstreetmap/resources/main.ui";
     settings.window_identifier = "MainWindow";

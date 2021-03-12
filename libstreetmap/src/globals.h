@@ -101,7 +101,7 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x,
 
 int createFileList(std::string directoryPath);
 
-extern std::vector<double> weatherData;
+extern std::vector<int> weatherData;
 
 #endif /* GLOBALS_H */
 

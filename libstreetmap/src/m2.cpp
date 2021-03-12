@@ -428,11 +428,35 @@ void draw_POIs(ezgl::renderer *g, int i, double font){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/school.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
+        else if (database.POIs[i].type == "toilets"){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/toilet.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
+        }
+        else if (database.POIs[i].type == "post_office"){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/post_office.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
+        }
+        else if (database.POIs[i].type == "police"){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/police.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
+        }
+        else if (database.POIs[i].type == "parking"){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/parking.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
+        }
+        else if (database.POIs[i].type == "fuel"){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/fuel.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
+        }
+        else if (database.POIs[i].type == "cinema"){
+            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/cinema.png");
+            draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
+        }
         else if (database.POIs[i].type == "cafe"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/cafe.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }
-        else if (database.POIs[i].type == "bank"){
+        else if (database.POIs[i].type == "bank" || database.POIs[i].type == "atm"){
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/bank.png");
             draw_POI_function(g, center_point, font, png_surface, database.POIs[i].name);
         }

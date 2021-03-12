@@ -7,6 +7,7 @@
 #include <boost/foreach.hpp>
 #include <string>
 #include <vector>
+#include <cstring>
 
 using namespace std;
 using boost::property_tree::ptree;
@@ -71,8 +72,18 @@ void loadCityWeatherData() {
     } 
     else {
         char errbuf[CURL_ERROR_SIZE] = {0};
-        //string cityName = "Toronto";
-        char targetURL[] = "http://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=69d3de6a38e4f0c9aa59c4235f670765";
+        
+        std::string firstPart = "http://api.openweathermap.org/data/2.5/weather?q=";
+        std::string secondPart = "&appid=69d3de6a38e4f0c9aa59c4235f670765";
+        std::string finalURL = firstPart + cityName + secondPart;
+        
+        char targetURL[finalURL.length()];
+        for(int i = 0; i < finalURL.length() + 1; i++){
+            targetURL[i] = finalURL[i];
+        }
+        
+        //char targetURL[] = "http://api.openweathermap.org/data/2.5/weather?q=Toronto&appid=69d3de6a38e4f0c9aa59c4235f670765";
+        
         MyCustomStruct myStruct;
 
         res = curl_easy_setopt(curlHandle, CURLOPT_URL, targetURL);

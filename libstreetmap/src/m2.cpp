@@ -24,7 +24,6 @@
 extern struct databases database;
 std::vector<std::string> fileNames;
 
-
 int cityNums = 0;
 
 void setFirstStreet(GtkWidget*, ezgl::application *application);
@@ -76,23 +75,25 @@ const ezgl::color chooseFeatureColour(FeatureType x) {
     return ezgl::color(0,0,0,0);
 }
 
+//sets the width and colour for the next line
 void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice){
     x->set_line_width(width);
     x->set_color(colorChoice);
 }
-std::vector<StreetIdx> results1, results2; //stores the results from user search street 1 and 22
-std::pair<StreetIdx, StreetIdx> resultStreets; //std pair to store the two chosen streets; this is passed onto the findIntersections function
+std::vector<StreetIdx> firstSearchResults, secondSearchResults; //stores the user's search results from the first and second search boxes
+std::pair<StreetIdx, StreetIdx> resultStreets; //std pair to store the two final chosen streets; this is passed onto the findIntersections function
 
 //callback function of searching the first street
+//this is executed each time the signal changes ie. a keyboard input
 void searchFirstStreet(GtkWidget *, ezgl::application *application){
     
-    //street1 will hold what the user inputs
+    //street1 will hold what the user has input so far
     const char* street1 = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet1"));
     
-    //results1 is the vector of matching streets
-    results1 = findStreetIdsFromPartialStreetName(street1);
+    //firstSearchResults will hold the matching streets so far
+    firstSearchResults = findStreetIdsFromPartialStreetName(street1);
 
-    //retrieve object
+    //initialize resultsList for the list store
     auto resultsList = (GtkListStore *)(application->get_object("ResultsList"));
     //reset the list
     gtk_list_store_clear(resultsList);
@@ -100,26 +101,29 @@ void searchFirstStreet(GtkWidget *, ezgl::application *application){
     GtkTreeIter iter;
     
     //give the list of results for the user to choose from
-    for(int i = 0; i < results1.size() && i < 20; i++){
+    //display only up to 20 results
+    for(int i = 0; i < firstSearchResults.size() && i < 20; i++){
         ///append to the list as you go
         gtk_list_store_append(resultsList, &iter);
+        //set the new line by feeding values from firstSearchResults
         gtk_list_store_set(resultsList, &iter, 
-                            0, getStreetName(results1[i]).c_str(),
+                            0, getStreetName(firstSearchResults[i]).c_str(),
                             -1);
         
     }
 }
 
-//callback function of searching the second street
+//callback function of searching the first street
+//this is executed each time the signal changes ie. a keyboard input
 void searchSecondStreet(GtkWidget*, ezgl::application *application){
     
-    //street2 will hold what the user inputs
+    //street2 will hold what the user has input so far
     const char* street2 = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet2"));
     
-    //results2 stores the vector of results
-    results2 = findStreetIdsFromPartialStreetName(street2);
+    //secondSearchResults will hold the matching streets so far
+    secondSearchResults = findStreetIdsFromPartialStreetName(street2);
     
-    //retrieve object
+    //initialize resultsList for the list store
     auto resultsList = (GtkListStore *)(application->get_object("ResultsList"));
     //reset the list
     gtk_list_store_clear(resultsList);
@@ -127,42 +131,51 @@ void searchSecondStreet(GtkWidget*, ezgl::application *application){
     GtkTreeIter iter;
     
     //give the list of results for the user to choose from
-    for(int i = 0; i < results2.size() && i < 20; i++){
+    //display only up to 20 results
+    for(int i = 0; i < secondSearchResults.size() && i < 20; i++){
         //append to the list as you go
         gtk_list_store_append(resultsList, &iter);
+        //set the new line by feeding values from firstSearchResults
         gtk_list_store_set(resultsList, &iter, 
-                            0, getStreetName(results2[i]).c_str(),
-                            -1);
-        
+                            0, getStreetName(secondSearchResults[i]).c_str(),
+                            -1); 
     }
-
 }
 
+//this is called when "enter" is pressed in the search bar, to check if the input yields any matches
 void setFirstStreet(GtkWidget*, ezgl::application *application){
     //this executes when the user hits enter; hence check if it's a valid street
     //otherwise prompt the user for a complete input
+    
+    //take the input
     std::string firstStreet = gtk_entry_get_text((GtkEntry*) application -> get_object("SearchStreet1"));
     
+    //initialize bool value to false, set streetID to garbage value so it ensures a correct value must be set
     bool foundStreet = false;
     int matchingStreetID = -1;
     
     for(int i = 0; i < getNumStreets(); i++){
+        //if no streets found, break without action
         if(findStreetIdsFromPartialStreetName(firstStreet).size() == 0){
             break;
         }else if(firstStreet == getStreetName(i) || getStreetName(findStreetIdsFromPartialStreetName(firstStreet)[0]) == getStreetName(i)){
+            //if street exactly matches OR, if there is at least 1 match, take the first result
             matchingStreetID = i;
             foundStreet = true;
             break;
         }
     }
     if(foundStreet == false){
+        //if the for loop didn't find any matches
         std::cout << "The street does not exist" << std::endl;
     }else if(foundStreet == true){
+        //if matched, update values
         resultStreets.first = matchingStreetID;
         std::cout << "Street 1 is " << getStreetName(resultStreets.first) << "." << std::endl;
     }
 }
 
+//identical function as setFirstStreet, but with the second street
 void setSecondStreet(GtkWidget*, ezgl::application *application){
     //this executes when the user hits enter; hence check if it's a valid street
     //otherwise prompt the user for a complete input
@@ -189,30 +202,32 @@ void setSecondStreet(GtkWidget*, ezgl::application *application){
 
 }
 
+//called when Find Intersections button is clicked
 void displayIntersections(GtkWidget*, ezgl::application *application){
     
+    //deal with different cases
     if(findIntersectionsOfTwoStreets(resultStreets).size() == 0){
+        //if no intersections found
         std::cout << "No intersections found between the streets "<< std::endl;
     }else if(getStreetName(resultStreets.first) == "<unknown>" || getStreetName(resultStreets.second) == "<unknown>"){
+        //corner case where either street is unknown
         std::cout << "One or more inputs are unknown streets, please try again." << std::endl;
     }else if(findIntersectionsOfTwoStreets(resultStreets).size() > 0){
+        //if intersections found, highlight those intersections
         for(int i = 0; i < findIntersectionsOfTwoStreets(resultStreets).size(); i++){
             database.intersections[findIntersectionsOfTwoStreets(resultStreets)[i]].highlight = 1;
         }
+        //just for clarity
         std::cout << "Total number of intersections: " << findIntersectionsOfTwoStreets(resultStreets).size() << std::endl;
     }
-    
-    ezgl::rectangle initial_world({x_from_lon(getIntersectionPosition(findIntersectionsOfTwoStreets(resultStreets)[0]).longitude()-200), y_from_lat(getIntersectionPosition(findIntersectionsOfTwoStreets(resultStreets)[0]).latitude())-400},
-        {
-        x_from_lon(getIntersectionPosition(findIntersectionsOfTwoStreets(resultStreets)[0]).longitude()+200), y_from_lat(getIntersectionPosition(findIntersectionsOfTwoStreets(resultStreets)[0]).latitude())
-        });    
-        
-        
+ 
     application->refresh_drawing();
 }
 
+//called by the reset button, removes all highlights from intersections
 void resetIntersections(GtkWidget*, ezgl::application *application){
     
+    //if highlighted, undo highlight; if not highlighted, move on
     for(int i = 0; i < getNumIntersections(); i++){
         if(database.intersections[i].highlight == 1){
             database.intersections[i].highlight = 0;
@@ -221,7 +236,7 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
     application->refresh_drawing();
 }
 
-//for closing the dialog
+//for closing the dialog which pops up when there's an erroneous load map name
 void on_dialog_response(GtkDialog *dialog) {
 gtk_widget_destroy(GTK_WIDGET(dialog));
 }
@@ -299,13 +314,13 @@ void reloadMap(GtkWidget*, ezgl::application *application){
         //std::cout << cityName << std::endl;
     }
     else{
-        std::cout << "Invalid city name! Please re-enter." << std::endl; 
         
-        GObject *window = application->get_object(application->get_main_window_id().c_str());
+        GObject *window = application->get_object(application->get_main_window_id().c_str()); //pointer to main application window
         GtkWidget *content_area; // the content area of the dialog
-        GtkWidget *label; // the label we will create to display a message in the content
-        GtkWidget *dialog; // the dialog box we will create
+        GtkWidget *label; // writing inside the box
+        GtkWidget *dialog; // dialog box to be created
                 
+        //create new dialog, customized
         dialog = gtk_dialog_new_with_buttons(
                 "Load Error",
                 (GtkWindow*) window,
@@ -318,6 +333,7 @@ void reloadMap(GtkWidget*, ezgl::application *application){
         
         gtk_widget_show_all(dialog);
         
+        //connect the dialog for when OK is clicked
         g_signal_connect(
                 GTK_DIALOG(dialog),
                 "response",
@@ -328,13 +344,16 @@ void reloadMap(GtkWidget*, ezgl::application *application){
     }
 }
 
+//called when weather button clicked
 void displayWeather(GtkWidget*, ezgl::application *application){
         
+    //define variables to be used
     GObject *window;
     GtkWidget *content_area;
     GtkWidget *label;
     GtkWidget* dialog;
     
+    //pointer to main winddow
     window = application -> get_object(application->get_main_window_id().c_str());
     
     dialog = gtk_dialog_new_with_buttons(
@@ -346,12 +365,15 @@ void displayWeather(GtkWidget*, ezgl::application *application){
             );
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
+    //string to display on the dialog
+    //convert to char array
     std::string displayText1 = "Temperature: " + std::to_string(weatherData[0+cityNums]) + " (°C)\nFeels Like: " + std::to_string(weatherData[1+cityNums]) + " (°C)\nPressure: " + std::to_string(weatherData[2+cityNums]) + " (hPA)\nHumidity: "; 
     std::string displayText2 = std::to_string(weatherData[3+cityNums]) + " (Rh)\nWind Speed: " + std::to_string(weatherData[4+cityNums]) + " (m/s)\nWind Direction: " + std::to_string(weatherData[5+cityNums]) + " (°)";
     std::string displayText = displayText1 + displayText2;
     char displayCharArray[displayText.length()+1];
     strcpy(displayCharArray,displayText.c_str());
     
+    //input char array into the label
     label = gtk_label_new(displayCharArray);
     //temperature (celsius) 0, feels like (celsius) 1, pressure (hPa) 2, humidity (g/m^3) 3, wind speed (m/s) 4, wind degrees (deg) 5
     
@@ -359,6 +381,7 @@ void displayWeather(GtkWidget*, ezgl::application *application){
     
     gtk_widget_show_all(dialog);
     
+    //connect the OK button
     g_signal_connect(
         GTK_DIALOG(dialog),
         "response",
@@ -368,24 +391,14 @@ void displayWeather(GtkWidget*, ezgl::application *application){
     application -> refresh_drawing();
     
 }
-/*
-void displayResults(GtkWidget*, ezgl::application *application){
-    
-    GtkWidget* dialog = gtk_dialog_new();
-    
-    gtk_widget_show(dialog);
-}*/
-
-
+//initial setup, makes all the connections needed
 void initial_setup(ezgl::application *application, bool /*new_window*/){
     //searching street 1 and street 2
     g_signal_connect(application->get_object("SearchStreet1"), "changed", G_CALLBACK(searchFirstStreet), application);
     g_signal_connect(application->get_object("SearchStreet2"), "changed", G_CALLBACK(searchSecondStreet), application);
-    
     //asserting search term by pressing enter
     g_signal_connect(application->get_object("SearchStreet1"), "activate", G_CALLBACK(setFirstStreet), application);
     g_signal_connect(application->get_object("SearchStreet2"), "activate", G_CALLBACK(setSecondStreet), application);
-
     //find intersection button
     g_signal_connect(application->get_object("FindButton"), "clicked", G_CALLBACK(displayIntersections), application);
     //reset intersection button

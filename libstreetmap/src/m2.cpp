@@ -204,8 +204,8 @@ void reloadMap(GtkWidget*, ezgl::application *application){
             foundMatch = true;
             
             //close current map
-            closeMap();
             closeOSMDatabase();
+            closeMap();
             
             bool loadSucess = loadOSMDatabaseBIN("/cad2/ece297s/public/maps/" + fileNames[i]);
             if (loadSucess) {
@@ -224,6 +224,7 @@ void reloadMap(GtkWidget*, ezgl::application *application){
                 std::cout << "successfully loaded map" << std::endl; 
                 
                 //load weather
+                cityNums += 6;
                 loadCityWeatherData(fileNames[i]);
             }
         }

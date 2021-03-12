@@ -116,6 +116,7 @@ std::string chooseCity(std::string fileName){
 
 void loadCityWeatherData(std::string cityFile) {
     std::string cityName = chooseCity(cityFile);
+    cout << cityName << endl;
     
     CURLcode res = curl_global_init(CURL_GLOBAL_ALL);
     if (res != CURLE_OK) {

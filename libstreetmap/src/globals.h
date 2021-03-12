@@ -100,7 +100,6 @@ void draw_main_canvas(ezgl::renderer *g);
 void act_on_mouse_click(ezgl::application* app, GdkEventButton* event, double x, double y);
 
 extern std::vector<double> weatherData;
-extern std::string currentWeather;
 
 #endif /* GLOBALS_H */
 

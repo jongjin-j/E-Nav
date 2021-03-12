@@ -464,7 +464,7 @@ void closeMap() {
     std::unordered_map<OSMID, std::string> ().swap(database.OSMID_wayType);
     //std::unordered_map<OSMID, std::string> ().swap(database.OSMID_nodeType);
     //std::unordered_map<OSMID, const OSMNode*> ().swap(database.OSMID_nodePtr);
-
+    
     closeStreetDatabase();
 }
 

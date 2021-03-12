@@ -164,11 +164,45 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
 //GtkListStore* resultList = gtk_list_store_new(1, G_TYPE_STRING);
 
 void reloadMap(GtkWidget*, ezgl::application *application){
+    //reset and close database
+    closeMap();
+    closeOSMDatabase();
     
     //cityName is a char array that holds user input --> can use to call a new map
     //should check for invalid inputs
-    const char* cityName = gtk_entry_get_text((GtkEntry*) application -> get_object("LoadCity"));
-    std::cout << cityName << std::endl;
+    const char* cityNameChar = gtk_entry_get_text((GtkEntry*) application -> get_object("LoadCity"));
+    std::cout << cityNameChar << std::endl;
+   
+    std::string cityName(cityNameChar);
+        
+    cityName.erase(std::remove(cityName.begin(), cityName.end(), ' '), cityName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
+    std::transform(cityName.begin(), cityName.end(), cityName.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
+            
+    //load OSM database
+    for (int i=0; fileNames.size(); i++){
+        if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("osm.bin") != std::string::npos){
+            loadOSMDatabaseBIN(fileNames[i]);
+        }
+    }
+    
+    //load streets database
+    for (int i=0; fileNames.size(); i++){
+        if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("streets.bin") != std::string::npos){
+            loadMap(fileNames[i]);
+        }
+    }
+    
+    /*
+    //parse the map path
+    std::string filename = "something";
+    int lastSlash = filename.find_last_of("/");
+    filename.erase(0, lastSlash);
+    
+    int firstPeriod = filename.find_first_of(".");
+    filename.erase(firstPeriod, filename.length() - 1);
+    */
+   
+    application -> refresh_drawing();
     
 }
 
@@ -698,45 +732,3 @@ void drawMap() {
 
     application.run(initial_setup, act_on_mouse_click, nullptr, nullptr);
 }
-
-void changeMap(ezgl::application* app){
-    closeMap();
-    closeOSMDatabase();
-    
-    //clear the global variables (done in close map?)
-    
-    
-    std::string cityName;
-    std::cin >> cityName;
-    cityName.erase(std::remove(cityName.begin(), cityName.end(), ' '), cityName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
-    std::transform(cityName.begin(), cityName.end(), cityName.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
-            
-    //load OSM database
-    for (int i=0; fileNames.size(); i++){
-        if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("osm.bin") != std::string::npos){
-            loadOSMDatabaseBIN(fileNames[i]);
-        }
-    }
-    
-    //load streets database
-    for (int i=0; fileNames.size(); i++){
-        if (fileNames[i].find(cityName) != std::string::npos && fileNames[i].find("streets.bin") != std::string::npos){
-            loadMap(fileNames[i]);
-        }
-    }
-    
-    /*
-    //parse the map path
-    std::string filename = "something";
-    int lastSlash = filename.find_last_of("/");
-    filename.erase(0, lastSlash);
-    
-    int firstPeriod = filename.find_first_of(".");
-    filename.erase(firstPeriod, filename.length() - 1);
-    */
-   
-    app -> refresh_drawing();
-}
-
-
-//path: /cad2/ece297s/public/maps

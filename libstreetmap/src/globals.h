@@ -88,7 +88,7 @@ void searchFirstStreet(GtkWidget *widget, ezgl::application *application);
 void searchSecondStreet(GtkWidget *widget, ezgl::application *application);
 void displayIntersections(GtkWidget *widget, ezgl::application *application);
 void initial_setup(ezgl::application *application, bool /*new_window*/);
-void draw_POI_function(ezgl::renderer *g, ezgl::point2d center_point, double font, ezgl::surface *p, std::string name);
+void draw_POI_function(ezgl::renderer *g, ezgl::point2d center_point, double font, ezgl::surface *p, std::string name, double scope_length, double scope_height);
 void draw_important_POIs(ezgl::renderer *g, int i, double font);
 void draw_POIs(ezgl::renderer *g, int i, double font);
 void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i, ezgl::color colorChoice);

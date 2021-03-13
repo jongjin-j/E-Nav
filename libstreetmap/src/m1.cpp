@@ -83,12 +83,16 @@ double lat_from_y(double y) {
 
 //create a MultiMap of simplified street names and their indexes
 void simplifiedStreetNames_streetIdx (){
+    
+    //loop through the street indexes
     for(int i = 0; i < getNumStreets(); i++){
         std::string streetName = getStreetName(i);
         
         //remove blank spaces and change to lowercase 
         streetName.erase(std::remove(streetName.begin(), streetName.end(), ' '), streetName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
         std::transform(streetName.begin(), streetName.end(), streetName.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
+       
+        //push in the simplified street name and index in database
         (database.streetName_and_streetID).insert(std::make_pair(streetName,i)); 
     }    
 }
@@ -101,6 +105,8 @@ void intersections_streetSegments (){
     for (int intersection = 0; intersection < getNumIntersections(); ++intersection) {
         for (int i = 0; i < getNumIntersectionStreetSegment(intersection); ++i) {
             int ss_id = getIntersectionStreetSegment(intersection, i);
+            
+            //push street segment ID corresponding to intersection ID
             database.intersection_street_segments[intersection].push_back(ss_id);
         }
     }
@@ -114,6 +120,8 @@ void streetID_streetSegments(){
     for (int i = 0; i < getNumStreetSegments(); i++) {
         StreetSegmentInfo temp_segment = getStreetSegmentInfo(i);
         int temp_street_id = temp_segment.streetID;
+        
+        //push street segment ID corresponding to the street ID
         (database.streetID_street_segments)[temp_street_id].push_back(i);
     }
 }
@@ -508,7 +516,7 @@ double findStreetSegmentTravelTime(StreetSegmentIdx street_segment_id) {
     return database.street_segment_travelTime[street_segment_id];
 }
 
-//fin the closest intersection from the current position
+//find the closest intersection from the current position
 int findClosestIntersection(LatLon my_position) {
     int minDist, minIndex = 0;
 

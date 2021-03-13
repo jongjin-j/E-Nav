@@ -830,15 +830,17 @@ void draw_main_canvas(ezgl::renderer *g) {
         float x = database.intersections[id].x;
         float y = database.intersections[id].y;
         float radius = 1;
-        if(scope_length < 1800 && scope_length > 800){
-            radius = 1.5;
-        }
 
+        //when highlighted, draw all necessary info
         if (database.intersections[id].highlight) {
 
+            //this is where the png will be attached
             ezgl::point2d center(x, y);
+            //retrieve png image
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/redpin.png");
-            //g->draw_surface(png_surface, {center.x - 5, center.y + 16});
+            
+            //scope ratios are for adjusting where the image/text appears as a function of zoom distance
+            //adjust the center point so that the png fits nicely (by default, top left corner of the png is attached to the center point)
             double scopeRatioX = 0.00928098;
             double scopeRatioY = 0.05807086;
             g->draw_surface(png_surface, {center.x - scopeRatioX * scope_length, center.y + scopeRatioY * scope_height});
@@ -849,12 +851,10 @@ void draw_main_canvas(ezgl::renderer *g) {
             g->set_color(ezgl::BLACK);
             g->set_font_size(13);
             g->draw_text(center_point, database.intersections[id].name);
+            //0.0563237 is also a scope constant as described above
             ezgl::point2d info_point(x, y - (0.0563237) * (scope_height));
             std::string intersectionInfo = "Lon: " + std::to_string(getIntersectionPosition(id).longitude()) + " Lat: " + std::to_string(getIntersectionPosition(id).latitude());
             g->draw_text(info_point, intersectionInfo);
-            std::cout << scope_height << std::endl;
-            
-            
         } 
         else if(database.intersections[id].highlight == false && scope_length < 800){
             g->set_color(ezgl::GREY_55);

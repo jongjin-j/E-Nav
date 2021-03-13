@@ -242,6 +242,7 @@ void on_dialog_response(GtkDialog *dialog) {
 gtk_widget_destroy(GTK_WIDGET(dialog));
 }
 
+//reload the map to show other cities
 void reloadMap(GtkWidget*, ezgl::application *application){
     //true if city name is found in the directory
     bool foundMatch = false;

@@ -380,7 +380,7 @@ void displayWeather(GtkWidget*, ezgl::application *application){
     std::string displayText1 = "Temperature: " + std::to_string(weatherData[0+cityNums]) + " (°C)\nFeels Like: " + std::to_string(weatherData[1+cityNums]) + " (°C)\nPressure: " + std::to_string(weatherData[2+cityNums]) + " (hPA)\nHumidity: "; 
     std::string displayText2 = std::to_string(weatherData[3+cityNums]) + " (Rh)\nWind Speed: " + std::to_string(weatherData[4+cityNums]) + " (m/s)\nWind Direction: " + std::to_string(weatherData[5+cityNums]) + " (°)";
     std::string displayText = displayText1 + displayText2;
-    char displayCharArray[displayText.length()+1];
+    char *displayCharArray = new char[displayText.length()+1];
     strcpy(displayCharArray,displayText.c_str());
     
     //input char array into the label
@@ -399,7 +399,7 @@ void displayWeather(GtkWidget*, ezgl::application *application){
         NULL
     );
     application -> refresh_drawing();
-    
+    delete[]displayCharArray;
 }
 //initial setup, makes all the connections needed
 void initial_setup(ezgl::application *application, bool /*new_window*/){

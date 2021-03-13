@@ -13,7 +13,6 @@ using namespace std;
 using boost::property_tree::ptree;
 using boost::property_tree::read_json;
 std::vector<int> weatherData;
-std::string currentWeather;
 
 std::string chooseCity(std::string fileName);
 
@@ -87,7 +86,7 @@ std::string chooseCity(std::string fileName){
     if(fileName == "tehran_iran.streets.bin"){
         return "Tehran";
     }
-    if(fileName == "rio-de-janeiro.streets.bin"){
+    if(fileName == "rio-de-janeiro_brazil.streets.bin"){
         return "Rio de Janeiro";
     }
     if(fileName == "cairo_egypt.streets.bin"){
@@ -138,7 +137,7 @@ void loadCityWeatherData(std::string cityFile) {
         std::string secondPartOfURL = "&appid=69d3de6a38e4f0c9aa59c4235f670765";
         std::string finalURL = firstPartOfURL + cityName + secondPartOfURL;
         
-        char targetURL[finalURL.length()];
+        char *targetURL = new char[finalURL.length()];
         for(int i = 0; i < finalURL.length() + 1; i++){
             targetURL[i] = finalURL[i];
         }
@@ -169,6 +168,8 @@ void loadCityWeatherData(std::string cityFile) {
             istringstream issJsonData(myStruct.response);
             boost::property_tree::read_json(issJsonData, ptRoot);
 
+            std::cout << "Received buffer within struct is " << myStruct.size << "bytes:" << std::endl;
+            
             // Obtaining the data from the JSON file
             cout << "Loading Weather Data in " << cityName << ": " << endl;
             
@@ -200,6 +201,8 @@ void loadCityWeatherData(std::string cityFile) {
 
         curl_easy_cleanup(curlHandle);
         curlHandle = NULL;
+        
+        delete[]targetURL;
     }
 
     curl_global_cleanup();

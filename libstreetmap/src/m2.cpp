@@ -250,7 +250,6 @@ void reloadMap(GtkWidget*, ezgl::application *application){
     //cityName is a char array that holds user input --> can use to call a new map
     //should check for invalid inputs
     const char* cityNameChar = gtk_entry_get_text((GtkEntry*) application -> get_object("LoadCity"));
-    //std::cout << cityNameChar << std::endl;
    
     std::string cityName(cityNameChar);
         
@@ -262,9 +261,24 @@ void reloadMap(GtkWidget*, ezgl::application *application){
     //load OSM database
     for (int i = 0; i < fileNames.size(); i++){
         
-        //if found a matching city name
-        if ((fileNames[i].find(cityName) != std::string::npos) && (fileNames[i].find("osm.bin") != std::string::npos)){
+        //parse file name
+        std::string fileName = fileNames[i];
+        
+        //if file is osm.bin
+        if (fileName.find("osm.bin") != std::string::npos){
             
+            //if _ is found (not singapore, iceland)
+            if (fileName.find("_") != std::string::npos){
+                    fileName.erase(fileName.find("_"), fileName.length() - fileName.find("_"));
+            }
+            else {
+                    fileName.erase(fileName.find("."), fileName.length() - fileName.find("."));
+            }
+        }
+        
+        
+        //if found a matching city name
+        if (cityName == fileName){
             foundMatch = true;
             
             //close current map
@@ -283,8 +297,24 @@ void reloadMap(GtkWidget*, ezgl::application *application){
     //load streets database
     for (int i = 0; i < fileNames.size(); i++){
         
+        //parse file name
+        std::string fileName = fileNames[i];
+        
+        
+        //if file is streets.bin
+        if (fileName.find("streets.bin") != std::string::npos){
+            
+            //if _ is found (not singapore, iceland)
+            if (fileName.find("_") != std::string::npos){
+                    fileName.erase(fileName.find("_"), fileName.length() - fileName.find("_"));
+            }
+            else {
+                    fileName.erase(fileName.find("."), fileName.length() - fileName.find("."));
+            }
+        }
+        
         //if found a matching city name 
-        if ((fileNames[i].find(cityName) != std::string::npos) && (fileNames[i].find("streets.bin") != std::string::npos)){
+        if (cityName == fileName){
             
             //load the new map
             bool loadMapSuccess = loadMap("/cad2/ece297s/public/maps/" + fileNames[i]);
@@ -869,6 +899,7 @@ void draw_main_canvas(ezgl::renderer *g) {
             ezgl::point2d center_point(x, y + scopeRatioY * (1.15) * scope_height);
             g->set_color(ezgl::BLACK);
             g->set_font_size(13);
+            g->set_text_rotation(0);
             g->draw_text(center_point, database.intersections[id].name);
             //0.0563237 is also a scope constant as described above
             ezgl::point2d info_point(x, y - (0.0563237) * (scope_height));

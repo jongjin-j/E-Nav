@@ -276,6 +276,7 @@ void reloadMap(GtkWidget*, ezgl::application *application){
             if (loadSuccess) {
                 std::cout << "successfully loaded OSM database" << std::endl; 
             }
+            break;
         }
     }
     
@@ -294,6 +295,7 @@ void reloadMap(GtkWidget*, ezgl::application *application){
                 cityNums += 6;
                 loadCityWeatherData(fileNames[i]);
             }
+            break;
         }
     }
     

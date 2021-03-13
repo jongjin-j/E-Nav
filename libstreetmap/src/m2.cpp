@@ -840,16 +840,19 @@ void draw_main_canvas(ezgl::renderer *g) {
             ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/redpin.png");
             //g->draw_surface(png_surface, {center.x - 5, center.y + 16});
             double scopeRatioX = 0.00928098;
-            double scopeRatioY = 0.05407086;
+            double scopeRatioY = 0.05807086;
             g->draw_surface(png_surface, {center.x - scopeRatioX * scope_length, center.y + scopeRatioY * scope_height});
             ezgl::renderer::free_surface(png_surface);
             
             //print name of intersection
-            ezgl::point2d center_point(x, y + scopeRatioY* (1.15) * scope_height);
+            ezgl::point2d center_point(x, y + scopeRatioY * (1.15) * scope_height);
             g->set_color(ezgl::BLACK);
             g->set_font_size(13);
             g->draw_text(center_point, database.intersections[id].name);
-            //std::cout << "Closest Intersection: " << database.intersections[id].name << std::endl;
+            ezgl::point2d info_point(x, y - (0.0563237) * (scope_height));
+            std::string intersectionInfo = "Lon: " + std::to_string(getIntersectionPosition(id).longitude()) + " Lat: " + std::to_string(getIntersectionPosition(id).latitude());
+            g->draw_text(info_point, intersectionInfo);
+            std::cout << scope_height << std::endl;
             
             
         } 

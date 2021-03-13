@@ -326,7 +326,12 @@ void reloadMap(GtkWidget*, ezgl::application *application){
                 "Load Error",
                 (GtkWindow*) window,
                 GTK_DIALOG_MODAL,
-                ("OK")
+                NULL,
+                //added to supress warnings
+                GTK_RESPONSE_ACCEPT,
+                NULL,
+                GTK_RESPONSE_REJECT,
+                NULL
                 );
         content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
         label = gtk_label_new("Invalid map name entered. Please exit and try again.");
@@ -362,7 +367,11 @@ void displayWeather(GtkWidget*, ezgl::application *application){
             (GtkWindow*) window,
             GTK_DIALOG_MODAL,
             ("Close"),
-            GTK_RESPONSE_ACCEPT
+            //added to supress warnings
+            GTK_RESPONSE_ACCEPT,
+            NULL,
+            GTK_RESPONSE_REJECT,
+            NULL
             );
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 

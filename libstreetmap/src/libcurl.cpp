@@ -17,9 +17,9 @@ std::vector<int> weatherData;
 std::string chooseCity(std::string fileName);
 
 typedef struct MyCustomStruct {
-    char *url = NULL;
+    char *url = nullptr;
     unsigned int size = 0;
-    char *response = NULL;
+    char *response = nullptr;
 } MyCustomStruct;
 
 static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
@@ -29,7 +29,7 @@ static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
         // Reads from struct passed in from loadCityWeatherData
         cout << "Successfully queried page at URL: " << pMyStruct->url << endl;
 
-        if (pMyStruct->response == NULL) {
+        if (pMyStruct->response == nullptr) {
             // Case when first time write_data() is invoked
             pMyStruct->response = new char[nmemb + 1];
             strncpy(pMyStruct->response, (char *)buffer, nmemb);

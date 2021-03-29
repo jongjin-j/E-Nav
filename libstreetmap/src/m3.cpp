@@ -14,13 +14,21 @@
 #include "m3.h"
 
 #define NO_EDGE -1
+class Node;
+
+struct outEdge{
+    StreetSegmentIdx id;
+    Node* toNode;
+};
 
 class Node{
 public:
     IntersectionIdx id;
-    std::vector<StreetSegmentIdx> outgoingEdges;
+    std::vector<outEdge> outEdges;
     StreetSegmentIdx reachingEdge;
 };
+
+
 
 struct WaveElem{
     Node *node;
@@ -30,6 +38,8 @@ struct WaveElem{
         edgeID = id;
     }
 };
+
+
 
 std::vector<Node> intersection_nodes;
 
@@ -42,21 +52,33 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
 const IntersectionIdx intersect_id_destination,const double turn_penalty){
        
     //initializing database for intersection nodes
+    
+    //loop through the intersections
     for(int i = 0; i < getNumIntersections(); i++){
         intersection_nodes[i].id = i;
-        intersection_nodes[i].outgoingEdges = findStreetSegmentsOfIntersection(i);
         
-        for(int j = 0; j < intersection_nodes[i].outgoingEdges.size(); j++){
-            StreetSegmentInfo street_segment = getStreetSegmentInfo(intersection_nodes[i].outgoingEdges[j]);
-            if(street_segment.to == intersection_nodes[i].id && street_segment.oneWay){
-                intersection_nodes[i].outgoingEdges.erase(intersection_nodes[j].outgoingEdges.begin() + j);
-            }
+        //loop through the street segments of the intersection
+        for (int j = 0; j < getNumIntersectionStreetSegment(i); j++){
             
+            StreetSegmentInfo street_segment = getStreetSegmentInfo(getIntersectionStreetSegment(i,j));
+            
+            if(street_segment.from == intersection_nodes[i].id || street_segment.oneWay == false){
+                struct outEdge edge;
+                
+                edge.id = getIntersectionStreetSegment(i, j);
+                
+                if (street_segment.from == intersection_nodes[i].id){
+                    edge.toNode->id = street_segment.to;
+                }
+                
+                if (street_segment.to == intersection_nodes[i].id){
+                    edge.toNode->id = street_segment.from;
+                }
+                
+                intersection_nodes[i].outEdges.push_back(edge);
+            }
         }
-        
     }
-    
-    
 }
 
 bool bfsPath(Node* sourceNode, int destID){
@@ -72,7 +94,7 @@ bool bfsPath(Node* sourceNode, int destID){
             return true;
         }
         
-        for(int i = 0; i < curr.node->outgoingEdges.size(); i++){
+        for(int i = 0; i < curr.node->outEdges.size(); i++){
             
         }
     }

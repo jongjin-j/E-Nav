@@ -28,8 +28,6 @@ public:
     StreetSegmentIdx reachingEdge;
 };
 
-
-
 struct WaveElem{
     Node *node;
     int edgeID;
@@ -39,11 +37,33 @@ struct WaveElem{
     }
 };
 
-
-
 std::vector<Node> intersection_nodes;
+std::pair<LatLon,LatLon> fromToPoints;
 
 double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const double turn_penalty){
+    int pathSize = path.size();
+    
+    if(pathSize == 0){
+        return 0;
+    }
+    double totalTime = 0;
+
+    for(int i=0; i<pathSize; i++){
+        
+        fromToPoints = std::make_pair(getIntersectionPosition(getStreetSegmentInfo(path[i]).from),getIntersectionPosition(getStreetSegmentInfo(path[i]).to));
+        
+        double distance = findDistanceBetweenTwoPoints(fromToPoints);
+                
+        totalTime += distance / getStreetSegmentInfo(path[i]).speedLimit;
+        
+        if(i<pathSize-1){
+            if(getStreetSegmentInfo(path[i]).streetID != getStreetSegmentInfo(path[i+1]).streetID){
+                totalTime += turn_penalty;
+            }
+        }
+        
+    }
+    return totalTime;
     
 }
 

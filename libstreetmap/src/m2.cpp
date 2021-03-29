@@ -28,6 +28,9 @@ std::vector<std::string> fileNames;
 //number of cities loaded so far (needed in libcurl)
 int cityNums = 0;
 
+IntersectionIdx startIntersectionID = 0;
+IntersectionIdx destIntersectionID = 0;
+
 void setFirstStreet(GtkWidget*, ezgl::application *application);
 
 void setSecondStreet(GtkWidget*, ezgl::application *application);
@@ -235,8 +238,8 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
             database.intersections[i].highlight = 0;
         }
         if((database.intersections[i].start == 1) || (database.intersections[i].dest == 1)){
-            database.intersections[i].start == 0;
-            database.intersections[i].dest == 0;
+            database.intersections[i].start = 0;
+            database.intersections[i].dest = 0;
         }
     }
     application->refresh_drawing();
@@ -448,26 +451,26 @@ void selectFrom(GtkWidget*, ezgl::application *application){
     for(int i = 0; i<getNumIntersections(); i++){
         if((database.intersections[i].highlight == true)){
             if(database.intersections[i].dest == 0){
-             intName = database.intersections[i].name;
-             database.intersections[i].start = 1;
-             count++;    
+             intName = database.intersections[i].name;      //store name of intersection
+             startIntersectionID = i;                       //store intersection ID
+             database.intersections[i].start = 1;           //set boolean start
+             count++;                                       //prevent further intersections from being used
             }
              
         }
     }
     if(count==1){
-      std::cout << "Starting intersection is " << intName << std::endl;
-      //save the starting intersection ID
-      //later, add visuals to indicate starting
-      
-      
+      std::cout << "Starting intersection is " << intName << std::endl;      
+      //save the destination intersection ID
+      //later, add visuals to indicate destination
+      std::cout<< startIntersectionID << std::endl;
+
       
     }else if(count>1){
         std::cout << "Too many input arguments" << std::endl;
     }else{
         std::cout << "Please select a starting point" << std::endl;
     }
-    
     
 }
 
@@ -480,6 +483,7 @@ void selectTo(GtkWidget*, ezgl::application *application){
         if((database.intersections[i].highlight == true)){
             if(database.intersections[i].start == 0){
                intName = database.intersections[i].name;
+               destIntersectionID = i;                    //store intersection ID
                database.intersections[i].dest = 1;
                count++; 
             }
@@ -489,7 +493,8 @@ void selectTo(GtkWidget*, ezgl::application *application){
       std::cout << "Destination intersection is " << intName << std::endl;
       //save the destination intersection ID
       //later, add visuals to indicate destination
-      
+      std::cout<< destIntersectionID << std::endl;
+
       
     }else if(count>1){
         std::cout << "Too many input arguments" << std::endl;
@@ -499,7 +504,6 @@ void selectTo(GtkWidget*, ezgl::application *application){
 }
 
 void displayPath(GtkWidget*, ezgl::application *application){
-    
    
     std::vector<StreetSegmentIdx> example_path = {188312, 188319};    
     std::cout << computePathTravelTime(example_path,0) << std::endl;

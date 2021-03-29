@@ -6,6 +6,7 @@
 
 #include "m1.h"
 #include "m2.h"
+#include "m3.h"
 #include "ezgl/application.hpp"
 #include "ezgl/graphics.hpp"
 #include "StreetsDatabaseAPI.h"
@@ -434,6 +435,58 @@ void displayWeather(GtkWidget*, ezgl::application *application){
     application -> refresh_drawing();
     delete[]displayCharArray;
 }
+
+void selectFrom(GtkWidget*, ezgl::application *application){
+    //make sure only one intersection is highlighted
+    //return the id of that intersection
+    int count = 0;
+    std::string intName;
+    for(int i = 0; i<getNumIntersections(); i++){
+        if(database.intersections[i].highlight == true){
+            intName = database.intersections[i].name;
+            count++;
+        }
+    }
+    if(count==1){
+      std::cout << "Starting intersection is " << intName << std::endl;
+      
+    }else if(count>1){
+        std::cout << "Too many input arguments" << std::endl;
+    }else{
+        std::cout << "Please select a starting point" << std::endl;
+    }
+    //save the intersection ID
+    
+    
+}
+
+void selectTo(GtkWidget*, ezgl::application *application){
+    //make sure only one intersection is highlighted
+    //return the id of that intersection
+    int count = 0;
+    std::string intName;
+    for(int i = 0; i<getNumIntersections(); i++){
+        if(database.intersections[i].highlight == true){
+            intName = database.intersections[i].name;
+            count++;
+        }
+    }
+    if(count==1){
+      std::cout << "Destination intersection is " << intName << std::endl;
+    }else if(count>1){
+        std::cout << "Too many input arguments" << std::endl;
+    }else{
+        std::cout << "Please select a destination point" << std::endl;
+    }   
+}
+
+void displayPath(GtkWidget*, ezgl::application *application){
+    
+   
+    std::vector<StreetSegmentIdx> example_path = {188312, 188319};    
+    std::cout << computePathTravelTime(example_path,0) << std::endl;
+    
+}
 //initial setup, makes all the connections needed
 void initial_setup(ezgl::application *application, bool /*new_window*/){
     //searching street 1 and street 2
@@ -450,6 +503,13 @@ void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("LoadCity"), "activate", G_CALLBACK(reloadMap), application);
     //display weather button
     g_signal_connect(application->get_object("WeatherButton"), "clicked", G_CALLBACK(displayWeather), application);
+
+    //select FROM intersection
+    g_signal_connect(application->get_object("FromButton"), "clicked", G_CALLBACK(selectFrom), application);
+    //select TO intersection
+    g_signal_connect(application->get_object("ToButton"), "clicked", G_CALLBACK(selectTo), application);
+    //find path button
+    g_signal_connect(application->get_object("findPathButton"), "clicked", G_CALLBACK(displayPath), application);
 }
 
 

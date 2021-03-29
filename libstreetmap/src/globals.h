@@ -106,7 +106,7 @@ public:
 };
 
 //extern Node** intersection_nodes;
-extern Node* intersection_nodes;
+//extern std::vector<Node*> intersection_nodes;
 
 bool bfsPath(Node* sourceNode, int destID);
 Node* getNodeByID(IntersectionIdx ID);

@@ -21,10 +21,11 @@
 struct WaveElem{
     Node *node;             //node of wave element
     int edgeID;             //id of segment used to get here
-    double travelTime;      //total time taken to reach node   
-    WaveElem (Node *n, int id){
+    double travelTime = 0;      //total time taken to reach node   
+    WaveElem (Node *n, int id, float time){
         node = n;
         edgeID = id;
+        travelTime = time;
     }
 };
 
@@ -73,12 +74,14 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
 
 bool bfsPath(Node* sourceNode, int destID){
     std::list<WaveElem> wavefront;  //stores the next set of nodes to be sweeped
-    wavefront.push_back(WaveElem(sourceNode, NO_EDGE)); //initialize with source node
+    //wavefront.push_back(WaveElem(sourceNode, NO_EDGE)); //initialize with source node
     
     while(wavefront.size()!=0){
         WaveElem curr = wavefront.front();      //take the first in wavefront to be currentNode
         wavefront.pop_front();                  //remove node from wavefront
-        curr.node->reachingEdge = curr.edgeID;  //segID used to get here (-1 for source node)
+        //curr.node->reachingEdge = curr.edgeID;  //segID used to get here (-1 for source node)
+        
+        //Node *currNode = wave.node;
         
         if(curr.node->id == destID){
             return true;
@@ -86,7 +89,7 @@ bool bfsPath(Node* sourceNode, int destID){
         
         for(int i = 0; i < curr.node->outEdges.size(); i++){
             Node* toNode = curr.node->outEdges[i].toNode;                    //accesses the toNodes of outgoing segments                  
-            wavefront.push_back(WaveElem(toNode,curr.node->outEdges[i].id)); //adds that to the wavefront
+            //wavefront.push_back(WaveElem(toNode,curr.node->outEdges[i].id, )); //adds that to the wavefront
         }
     } 
     return false;

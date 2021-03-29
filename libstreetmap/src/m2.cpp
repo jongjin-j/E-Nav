@@ -234,6 +234,10 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
         if(database.intersections[i].highlight == 1){
             database.intersections[i].highlight = 0;
         }
+        if((database.intersections[i].start == 1) || (database.intersections[i].dest == 1)){
+            database.intersections[i].start == 0;
+            database.intersections[i].dest == 0;
+        }
     }
     application->refresh_drawing();
 }
@@ -442,9 +446,13 @@ void selectFrom(GtkWidget*, ezgl::application *application){
     int count = 0;
     std::string intName;
     for(int i = 0; i<getNumIntersections(); i++){
-        if(database.intersections[i].highlight == true){
-            intName = database.intersections[i].name;
-            count++;
+        if((database.intersections[i].highlight == true)){
+            if(database.intersections[i].dest == 0){
+             intName = database.intersections[i].name;
+             database.intersections[i].start = 1;
+             count++;    
+            }
+             
         }
     }
     if(count==1){
@@ -466,9 +474,12 @@ void selectTo(GtkWidget*, ezgl::application *application){
     int count = 0;
     std::string intName;
     for(int i = 0; i<getNumIntersections(); i++){
-        if(database.intersections[i].highlight == true){
-            intName = database.intersections[i].name;
-            count++;
+        if((database.intersections[i].highlight == true)){
+            if(database.intersections[i].start == 0){
+               intName = database.intersections[i].name;
+               database.intersections[i].dest = 1;
+               count++; 
+            }
         }
     }
     if(count==1){

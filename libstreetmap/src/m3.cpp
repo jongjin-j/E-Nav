@@ -54,7 +54,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
         
         double distance = findDistanceBetweenTwoPoints(fromToPoints);
                 
-        totalTime += distance / getStreetSegmentInfo(path[i]).speedLimit;
+        totalTime += (distance / getStreetSegmentInfo(path[i]).speedLimit);
         
         if(i<pathSize-1){
             if(getStreetSegmentInfo(path[i]).streetID != getStreetSegmentInfo(path[i+1]).streetID){

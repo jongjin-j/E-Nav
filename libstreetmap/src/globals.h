@@ -30,6 +30,8 @@ struct intersection_data {
     double x = 0;
     double y = 0;
     bool highlight = false;
+    bool start = false;
+    bool dest = false;
 };
 
 struct POI_data {

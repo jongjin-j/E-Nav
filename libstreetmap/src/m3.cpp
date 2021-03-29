@@ -77,7 +77,7 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
 const IntersectionIdx intersect_id_destination,const double turn_penalty){
        
     //initializing database for intersection nodes
-    
+
     //loop through the intersections
     for(int i = 0; i < getNumIntersections(); i++){
         intersection_nodes[i].id = i;
@@ -94,8 +94,8 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
                 
                 if (street_segment.from == intersection_nodes[i].id){
                     edge.toNode->id = street_segment.to;
-                }
-                
+}
+
                 if (street_segment.to == intersection_nodes[i].id){
                     edge.toNode->id = street_segment.from;
                 }
@@ -120,8 +120,8 @@ bool bfsPath(Node* sourceNode, int destID){
         }
         
         for(int i = 0; i < curr.node->outEdges.size(); i++){
-            Node* toNode = curr.node->outEdges[i].toNode;                    
-            wavefront.push_back(WaveElem(toNode,curr.node->outEdges[i].id)); 
+            Node* toNode = curr.node->outEdges[i].toNode;                    //accesses the toNodes of outgoing segments                  
+            wavefront.push_back(WaveElem(toNode,curr.node->outEdges[i].id)); //adds that to the wavefront
         }
     } 
     return false;

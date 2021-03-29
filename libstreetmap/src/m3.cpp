@@ -16,7 +16,7 @@
 
 #define NO_EDGE -1
 
-/*
+
 //waveElems have nodes with directions on how they got here
 struct WaveElem{
     Node *node;             //node of wave element
@@ -27,23 +27,20 @@ struct WaveElem{
         edgeID = id;
     }
 };
-*/
+
 extern struct databases database;
 std::pair<LatLon,LatLon> fromToPoints;
 /*
-Node* getNodeByID(IntersectionIdx ID){
-    bool found = false;
+Node* getNodeByID(IntersectionIdx ID){    
     
-    int i = 0;
-    
-    while (!found){
-        if (intersection_nodes[i]->id == ID){
-            found = true;
-            i++;
-            
-            return intersection_nodes[i];
+    for (int i = 0; i < getNumIntersections(); i++){
+        //if (intersection_nodes[i]->id == ID){      
+        if (i == ID){
+            return &intersection_nodes[i];
         }
     }
+    
+    return 0;
 }
 */
 double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const double turn_penalty){

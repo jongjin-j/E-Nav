@@ -25,7 +25,7 @@ extern int cityNums;
 
 extern IntersectionIdx startIntersectionID, destIntersectionID;
 
-//class Node;
+class Node;
 
 
 struct intersection_data {
@@ -58,12 +58,12 @@ struct street_data {
     bool reverse = false;
     std::string street_type;
 };
-/*
+
 struct outEdge{
     StreetSegmentIdx id;               
     Node* toNode;
 };
-*/
+
 struct databases {
     std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
     std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;
@@ -96,7 +96,7 @@ extern double max_lon;
 extern std::vector<std::string> fileNames;
 
 //extern std::string path;
-/*
+
 //m3.cpp function declaration
 class Node{
 public:
@@ -104,10 +104,12 @@ public:
     std::vector<outEdge> outEdges;      //outgoing segments of current node
     StreetSegmentIdx reachingEdge = 0;      //segment used to get here
 };
-*/
-//extern Node** intersection_nodes;
 
-//bool bfsPath(Node* sourceNode, int destID);
+//extern Node** intersection_nodes;
+extern Node* intersection_nodes;
+
+bool bfsPath(Node* sourceNode, int destID);
+Node* getNodeByID(IntersectionIdx ID);
 
 //m2.cpp function declaration
 const ezgl::color chooseFeatureColour(FeatureType x); 

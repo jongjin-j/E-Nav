@@ -55,7 +55,8 @@ double min_lat;
 double max_lon; 
 double min_lon; 
 
-//Node** intersection_nodes = new Node*[getNumIntersections()];
+//Node** intersection_nodes;
+//Node* intersection_nodes = new Node [getNumIntersections()];
 //std::string path; 
 
 
@@ -411,39 +412,45 @@ void POIDatabase_nonAmenity(){
 /*
 void createNodesfromIntersections(){
     //initializing database for intersection nodes
-    //Node** intersection_nodes = new Node*[getNumIntersections()];
+    //Node* intersection_nodes[getNumIntersections()];
             
     //loop through the intersections
     for(int i = 0; i < getNumIntersections(); i++){
         
-        intersection_nodes[i] = new Node;
+        //intersection_nodes[i] = new Node;
+        Node* temp = new Node;
         
-        intersection_nodes[i]->id = i;
+        //intersection_nodes[i].id = i;
+        temp->id = i;
+        //std::cout << intersection_nodes[i].id << std::endl;
         
         //loop through the street segments of the intersection
         for (int j = 0; j < getNumIntersectionStreetSegment(i); j++){
             
             StreetSegmentInfo street_segment = getStreetSegmentInfo(getIntersectionStreetSegment(i,j));
             
-            if(street_segment.from == intersection_nodes[i]->id || street_segment.oneWay == false){
+            //if(street_segment.from == intersection_nodes[i].id || street_segment.oneWay == false){
+            if(street_segment.from == temp.id || street_segment.oneWay == false){
                 struct outEdge edge;
                 
                 edge.id = getIntersectionStreetSegment(i, j);
                 
-                if (street_segment.from == intersection_nodes[i]->id){
-                    edge.toNode->id = street_segment.to;
+                if (street_segment.from == intersection_nodes[i].id){
+                    edge.toNode = getNodeByID(street_segment.to);
                 }
 
-                if (street_segment.to == intersection_nodes[i]->id){
-                    edge.toNode->id = street_segment.from;
+                if (street_segment.to == intersection_nodes[i].id){
+                    edge.toNode = getNodeByID(street_segment.from);
                 }
                 
                 intersection_nodes[i]->outEdges.push_back(edge);
             }
         }
     }
+    //std::cout << intersection_nodes[1]->id;
 }
 */
+
 //creating a vector of file names in a certain directory
 //code from https://www.systutorials.com/how-to-iterate-all-dirs-and-files-in-a-dir-in-c/
 int createFileList(std::string directoryPath) {

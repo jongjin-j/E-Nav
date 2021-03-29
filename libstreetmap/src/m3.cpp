@@ -120,10 +120,41 @@ bool bfsPath(Node* sourceNode, int destID){
         }
         
         for(int i = 0; i < curr.node->outEdges.size(); i++){
-            Node* toNode = curr.node->outEdges[i].toNode;                    //toNode are the child nodes; stemmed from each outEdge's toNode
-            wavefront.push_back(WaveElem(toNode,curr.node->outEdges[i].id)); //construct WaveElem with the toNode above and their id (used to get to )
+            Node* toNode = curr.node->outEdges[i].toNode;                    
+            wavefront.push_back(WaveElem(toNode,curr.node->outEdges[i].id)); 
         }
     } 
     return false;
     
+}
+
+std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
+    //vector stores the path to destination
+    std::vector<StreetSegmentIdx> pathToDest;            
+    Node* currNode;
+    
+    //find the destinationID
+    for(int i=0; i<getNumIntersections();i++){
+        if(intersection_nodes[i].id == destID){
+            //if match, destID = currentID
+            *currNode = intersection_nodes[i];
+        } 
+    }
+    //prevEdge stores what segment was used to get to destID
+    StreetSegmentIdx prevEdge = currNode->reachingEdge;
+    
+    while(prevEdge!=NO_EDGE){
+        //add the segment used to get to destID
+        pathToDest.push_back(prevEdge);
+        //find the prevNode of the prevNode
+        //store that into currNode
+        *currNode = intersection_nodes[getStreetSegmentInfo(prevEdge).from];
+        //obtain reaching edge and insert into vector
+        prevEdge = currNode->reachingEdge;
+    }
+
+    //reverse vector
+    std::reverse(path.begin(),path.end());
+ 
+    return pathToDest;
 }

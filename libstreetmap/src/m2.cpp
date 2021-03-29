@@ -520,7 +520,12 @@ void displayPath(GtkWidget*, ezgl::application *application){
     //bool found = bfsPath(sourceNode,100);
     //std::cout<<found<<std::endl;
     //readjust scope       
-        application->refresh_drawing();
+    
+    //if found, return a vector<Edge> path = bfsTraceBack(destID);
+    //bool found = bfsPath(137276, 137278);
+    //std::vector<StreetSegmentIdx> pather = bfsTraceBack(137278);
+    
+    application->refresh_drawing();
      
 }
 //initial setup, makes all the connections needed

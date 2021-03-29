@@ -70,7 +70,7 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
        
     
 }
-/*
+
 bool bfsPath(Node* sourceNode, int destID){
     std::list<WaveElem> wavefront;  //stores the next set of nodes to be sweeped
     wavefront.push_back(WaveElem(sourceNode, NO_EDGE)); //initialize with source node
@@ -123,4 +123,4 @@ std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
  
     return pathToDest;
 }
-*/
+

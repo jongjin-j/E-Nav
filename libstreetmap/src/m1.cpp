@@ -410,17 +410,23 @@ void POIDatabase_nonAmenity(){
     }
 }
 
-/*
+
 void createNodesfromIntersections(){
     //initializing database for intersection nodes
-    //Node* intersection_nodes[getNumIntersections()];
-    //intersection_nodes.resize(getNumIntersections());
+    intersection_nodes.resize(getNumIntersections());
             
     //loop through the intersections
     for(int i = 0; i < getNumIntersections(); i++){
         //intersection_nodes[i]->outEdges.resize(getNumIntersectionStreetSegment(i));
         Node* temp = new Node;
         temp->id = i;
+        intersection_nodes[i] = temp;
+    }
+    std::cout << intersection_nodes[0]->id << std::endl;
+    for(int i = 0; i < getNumIntersections(); i++){
+        //intersection_nodes[i]->outEdges.resize(getNumIntersectionStreetSegment(i));
+        /*Node* temp = new Node;
+        temp->id = i;*/
         
         //loop through the street segments of the intersection
         for (int j = 0; j < getNumIntersectionStreetSegment(i); j++){
@@ -428,17 +434,16 @@ void createNodesfromIntersections(){
             StreetSegmentInfo street_segment = getStreetSegmentInfo(getIntersectionStreetSegment(i,j));
             
             //if(street_segment.from == intersection_nodes[i].id || street_segment.oneWay == false){
-            if(street_segment.from == temp->id || street_segment.oneWay == false){
+            if(street_segment.from == intersection_nodes[i]->id || street_segment.oneWay == false){
                 outEdge edge;
                 
                 edge.id = getIntersectionStreetSegment(i, j);
                 
-                //Node* to = new Node;
                 
                 if (street_segment.from == i){
                     //to->id = street_segment.to;
                     //edge.toNode = to;
-                    edge.toNode = getNodeByID(i);
+                    edge.toNode = getNodeByID(street_segment.to);
                 }
 
                 if (street_segment.to == i){
@@ -450,11 +455,11 @@ void createNodesfromIntersections(){
                 intersection_nodes[i]->outEdges.push_back(edge);
             }
         }
-        intersection_nodes.push_back(temp);
+        //intersection_nodes.push_back(temp);
     }
-    //std::cout << intersection_nodes[1]->id;
+    
 }
-*/
+
 
 //creating a vector of file names in a certain directory
 //code from https://www.systutorials.com/how-to-iterate-all-dirs-and-files-in-a-dir-in-c/
@@ -507,7 +512,7 @@ bool loadMap(std::string map_streets_database_filename) {
     streets_database();
     OSMID_wayValue();
     POIDatabase_nonAmenity();
-    //createNodesfromIntersections();
+    createNodesfromIntersections();
     
   
     //load was successful

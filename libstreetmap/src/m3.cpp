@@ -31,6 +31,21 @@ struct WaveElem{
 extern struct databases database;
 std::pair<LatLon,LatLon> fromToPoints;
 
+Node* getNodeByID(IntersectionIdx ID){
+    bool found = false;
+    
+    int i = 0;
+    
+    while (!found){
+        if (database.intersection_nodes[i].id == ID){
+            found = true;
+            i++;
+            
+            return &database.intersection_nodes[i];
+        }
+    }
+}
+
 double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const double turn_penalty){
     int pathSize = path.size();
     double totalTime = 0;

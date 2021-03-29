@@ -464,8 +464,8 @@ void selectFrom(GtkWidget*, ezgl::application *application){
       //save the destination intersection ID
       //later, add visuals to indicate destination
       std::cout<< startIntersectionID << std::endl;
-
       
+
     }else if(count>1){
         std::cout << "Too many input arguments" << std::endl;
     }else{
@@ -503,11 +503,16 @@ void selectTo(GtkWidget*, ezgl::application *application){
     }   
 }
 
+std::vector<StreetSegmentIdx> example_path;    
+
 void displayPath(GtkWidget*, ezgl::application *application){
    
-    std::vector<StreetSegmentIdx> example_path = {188312, 188319};    
-    std::cout << computePathTravelTime(example_path,0) << std::endl;
+        example_path = {190148, 190131, 190162, 190163, 190164, 211005, 190175, 190174, 190173, 254928, 254929, 254930, 254931, 254932, 254933, 274507, 274508, 274505, 274506, 274509, 274510, 274494, 274496, 274503, 274499, 274500, 274497, 274498, 254934, 254935, 254936, 254937, 254938, 254939, 254940, 254941, 254942, 254943, 254944, 254945, 254946, 254947, 254952, 254953, 254954, 254955, 274516, 191610, 188477, 188478, 188479, 188480, 188481, 188482, 188483, 188500, 188501, 188502, 188503, 189019, 189020, 189021, 274560, 274559, 196717, 196713, 180588, 180587, 180589, 198728, 1089, 1090, 1091, 1092, 309901, 304215, 304214, 198716, 198715, 309902, 47097, 47098, 47099, 47100, 47101, 47102, 47103, 47104, 47105, 47106, 47107, 47108, 309893, 309894, 182225, 1081, 1082, 1083, 198664, 198665, 221336, 136992, 136993, 136991, 195382, 221339, 95607, 95608, 136472, 136467, 136468, 136469, 136470, 187975, 239741, 265939, 181281, 265519, 265516, 138398, 138399, 265513, 265523, 181280, 107234, 107233, 107228, 107226, 107223, 87841, 193063, 193065, 181279, 228895, 248398, 31594, 240538, 193785, 181277, 265529, 217409, 136923, 136924, 136925, 136926, 181275, 265534, 265536, 265537, 217410, 168735, 190972, 151095, 217414, 265554, 173852, 91785, 91782, 91783, 150125, 150126, 265545, 265542, 265543, 265544, 106190, 106189, 106200, 106201, 106202, 106203, 148917, 148918, 228975, 217418, 151089, 123553, 202142, 221350, 221351, 188011, 215406, 123551, 123552, 189600, 266403, 266402, 266406, 266409, 266411, 266408, 266410, 189599, 189597, 237131, 189598, 189601, 266412, 266413, 142859, 142860, 122175, 122176, 142864, 254372, 142865, 229859, 229855, 167875, 216943, 161942, 237648, 237649, 265598, 120921, 233496, 181624, 141360, 14304, 14303, 14302, 14301, 14300, 14299, 14298, 14297, 14296, 14295, 35152, 35151, 35150, 35149, 35148, 35147, 35146, 35145, 35144, 35143, 35142, 35141, 35140, 35139, 35138, 35157, 35156, 35155, 35154, 35153, 30937, 143347, 35127, 35128, 35129, 35130, 35131, 35132, 35133, 35134, 35135, 35136, 35137, 30961, 248999, 30944, 30945, 30946, 30947, 30948, 30949, 30950, 30951, 30952, 30953, 245312, 245313, 245314, 245315, 290353, 290352, 37980};
+        
+        std::cout << computePathTravelTime(example_path,0) << std::endl;
     
+    application->refresh_drawing();
+     
 }
 //initial setup, makes all the connections needed
 void initial_setup(ezgl::application *application, bool /*new_window*/){
@@ -688,6 +693,7 @@ void draw_important_POIs(ezgl::renderer *g, int i, double font){
 //drawing segments of streets
 void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i, ezgl::color colorChoice){
     g->set_color(colorChoice);
+    
     if(tempInfo.numCurvePoints == 0){
          g->draw_line({database.streets[i].start_x, database.streets[i].start_y}, {database.streets[i].end_x, database.streets[i].end_y});
     }   
@@ -825,15 +831,14 @@ void draw_main_canvas(ezgl::renderer *g) {
     
     //drawing streets
     for (int i = 0; i < getNumStreetSegments(); i++) {
-
-        //introduce white streets at a max scope of 12000 height & width        //suggestion. while loop?
+        
         if (scope_length < 7000 && scope_height < 7000) {
             //helper function to set width and color of line
             colourWidthSetter(g, 6, ezgl::WHITE);
             StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
             //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
             drawSegment(g, tempInfo, i, ezgl::WHITE);
-            
+                     
             //introduce bordered streets if scope within approx 2000
             if (scope_length < 2000 && scope_height < 1700) {
                 colourWidthSetter(g, 6, ezgl::color(130,130,130));
@@ -851,7 +856,7 @@ void draw_main_canvas(ezgl::renderer *g) {
                     g->set_line_width(18);
                 }
                 //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
-                drawSegment(g,tempInfo, i, ezgl::WHITE);
+                drawSegment(g,tempInfo, i, ezgl::WHITE); 
                 //then draw the street in white
                 colourWidthSetter(g, 4, ezgl::WHITE);
                 if(scope_length < 1000){
@@ -905,6 +910,8 @@ void draw_main_canvas(ezgl::renderer *g) {
                 //g->draw_line({streets[i].start_x, streets[i].start_y}, {streets[i].end_x, streets[i].end_y});
             }
         }
+
+
         
         if (scope_length < 1500 && scope_height < 1200) {
             if (findStreetSegmentLength(i) > 70 && scope.m_first.x < database.streets[i].mid_x && scope.m_second.x > database.streets[i].mid_x && scope.m_first.y < database.streets[i].mid_y && scope.m_second.y > database.streets[i].mid_y) {
@@ -995,7 +1002,16 @@ void draw_main_canvas(ezgl::renderer *g) {
         }
     }
 
-    //make the search box for street intersections
+    for(int i = 0; i < getNumStreetSegments(); i++){
+        for(int j = 0; j<example_path.size(); j++){
+            if(i==example_path[j]){
+            g->set_line_width(10);
+            StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
+            drawSegment(g, tempInfo, i, ezgl::BLUE);
+            }
+        }
+        
+    }
 
 }
 

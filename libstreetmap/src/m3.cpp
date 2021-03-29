@@ -40,6 +40,8 @@ struct WaveElem{
 std::vector<Node> intersection_nodes;
 std::pair<LatLon,LatLon> fromToPoints;
 
+//intersectionIDs are returned at (startIntersectionID, destIntersectionID)
+
 double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const double turn_penalty){
     int pathSize = path.size();
     

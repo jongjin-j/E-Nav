@@ -531,8 +531,8 @@ void displayPath(GtkWidget*, ezgl::application *application){
     //bool found = bfsPath(137276, 137278);
     //std::vector<StreetSegmentIdx> pather = bfsTraceBack(137278);
     
-    LatLonBounds newBounds;
 
+    //adjusting the scope based on the path size
     std::vector<double> latIntersections;
     std::vector<double> lonIntersections;
     

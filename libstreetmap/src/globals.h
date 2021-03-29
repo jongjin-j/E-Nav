@@ -143,6 +143,7 @@ void streets_database();
 void OSMID_wayValue();
 void POIDatabase_nonAmenity();
 int createFileList(std::string directoryPath);
+void createNodesfromIntersections();
 
 extern std::vector<int> weatherData;
 

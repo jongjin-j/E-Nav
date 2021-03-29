@@ -507,12 +507,14 @@ void selectTo(GtkWidget*, ezgl::application *application){
 std::vector<StreetSegmentIdx> example_path;    
 
 void displayPath(GtkWidget*, ezgl::application *application){
+    
+    //call the pathfinder and insert result into the example path
    
     example_path = {175216, 102514, 102515, 175313};
     //example_path = {1328, 4095, 4094, 136214, 136643, 136642, 136641, 136646, 136645, 112083, 112082, 112081, 112080, 112079, 112078, 112077, 112076, 112075, 112074, 112073, 112072, 146885, 1660, 1659, 1658, 1657, 1656, 1655, 761};            
     std::cout << computePathTravelTime(example_path,0) << std::endl;
     
-    application->refresh_drawing();
+        application->refresh_drawing();
      
 }
 //initial setup, makes all the connections needed

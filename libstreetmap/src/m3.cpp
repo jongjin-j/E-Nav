@@ -11,26 +11,30 @@
 #include <string>
 #include <string.h>
 #include <list>
+#include "m2.h"
 #include "m3.h"
 
 #define NO_EDGE -1
 class Node;
 
+//outedges are street segments with pointers to the nodes they go to
 struct outEdge{
-    StreetSegmentIdx id;
+    StreetSegmentIdx id;               
     Node* toNode;
 };
 
+//nodes have reaching edges and outgoing edges
 class Node{
 public:
     IntersectionIdx id;
-    std::vector<outEdge> outEdges;
-    StreetSegmentIdx reachingEdge;
+    std::vector<outEdge> outEdges;      //outgoing segments of current node
+    StreetSegmentIdx reachingEdge;      //segment used to get here
 };
 
+//waveElems have nodes with directions on how they got here
 struct WaveElem{
-    Node *node;
-    int edgeID;
+    Node *node;     //node of wave element
+    int edgeID;     //id of segment used to get here
     WaveElem (Node *n, int id){
         node = n;
         edgeID = id;
@@ -48,7 +52,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
     if(pathSize == 0){
         return 0;
     }
-
+    
     for(int i=0; i<pathSize; i++){
         
         fromToPoints = std::make_pair(getIntersectionPosition(getStreetSegmentInfo(path[i]).from),getIntersectionPosition(getStreetSegmentInfo(path[i]).to));
@@ -104,13 +108,13 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
 }
 
 bool bfsPath(Node* sourceNode, int destID){
-    std::list<WaveElem> wavefront;
-    wavefront.push_back(WaveElem(sourceNode, NO_EDGE));
+    std::list<WaveElem> wavefront;  //stores the next set of nodes to be sweeped
+    wavefront.push_back(WaveElem(sourceNode, NO_EDGE)); //initialize with source node
     
-    while(1){
-        WaveElem curr = wavefront.front();
-        wavefront.pop_front();
-        curr.node->reachingEdge = curr.edgeID;
+    while(wavefront.size()!=0){
+        WaveElem curr = wavefront.front();      //take the first in wavefront to be currentNode
+        wavefront.pop_front();                  //remove node from wavefront
+        curr.node->reachingEdge = curr.edgeID;  //segID used to get here (-1 for source node)
         
         if(curr.node->id == destID){
             return true;
@@ -120,5 +124,6 @@ bool bfsPath(Node* sourceNode, int destID){
             
         }
     }
+    return false;
     
 }

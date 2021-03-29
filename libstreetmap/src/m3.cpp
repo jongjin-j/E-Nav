@@ -16,19 +16,6 @@
 
 #define NO_EDGE -1
 
-//outedges are street segments with pointers to the nodes they go to
-struct outEdge{
-    StreetSegmentIdx id;               
-    Node* toNode;
-};
-
-//nodes have reaching edges and outgoing edges
-class Node{
-public:
-    IntersectionIdx id;
-    std::vector<outEdge> outEdges;      //outgoing segments of current node
-    StreetSegmentIdx reachingEdge;      //segment used to get here
-};
 
 //waveElems have nodes with directions on how they got here
 struct WaveElem{
@@ -41,7 +28,7 @@ struct WaveElem{
     }
 };
 
-std::vector<Node> intersection_nodes;
+extern struct databases database;
 std::pair<LatLon,LatLon> fromToPoints;
 
 double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const double turn_penalty){
@@ -77,34 +64,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
 std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx intersect_id_start, 
 const IntersectionIdx intersect_id_destination,const double turn_penalty){
        
-    //initializing database for intersection nodes
-
-    //loop through the intersections
-    for(int i = 0; i < getNumIntersections(); i++){
-        intersection_nodes[i].id = i;
-        
-        //loop through the street segments of the intersection
-        for (int j = 0; j < getNumIntersectionStreetSegment(i); j++){
-            
-            StreetSegmentInfo street_segment = getStreetSegmentInfo(getIntersectionStreetSegment(i,j));
-            
-            if(street_segment.from == intersection_nodes[i].id || street_segment.oneWay == false){
-                struct outEdge edge;
-                
-                edge.id = getIntersectionStreetSegment(i, j);
-                
-                if (street_segment.from == intersection_nodes[i].id){
-                    edge.toNode->id = street_segment.to;
-}
-
-                if (street_segment.to == intersection_nodes[i].id){
-                    edge.toNode->id = street_segment.from;
-                }
-                
-                intersection_nodes[i].outEdges.push_back(edge);
-            }
-        }
-    }
+    
 }
 
 bool bfsPath(Node* sourceNode, int destID){
@@ -136,9 +96,9 @@ std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
     
     //find the destinationID
     for(int i=0; i<getNumIntersections();i++){
-        if(intersection_nodes[i].id == destID){
+        if(database.intersection_nodes[i].id == destID){
             //if match, destID = currentID
-            *currNode = intersection_nodes[i];
+            *currNode = database.intersection_nodes[i];
         } 
     }
     //prevEdge stores what segment was used to get to destID
@@ -149,13 +109,13 @@ std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
         pathToDest.push_back(prevEdge);
         //find the prevNode of the prevNode
         //store that into currNode
-        *currNode = intersection_nodes[getStreetSegmentInfo(prevEdge).from];
+        *currNode = database.intersection_nodes[getStreetSegmentInfo(prevEdge).from];
         //obtain reaching edge and insert into vector
         prevEdge = currNode->reachingEdge;
     }
 
     //reverse vector
-    std::reverse(path.begin(),path.end());
+    std::reverse(pathToDest.begin(),pathToDest.end());
  
     return pathToDest;
 }

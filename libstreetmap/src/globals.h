@@ -25,6 +25,8 @@ extern int cityNums;
 
 extern IntersectionIdx startIntersectionID, destIntersectionID;
 
+class Node;
+
 
 struct intersection_data {
     std::string name;
@@ -57,6 +59,11 @@ struct street_data {
     std::string street_type;
 };
 
+struct outEdge{
+    StreetSegmentIdx id;               
+    Node* toNode;
+};
+
 struct databases {
     std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
     std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;
@@ -71,6 +78,7 @@ struct databases {
     std::vector<StreetIdx> results1; //stores the results from user search street 1
     std::vector<StreetIdx> results2; //stores the results from user search street 2
     std::unordered_map<OSMID, std::string> OSMID_wayType;
+    std::vector<Node> intersection_nodes;
     //std::unordered_map<OSMID, std::string> OSMID_nodeType;
     //std::unordered_map<OSMID, const OSMNode*> OSMID_nodePtr;
 };
@@ -84,10 +92,16 @@ extern double max_lon;
 
 extern std::vector<std::string> fileNames;
 
-extern std::string path;
+//extern std::string path;
 
 //m3.cpp function declaration
-class Node;
+class Node{
+public:
+    IntersectionIdx id = 0;
+    std::vector<outEdge> outEdges;      //outgoing segments of current node
+    StreetSegmentIdx reachingEdge = 0;      //segment used to get here
+};
+
 bool bfsPath(Node* sourceNode, int destID);
 
 //m2.cpp function declaration

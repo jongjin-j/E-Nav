@@ -55,7 +55,7 @@ double min_lat;
 double max_lon; 
 double min_lon; 
 
-std::string path; 
+//std::string path; 
 
 
 //implementing conversion functions
@@ -407,6 +407,37 @@ void POIDatabase_nonAmenity(){
     }
 }
 
+void createNodesfromIntersections(){
+    //initializing database for intersection nodes
+
+    //loop through the intersections
+    for(int i = 0; i < getNumIntersections(); i++){
+        database.intersection_nodes[i].id = i;
+        
+        //loop through the street segments of the intersection
+        for (int j = 0; j < getNumIntersectionStreetSegment(i); j++){
+            
+            StreetSegmentInfo street_segment = getStreetSegmentInfo(getIntersectionStreetSegment(i,j));
+            
+            if(street_segment.from == database.intersection_nodes[i].id || street_segment.oneWay == false){
+                struct outEdge edge;
+                
+                edge.id = getIntersectionStreetSegment(i, j);
+                
+                if (street_segment.from == database.intersection_nodes[i].id){
+                    edge.toNode->id = street_segment.to;
+                }
+
+                if (street_segment.to == database.intersection_nodes[i].id){
+                    edge.toNode->id = street_segment.from;
+                }
+                
+                database.intersection_nodes[i].outEdges.push_back(edge);
+            }
+        }
+    }
+}
+
 //creating a vector of file names in a certain directory
 //code from https://www.systutorials.com/how-to-iterate-all-dirs-and-files-in-a-dir-in-c/
 int createFileList(std::string directoryPath) {
@@ -458,6 +489,7 @@ bool loadMap(std::string map_streets_database_filename) {
     streets_database();
     OSMID_wayValue();
     POIDatabase_nonAmenity();
+    createNodesfromIntersections();
     
   
     //load was successful
@@ -484,6 +516,7 @@ void closeMap() {
     std::vector<StreetIdx> ().swap(database.results1); //stores the results from user search street 1
     std::vector<StreetIdx> ().swap(database.results2); //stores the results from user search street 2
     std::unordered_map<OSMID, std::string> ().swap(database.OSMID_wayType);
+    std::vector<Node> ().swap(database.intersection_nodes);
     
     //close the street database
     closeStreetDatabase();

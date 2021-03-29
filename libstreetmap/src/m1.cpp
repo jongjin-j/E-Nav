@@ -422,18 +422,14 @@ void createNodesfromIntersections(){
         temp->id = i;
         intersection_nodes[i] = temp;
     }
-    std::cout << intersection_nodes[0]->id << std::endl;
+    //std::cout << intersection_nodes[0]->id << std::endl;
+    
     for(int i = 0; i < getNumIntersections(); i++){
-        //intersection_nodes[i]->outEdges.resize(getNumIntersectionStreetSegment(i));
-        /*Node* temp = new Node;
-        temp->id = i;*/
-        
         //loop through the street segments of the intersection
         for (int j = 0; j < getNumIntersectionStreetSegment(i); j++){
             
             StreetSegmentInfo street_segment = getStreetSegmentInfo(getIntersectionStreetSegment(i,j));
             
-            //if(street_segment.from == intersection_nodes[i].id || street_segment.oneWay == false){
             if(street_segment.from == intersection_nodes[i]->id || street_segment.oneWay == false){
                 outEdge edge;
                 
@@ -441,23 +437,17 @@ void createNodesfromIntersections(){
                 
                 
                 if (street_segment.from == i){
-                    //to->id = street_segment.to;
-                    //edge.toNode = to;
                     edge.toNode = getNodeByID(street_segment.to);
                 }
 
                 if (street_segment.to == i){
-                    //to->id = street_segment.from;
-                    //edge.toNode = to;
                     edge.toNode = getNodeByID(i);
                 }
                 
                 intersection_nodes[i]->outEdges.push_back(edge);
             }
         }
-        //intersection_nodes.push_back(temp);
     }
-    
 }
 
 

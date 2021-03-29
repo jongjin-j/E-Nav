@@ -77,19 +77,27 @@ bool bfsPath(Node* sourceNode, int destID){
     //wavefront.push_back(WaveElem(sourceNode, NO_EDGE)); //initialize with source node
     
     while(wavefront.size()!=0){
-        WaveElem curr = wavefront.front();      //take the first in wavefront to be currentNode
+        WaveElem wave = wavefront.front();      //take the first in wavefront to be currentNode
         wavefront.pop_front();                  //remove node from wavefront
-        //curr.node->reachingEdge = curr.edgeID;  //segID used to get here (-1 for source node)
+        
+        Node *currNode = wave.node;
+        
+        if (wave.travelTime < currNode->bestTime) {
+            // Was this a better path to this node? Update if so.
+            currNode->reachingEdge = wave.edgeID;         
+            currNode->bestTime = wave.travelTime;
+            
+            if(currNode->id == destID){
+                return true;
+            }   
+        }
         
         //Node *currNode = wave.node;
         
-        if(curr.node->id == destID){
-            return true;
-        }
         
-        for(int i = 0; i < curr.node->outEdges.size(); i++){
-            Node* toNode = curr.node->outEdges[i].toNode;                    //accesses the toNodes of outgoing segments                  
-            //wavefront.push_back(WaveElem(toNode,curr.node->outEdges[i].id, )); //adds that to the wavefront
+        for(int i = 0; i < currNode->outEdges.size(); i++){
+            Node* toNode = currNode->outEdges[i].toNode;                    //accesses the toNodes of outgoing segments                  
+            wavefront.push_back(WaveElem(toNode,currNode->outEdges[i].id, currNode->bestTime + findStreetSegmentTravelTime(currNode->outEdges[i].id))); //adds that to the wavefront
         }
     } 
     return false;

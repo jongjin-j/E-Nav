@@ -514,6 +514,12 @@ void displayPath(GtkWidget*, ezgl::application *application){
     //example_path = {1328, 4095, 4094, 136214, 136643, 136642, 136641, 136646, 136645, 112083, 112082, 112081, 112080, 112079, 112078, 112077, 112076, 112075, 112074, 112073, 112072, 146885, 1660, 1659, 1658, 1657, 1656, 1655, 761};            
     std::cout << computePathTravelTime(example_path,0) << std::endl;
     
+    //call bfsPath
+    
+    //Node* sourceNode = getNodebyID(sourceID);
+    //bool found = bfsPath(sourceNode,100);
+    //std::cout<<found<<std::endl;
+    //readjust scope       
         application->refresh_drawing();
      
 }

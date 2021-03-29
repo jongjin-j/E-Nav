@@ -86,6 +86,10 @@ extern std::vector<std::string> fileNames;
 
 extern std::string path;
 
+//m3.cpp function declaration
+class Node;
+bool bfsPath(Node* sourceNode, int destID);
+
 //m2.cpp function declaration
 const ezgl::color chooseFeatureColour(FeatureType x); 
 void colourWidthSetter(ezgl::renderer *x, double width, ezgl::color colorChoice);

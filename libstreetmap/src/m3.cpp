@@ -16,7 +16,7 @@
 
 #define NO_EDGE -1
 
-
+/*
 //waveElems have nodes with directions on how they got here
 struct WaveElem{
     Node *node;             //node of wave element
@@ -27,25 +27,25 @@ struct WaveElem{
         edgeID = id;
     }
 };
-
+*/
 extern struct databases database;
 std::pair<LatLon,LatLon> fromToPoints;
-
+/*
 Node* getNodeByID(IntersectionIdx ID){
     bool found = false;
     
     int i = 0;
     
     while (!found){
-        if (database.intersection_nodes[i].id == ID){
+        if (intersection_nodes[i]->id == ID){
             found = true;
             i++;
             
-            return &database.intersection_nodes[i];
+            return intersection_nodes[i];
         }
     }
 }
-
+*/
 double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const double turn_penalty){
     int pathSize = path.size();
     double totalTime = 0;
@@ -81,7 +81,7 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
        
     
 }
-
+/*
 bool bfsPath(Node* sourceNode, int destID){
     std::list<WaveElem> wavefront;  //stores the next set of nodes to be sweeped
     wavefront.push_back(WaveElem(sourceNode, NO_EDGE)); //initialize with source node
@@ -111,9 +111,9 @@ std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
     
     //find the destinationID
     for(int i=0; i<getNumIntersections();i++){
-        if(database.intersection_nodes[i].id == destID){
+        if(intersection_nodes[i]->id == destID){
             //if match, destID = currentID
-            *currNode = database.intersection_nodes[i];
+            currNode = intersection_nodes[i];
         } 
     }
     //prevEdge stores what segment was used to get to destID
@@ -124,7 +124,7 @@ std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
         pathToDest.push_back(prevEdge);
         //find the prevNode of the prevNode
         //store that into currNode
-        *currNode = database.intersection_nodes[getStreetSegmentInfo(prevEdge).from];
+        currNode = intersection_nodes[getStreetSegmentInfo(prevEdge).from];
         //obtain reaching edge and insert into vector
         prevEdge = currNode->reachingEdge;
     }
@@ -134,3 +134,4 @@ std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
  
     return pathToDest;
 }
+*/

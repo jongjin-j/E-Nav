@@ -25,7 +25,7 @@ extern int cityNums;
 
 extern IntersectionIdx startIntersectionID, destIntersectionID;
 
-class Node;
+//class Node;
 
 
 struct intersection_data {
@@ -58,12 +58,12 @@ struct street_data {
     bool reverse = false;
     std::string street_type;
 };
-
+/*
 struct outEdge{
     StreetSegmentIdx id;               
     Node* toNode;
 };
-
+*/
 struct databases {
     std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
     std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;
@@ -78,10 +78,13 @@ struct databases {
     std::vector<StreetIdx> results1; //stores the results from user search street 1
     std::vector<StreetIdx> results2; //stores the results from user search street 2
     std::unordered_map<OSMID, std::string> OSMID_wayType;
-    std::vector<Node> intersection_nodes;
+    //Node **intersection_nodes = new Node[getNumIntersections()];
     //std::unordered_map<OSMID, std::string> OSMID_nodeType;
     //std::unordered_map<OSMID, const OSMNode*> OSMID_nodePtr;
 };
+
+
+
 
 extern float avg_lat;
 
@@ -93,7 +96,7 @@ extern double max_lon;
 extern std::vector<std::string> fileNames;
 
 //extern std::string path;
-
+/*
 //m3.cpp function declaration
 class Node{
 public:
@@ -101,8 +104,10 @@ public:
     std::vector<outEdge> outEdges;      //outgoing segments of current node
     StreetSegmentIdx reachingEdge = 0;      //segment used to get here
 };
+*/
+//extern Node** intersection_nodes;
 
-bool bfsPath(Node* sourceNode, int destID);
+//bool bfsPath(Node* sourceNode, int destID);
 
 //m2.cpp function declaration
 const ezgl::color chooseFeatureColour(FeatureType x); 

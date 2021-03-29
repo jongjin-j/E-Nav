@@ -410,15 +410,15 @@ void POIDatabase_nonAmenity(){
     }
 }
 
-
-/*void createNodesfromIntersections(){
+/*
+void createNodesfromIntersections(){
     //initializing database for intersection nodes
     //Node* intersection_nodes[getNumIntersections()];
-    intersection_nodes.resize(getNumIntersections());
+    //intersection_nodes.resize(getNumIntersections());
             
     //loop through the intersections
     for(int i = 0; i < getNumIntersections(); i++){
-        intersection_nodes[i]->outEdges.resize(getNumIntersectionStreetSegment(i));
+        //intersection_nodes[i]->outEdges.resize(getNumIntersectionStreetSegment(i));
         Node* temp = new Node;
         temp->id = i;
         
@@ -433,16 +433,18 @@ void POIDatabase_nonAmenity(){
                 
                 edge.id = getIntersectionStreetSegment(i, j);
                 
-                Node* to = new Node;
+                //Node* to = new Node;
                 
-                if (street_segment.from == intersection_nodes[i]->id){
-                    to->id = street_segment.to;
-                    edge.toNode = to;
+                if (street_segment.from == i){
+                    //to->id = street_segment.to;
+                    //edge.toNode = to;
+                    edge.toNode = getNodeByID(i);
                 }
 
-                if (street_segment.to == intersection_nodes[i]->id){
-                    to->id = street_segment.from;
-                    edge.toNode = to;
+                if (street_segment.to == i){
+                    //to->id = street_segment.from;
+                    //edge.toNode = to;
+                    edge.toNode = getNodeByID(i);
                 }
                 
                 intersection_nodes[i]->outEdges.push_back(edge);
@@ -451,8 +453,8 @@ void POIDatabase_nonAmenity(){
         intersection_nodes.push_back(temp);
     }
     //std::cout << intersection_nodes[1]->id;
-}*/
-
+}
+*/
 
 //creating a vector of file names in a certain directory
 //code from https://www.systutorials.com/how-to-iterate-all-dirs-and-files-in-a-dir-in-c/

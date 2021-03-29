@@ -457,13 +457,16 @@ void selectFrom(GtkWidget*, ezgl::application *application){
     }
     if(count==1){
       std::cout << "Starting intersection is " << intName << std::endl;
+      //save the starting intersection ID
+      //later, add visuals to indicate starting
+      
+      
       
     }else if(count>1){
         std::cout << "Too many input arguments" << std::endl;
     }else{
         std::cout << "Please select a starting point" << std::endl;
     }
-    //save the intersection ID
     
     
 }
@@ -484,6 +487,10 @@ void selectTo(GtkWidget*, ezgl::application *application){
     }
     if(count==1){
       std::cout << "Destination intersection is " << intName << std::endl;
+      //save the destination intersection ID
+      //later, add visuals to indicate destination
+      
+      
     }else if(count>1){
         std::cout << "Too many input arguments" << std::endl;
     }else{

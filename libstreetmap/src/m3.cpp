@@ -60,7 +60,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
         fromToPoints = std::make_pair(getIntersectionPosition(getStreetSegmentInfo(path[i]).from),getIntersectionPosition(getStreetSegmentInfo(path[i]).to));
         
         distance = findDistanceBetweenTwoPoints(fromToPoints);
-                
+             
         totalTime += (distance / getStreetSegmentInfo(path[i]).speedLimit);
         
         if(i<pathSize-1){

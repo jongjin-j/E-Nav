@@ -44,6 +44,8 @@ void reloadMap(GtkWidget*, ezgl::application *application);
 
 void displayWeather(GtkWidget*, ezgl::application *application);
 
+void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections);
+
 //helper function to choose colour from feature type
 const ezgl::color chooseFeatureColour(FeatureType x) {
 
@@ -554,27 +556,40 @@ void displayPath(GtkWidget*, ezgl::application *application){
     
     application->get_renderer()->set_visible_world(r);
     application->refresh_drawing();
+    
+    directionPrinter(example_path);
      
 }
 
 void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
     
     /* idea:
-     * 
+     * as long as the streetID is the same, add up
+     * if streetID changes; save the sum. print the streetID and travel distance so far, with instructions
+     * determine what kind of turn it is, and print directions
+     * as long as the streetID is the same, add up
+     * ...
+     * segment at i = pathForDirections.size()-1 is the final one
+     * this will reach the destination
     
     */
     double tempDistance = 0;
     
     for(int i=0; i < pathForDirections.size(); i++){
         
-        //first compute the length of the segment
+        std::string currentStreet = getStreetName(getStreetSegmentInfo(pathForDirections[i]).streetID);
+        
+        std::cout << getStreetName(getStreetSegmentInfo(pathForDirections[i]).streetID) << std::endl;
+        
+        if(i != pathForDirections.size()-1){
+            if(currentStreet != getStreetName(getStreetSegmentInfo(pathForDirections[i+1]).streetID)){
+            std::cout << "Make a turn" << std::endl;
+            }     
+        }
         
         tempDistance += findStreetSegmentLength(i);
         
-                
-       
-        
-        
+     
     }
     
     

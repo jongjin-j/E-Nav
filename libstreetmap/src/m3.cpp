@@ -40,21 +40,20 @@ struct WaveElem{
 std::vector<Node> intersection_nodes;
 std::pair<LatLon,LatLon> fromToPoints;
 
-//intersectionIDs are returned at (startIntersectionID, destIntersectionID)
-
 double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const double turn_penalty){
     int pathSize = path.size();
+    double totalTime = 0;
+    double distance = 0;
     
     if(pathSize == 0){
         return 0;
     }
-    double totalTime = 0;
 
     for(int i=0; i<pathSize; i++){
         
         fromToPoints = std::make_pair(getIntersectionPosition(getStreetSegmentInfo(path[i]).from),getIntersectionPosition(getStreetSegmentInfo(path[i]).to));
         
-        double distance = findDistanceBetweenTwoPoints(fromToPoints);
+        distance = findDistanceBetweenTwoPoints(fromToPoints);
                 
         totalTime += (distance / getStreetSegmentInfo(path[i]).speedLimit);
         
@@ -68,7 +67,8 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
     return totalTime;
     
 }
-
+//intersectionIDs are returned at (startIntersectionID, destIntersectionID)
+//take startIntersectionID and destIntersectionID as start and finish
 
 std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx intersect_id_start, 
 const IntersectionIdx intersect_id_destination,const double turn_penalty){

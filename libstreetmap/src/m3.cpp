@@ -32,8 +32,9 @@ public:
 
 //waveElems have nodes with directions on how they got here
 struct WaveElem{
-    Node *node;     //node of wave element
-    int edgeID;     //id of segment used to get here
+    Node *node;             //node of wave element
+    int edgeID;             //id of segment used to get here
+    double travelTime;      //total time taken to reach node   
     WaveElem (Node *n, int id){
         node = n;
         edgeID = id;

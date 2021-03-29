@@ -516,7 +516,6 @@ void displayPath(GtkWidget*, ezgl::application *application){
     //Node* sourceNode = getNodebyID(sourceID);
     //bool found = bfsPath(sourceNode,100);
     //std::cout<<found<<std::endl;
-    //readjust scope       
     /*
     Node* sourceNode;
     
@@ -530,6 +529,13 @@ void displayPath(GtkWidget*, ezgl::application *application){
     //bool found = bfsPath(137276, 137278);
     //std::vector<StreetSegmentIdx> pather = bfsTraceBack(137278);
     
+    //ezgl::rectangle newScope = application->get_renderer()->get_visible_world();
+    
+    ezgl::point2d first = ezgl::point2d(-6.35455e+06, 4.87847e+06);
+    ezgl::point2d second = ezgl::point2d(-6.35365e+06,4.87896e+06);
+    ezgl::rectangle r = {first,second};
+    
+    application->get_renderer()->set_visible_world(r);
     application->refresh_drawing();
      
 }
@@ -781,6 +787,12 @@ void draw_main_canvas(ezgl::renderer *g) {
     ezgl::rectangle scope = g->get_visible_world();
     double scope_length = scope.m_second.x - scope.m_first.x;
     double scope_height = scope.m_second.y - scope.m_first.y;
+    
+    std::cout << "   " << std::endl;
+    std::cout << scope.m_second.x << " " << scope.m_first.x << std::endl;
+    std::cout << scope.m_second.y << " " << scope.m_first.y << std::endl;
+    std::cout << scope_length << std::endl;
+    std::cout << scope_height << std::endl;
 
     //drawing features
     for (int i = 0; i < getNumFeatures(); i++) {
@@ -987,7 +999,7 @@ void draw_main_canvas(ezgl::renderer *g) {
         float x = database.intersections[id].x;
         float y = database.intersections[id].y;
         float radius = 1;
-
+        
         //when highlighted, draw all necessary info
         if (database.intersections[id].highlight) {
 

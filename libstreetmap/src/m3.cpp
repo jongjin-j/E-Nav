@@ -91,6 +91,7 @@ bool bfsPath(Node* sourceNode, int destID){
         wavefront.pop_front();                  //remove node from wavefront
         
         Node *currNode = wave.node;
+        //std::cout << currNode->id << std::endl;
         
         if (wave.travelTime < currNode->bestTime) {
             // Was this a better path to this node? Update if so.
@@ -118,19 +119,33 @@ std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
     
     //prevEdge stores what segment was used to get to destID
     StreetSegmentIdx prevEdge = currNode->reachingEdge;
+    //std::cout << prevEdge << std::endl;
+    //return pathToDest;
     
     while(prevEdge!=NO_EDGE){
+        //std::cout << prevEdge << std::endl;
+        //if (prevEdge == 9043){
+            //break;
+        //}
         //add the segment used to get to destID
         pathToDest.push_back(prevEdge);
         //find the prevNode of the prevNode
         //store that into currNode
-        currNode = intersection_nodes[getStreetSegmentInfo(prevEdge).from];
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(prevEdge);
+        //std::cout << getStreetName(ss_info.streetID) << std::endl;
+        
+        if (currNode->id == ss_info.to){
+            currNode = intersection_nodes[ss_info.from];
+        }
+        else if (currNode->id == ss_info.from){
+            currNode = intersection_nodes[ss_info.to];
+        }
         //obtain reaching edge and insert into vector
         prevEdge = currNode->reachingEdge;
     }
 
     //reverse vector
-    //std::reverse(pathToDest.begin(),pathToDest.end());
+    std::reverse(pathToDest.begin(),pathToDest.end());
  
     return pathToDest;
 }

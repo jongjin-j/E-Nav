@@ -574,29 +574,78 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
     application->refresh_drawing();
 }
 
+//only give input that is 2 or 3 digits
+int integerRound(int x){
+    
+    if((x%100)==0){
+        x-=(x%10);
+        return x;
+    }
+}
+
+double toKM(double x){
+    x /= 1000;
+    return x;
+}
+
+//returns a direction (N,S,W,E)
+std::string cardinalDirections(StreetSegmentIdx from, StreetSegmentIdx to){
+    std::string northSouth, westEast;
+    LatLon goingFrom = getIntersectionPosition(getStreetSegmentInfo(from).from);
+    LatLon goingTo = getIntersectionPosition(getStreetSegmentInfo(to).to);
+    
+    if(x_from_lon(goingFrom.longitude()) > x_from_lon(goingTo.longitude())){
+        westEast = "West";
+    }else{
+        westEast = "East";
+    }
+    if(y_from_lat(goingFrom.latitude()) > y_from_lat(goingTo.latitude())){
+        northSouth = "South";
+    }else{
+        northSouth = "North";
+    }
+    return (northSouth + westEast);
+}
+
 void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
 
     double tempDistance = 0;
-    int precision = 0;
+    std::string currentStreet, nextStreet;
     
     for(int i=0; i < pathForDirections.size(); i++){
-        //printing out the current street name
-        std::string currentStreet = getStreetName(getStreetSegmentInfo(pathForDirections[i]).streetID);
+        
+        currentStreet = getStreetName(getStreetSegmentInfo(pathForDirections[i]).streetID);
+        
+        if(i!=pathForDirections.size()-1){
+            nextStreet = getStreetName(getStreetSegmentInfo(pathForDirections[i+1]).streetID);
+        }
+        
         tempDistance += findStreetSegmentLength(pathForDirections[i]);
-  
+        
+        if(i==0){
+            std::cout << "Start on " << currentStreet << ", and head " << cardinalDirections(pathForDirections[i],pathForDirections[i+1]);  
+            std::cout << " towards " << nextStreet << std::endl;    // 'you are starting on chestnut st, heading northeast'
+        }
+        
         if(i != pathForDirections.size()-1){
-            if(currentStreet != getStreetName(getStreetSegmentInfo(pathForDirections[i+1]).streetID)){
-                std::cout << "Travel " << std::fixed << (int)tempDistance << "m on " << std::endl;
-                std::cout << currentStreet << std::endl;
-                std::cout << "Make a turn" << std::endl;
+            if(currentStreet != nextStreet){
+                
+                if(tempDistance<1000){
+                std::cout << "Travel " << std::fixed << integerRound((int)tempDistance) << "m" << std::endl;
+                }else if(tempDistance>999){
+                std::cout << "Travel " << std::fixed << std::setprecision(1) << toKM(tempDistance) << "km" << std::endl; 
+                }
+                std::cout << "Make a turn to " << nextStreet << std::endl;
                 tempDistance = 0;
             }
         }else if(i == pathForDirections.size()-1){
-                std::cout << "Travel " << (int)tempDistance << "m onto your destination " << std::endl;
-                std::cout << getStreetName(getStreetSegmentInfo(pathForDirections[i]).streetID) << std::endl;
+            if(tempDistance<1000){
+                std::cout << "Travel " << integerRound((int)tempDistance) << "m";
+            }else if(tempDistance>999){
+                std::cout << "Travel " << std::setprecision(1) << toKM(tempDistance) << "km";
+            }
+                std::cout << " to your destination" << std::endl;
         }
-        
-
     }   
 }
 //initial setup, makes all the connections needed

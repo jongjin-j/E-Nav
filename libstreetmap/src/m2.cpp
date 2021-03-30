@@ -46,6 +46,8 @@ void displayWeather(GtkWidget*, ezgl::application *application);
 
 void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections);
 
+void displayPath(GtkWidget*, ezgl::application *application);
+
 //helper function to choose colour from feature type
 const ezgl::color chooseFeatureColour(FeatureType x) {
 
@@ -229,25 +231,6 @@ void displayIntersections(GtkWidget*, ezgl::application *application){
         std::cout << "Total number of intersections: " << findIntersectionsOfTwoStreets(resultStreets).size() << std::endl;
     }
  
-    application->refresh_drawing();
-}
-
-bool resetPathHighlight = false;
-
-//called by the reset button, removes all highlights from intersections
-void resetIntersections(GtkWidget*, ezgl::application *application){
-    
-    //if highlighted, undo highlight; if not highlighted, move on
-    for(int i = 0; i < getNumIntersections(); i++){
-        if(database.intersections[i].highlight == 1){
-            database.intersections[i].highlight = 0;
-        }
-        if((database.intersections[i].start == 1) || (database.intersections[i].dest == 1)){
-            database.intersections[i].start = 0;
-            database.intersections[i].dest = 0;
-        }
-    }
-    resetPathHighlight = true;
     application->refresh_drawing();
 }
 
@@ -568,6 +551,27 @@ void displayPath(GtkWidget*, ezgl::application *application){
     
     directionPrinter(example_path);
      
+}
+
+//called by the reset button, removes all highlights from intersections
+void resetIntersections(GtkWidget*, ezgl::application *application){
+    
+    //if highlighted, undo highlight; if not highlighted, move on
+    for(int i = 0; i < getNumIntersections(); i++){
+        if(database.intersections[i].highlight == 1){
+            database.intersections[i].highlight = 0;
+        }
+        if((database.intersections[i].start == 1) || (database.intersections[i].dest == 1)){
+            database.intersections[i].start = 0;
+            database.intersections[i].dest = 0;
+        }
+    }
+    
+    if(example_path.size()!=0){
+        example_path.clear();
+    }
+    
+    application->refresh_drawing();
 }
 
 void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
@@ -1098,7 +1102,7 @@ void draw_main_canvas(ezgl::renderer *g) {
     }
 
     //drawing path
-    if(!resetPathHighlight){
+    if(example_path.size()!=0){
         for(int i = 0; i < getNumStreetSegments(); i++){
             for(int j = 0; j<example_path.size(); j++){
                 if(i==example_path[j]){
@@ -1109,10 +1113,7 @@ void draw_main_canvas(ezgl::renderer *g) {
             }
         }
     }
-    resetPathHighlight = false;
-    //set the scope to fit the path
-    //determine the bounds of the path, then use ratios to determine best fit
-
+    
 }
 
 void act_on_mouse_click(ezgl::application* app, GdkEventButton* , double x, double y) {

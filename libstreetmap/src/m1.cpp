@@ -545,6 +545,7 @@ void closeMap() {
     */
     
     //close the street database
+    closeOSMDatabase();
     closeStreetDatabase();
 }
 

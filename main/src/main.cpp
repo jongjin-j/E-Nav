@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
     
     drawMap();
     closeMap(); 
-    closeOSMDatabase();
+    //closeOSMDatabase();
 
     return SUCCESS_EXIT_CODE;
 }

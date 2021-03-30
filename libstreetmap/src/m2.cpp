@@ -268,7 +268,7 @@ void reloadMap(GtkWidget*, ezgl::application *application){
     cityName.erase(std::remove(cityName.begin(), cityName.end(), ' '), cityName.end()); //code snippet from https://stackoverflow.com/questions/20326356/how-to-remove-all-the-occurrences-of-a-char-in-c-string
     std::transform(cityName.begin(), cityName.end(), cityName.begin(), ::tolower); // code snippet from https://www.geeksforgeeks.org/conversion-whole-string-uppercase-lowercase-using-stl-c/
             
-    
+    /*
     //load OSM database
     for (int i = 0; i < fileNames.size(); i++){
         
@@ -304,6 +304,7 @@ void reloadMap(GtkWidget*, ezgl::application *application){
             break;
         }
     }
+    */
     
     //load streets database
     for (int i = 0; i < fileNames.size(); i++){
@@ -317,15 +318,20 @@ void reloadMap(GtkWidget*, ezgl::application *application){
             
             //if _ is found (not singapore, iceland)
             if (fileName.find("_") != std::string::npos){
-                    fileName.erase(fileName.find("_"), fileName.length() - fileName.find("_"));
+                fileName.erase(fileName.find("_"), fileName.length() - fileName.find("_"));
             }
             else {
-                    fileName.erase(fileName.find("."), fileName.length() - fileName.find("."));
+                fileName.erase(fileName.find("."), fileName.length() - fileName.find("."));
             }
         }
         
         //if found a matching city name 
         if (cityName == fileName){
+            foundMatch = true;
+            
+            //close current map
+            //closeOSMDatabase();
+            closeMap();
             
             //load the new map
             bool loadMapSuccess = loadMap("/cad2/ece297s/public/maps/" + fileNames[i]);

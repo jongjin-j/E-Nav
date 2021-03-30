@@ -79,9 +79,12 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
 
 bool bfsPath(Node* sourceNode, int destID){
     std::list<WaveElem> wavefront;  //stores the next set of nodes to be sweeped
-    //wavefront.push_back(WaveElem(sourceNode, NO_EDGE)); //initialize with source node
+    wavefront.push_back(WaveElem(sourceNode, NO_EDGE, 20)); //initialize with source node
     
     while(wavefront.size()!=0){
+        //make the wavefront into a heap
+        //std::make_heap(wavefront.begin(), wavefront.end());
+        
         WaveElem wave = wavefront.front();      //take the first in wavefront to be currentNode
         wavefront.pop_front();                  //remove node from wavefront
         
@@ -95,15 +98,14 @@ bool bfsPath(Node* sourceNode, int destID){
             if(currNode->id == destID){
                 return true;
             }   
-        }
-        
-        for(int i = 0; i < currNode->outEdges.size(); i++){
-            Node* toNode = currNode->outEdges[i].toNode;                    //accesses the toNodes of outgoing segments                  
-            wavefront.push_back(WaveElem(toNode,currNode->outEdges[i].id, currNode->bestTime + findStreetSegmentTravelTime(currNode->outEdges[i].id))); //adds that to the wavefront
+            
+            for(int i = 0; i < currNode->outEdges.size(); i++){
+                Node* toNode = currNode->outEdges[i].toNode;                    //accesses the toNodes of outgoing segments                  
+                wavefront.push_back(WaveElem(toNode,currNode->outEdges[i].id, currNode->bestTime + findStreetSegmentTravelTime(currNode->outEdges[i].id))); //adds that to the wavefront
+            }
         }
     } 
     return false;
-    
 }
 
 std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
@@ -126,7 +128,7 @@ std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
     }
 
     //reverse vector
-    std::reverse(pathToDest.begin(),pathToDest.end());
+    //std::reverse(pathToDest.begin(),pathToDest.end());
  
     return pathToDest;
 }

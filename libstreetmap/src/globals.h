@@ -103,7 +103,7 @@ public:
     IntersectionIdx id = 0;
     std::vector<outEdge> outEdges;      //outgoing segments of current node
     StreetSegmentIdx reachingEdge = 0;      //segment used to get here
-    double bestTime = 0;
+    double bestTime;
 };
 
 //extern Node** intersection_nodes;

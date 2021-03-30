@@ -448,8 +448,9 @@ void selectFrom(GtkWidget*, ezgl::application *application){
     //make sure only one intersection is highlighted
     //return the id of that intersection
     int count = 0;
+    int i;
     std::string intName;
-    for(int i = 0; i<getNumIntersections(); i++){
+    for(i = 0; i<getNumIntersections(); i++){
         if((database.intersections[i].highlight == true)){
             if(database.intersections[i].dest == 0){
              intName = database.intersections[i].name;      //store name of intersection
@@ -462,10 +463,10 @@ void selectFrom(GtkWidget*, ezgl::application *application){
     }
     if(count==1){
       std::cout << "Starting intersection is " << intName << std::endl;      
+      std::cout<< startIntersectionID << std::endl;
       //save the destination intersection ID
       //later, add visuals to indicate destination
-      std::cout<< startIntersectionID << std::endl;
-      
+           
      
     }else if(count>1){
         std::cout << "Too many input arguments" << std::endl;
@@ -492,10 +493,10 @@ void selectTo(GtkWidget*, ezgl::application *application){
     }
     if(count==1){
       std::cout << "Destination intersection is " << intName << std::endl;
+      std::cout<< destIntersectionID << std::endl;
       //save the destination intersection ID
       //later, add visuals to indicate destination
-      std::cout<< destIntersectionID << std::endl;
-
+      
       
     }else if(count>1){
         std::cout << "Too many input arguments" << std::endl;

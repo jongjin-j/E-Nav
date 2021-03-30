@@ -96,7 +96,7 @@ std::string chooseCity(std::string fileName){
         return "Hong Kong";
     }
     if(fileName == "saint-helena.streets.bin"){
-        return "Saint Helena";
+        return "Cape Town";
     }
     if(fileName == "new-york_usa.streets.bin"){
         return "New York";

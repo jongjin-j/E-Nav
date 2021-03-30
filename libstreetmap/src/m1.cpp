@@ -536,13 +536,12 @@ void closeMap() {
     std::vector<StreetIdx> ().swap(database.results1); //stores the results from user search street 1
     std::vector<StreetIdx> ().swap(database.results2); //stores the results from user search street 2
     std::unordered_map<OSMID, std::string> ().swap(database.OSMID_wayType);
-    /*
+    
     for (int i = 0; i < getNumIntersections(); i++){
         delete intersection_nodes[i];
     }
-    delete[] intersection_nodes;
-    intersection_nodes = nullptr;
-    */
+    std::vector<Node*> ().swap(intersection_nodes);
+    
     
     //close the street database
     closeOSMDatabase();

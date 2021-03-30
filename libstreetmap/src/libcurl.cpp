@@ -110,6 +110,9 @@ std::string chooseCity(std::string fileName){
     if(fileName == "hamilton_canada.streets.bin"){
         return "Hamilton";
     }
+    if(fileName == "golden-horseshoe_canada.streets.bin"){
+        return "Toronto";
+    }
     else{
         return "Toronto";
     }

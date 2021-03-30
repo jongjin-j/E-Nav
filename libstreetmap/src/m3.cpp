@@ -68,8 +68,14 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
 
 std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx intersect_id_start, 
 const IntersectionIdx intersect_id_destination,const double turn_penalty){
-       
+    Node *sourceNode = getNodeByID(intersect_id_start);
+    bool found = bfsPath(sourceNode, intersect_id_destination);
+    if(found){
+        //make path a global variable so it can be accessed by bfsTraceBack
+        std::vector<StreetSegmentIdx> path = bfsTraceBack(intersect_id_destination);
+    }
     
+    //take turn penalty into account by checking street name
 }
 
 bool bfsPath(Node* sourceNode, int destID){
@@ -92,9 +98,6 @@ bool bfsPath(Node* sourceNode, int destID){
             }   
         }
         
-        //Node *currNode = wave.node;
-        
-        
         for(int i = 0; i < currNode->outEdges.size(); i++){
             Node* toNode = currNode->outEdges[i].toNode;                    //accesses the toNodes of outgoing segments                  
             wavefront.push_back(WaveElem(toNode,currNode->outEdges[i].id, currNode->bestTime + findStreetSegmentTravelTime(currNode->outEdges[i].id))); //adds that to the wavefront
@@ -106,16 +109,10 @@ bool bfsPath(Node* sourceNode, int destID){
 
 std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
     //vector stores the path to destination
-    std::vector<StreetSegmentIdx> pathToDest;            
-    Node* currNode;
+    std::vector<StreetSegmentIdx> pathToDest; 
     
-    //find the destinationID
-    for(int i=0; i<getNumIntersections();i++){
-        if(intersection_nodes[i]->id == destID){
-            //if match, destID = currentID
-            currNode = intersection_nodes[i];
-        } 
-    }
+    Node* currNode = getNodeByID(destID);
+    
     //prevEdge stores what segment was used to get to destID
     StreetSegmentIdx prevEdge = currNode->reachingEdge;
     

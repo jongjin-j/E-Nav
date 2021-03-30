@@ -111,6 +111,7 @@ extern std::vector<Node*> intersection_nodes;
 
 bool bfsPath(Node* sourceNode, int destID);
 Node* getNodeByID(IntersectionIdx ID);
+std::vector<StreetSegmentIdx> bfsTraceBack(int destID);
 
 //m2.cpp function declaration
 const ezgl::color chooseFeatureColour(FeatureType x); 

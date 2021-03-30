@@ -232,6 +232,8 @@ void displayIntersections(GtkWidget*, ezgl::application *application){
     application->refresh_drawing();
 }
 
+bool resetPathHighlight = false;
+
 //called by the reset button, removes all highlights from intersections
 void resetIntersections(GtkWidget*, ezgl::application *application){
     
@@ -245,6 +247,7 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
             database.intersections[i].dest = 0;
         }
     }
+    resetPathHighlight = true;
     application->refresh_drawing();
 }
 
@@ -1095,15 +1098,18 @@ void draw_main_canvas(ezgl::renderer *g) {
     }
 
     //drawing path
-    for(int i = 0; i < getNumStreetSegments(); i++){
-        for(int j = 0; j<example_path.size(); j++){
-            if(i==example_path[j]){
-            g->set_line_width(10);
-            StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
-            drawSegment(g, tempInfo, i, ezgl::BLUE);
+    if(!resetPathHighlight){
+        for(int i = 0; i < getNumStreetSegments(); i++){
+            for(int j = 0; j<example_path.size(); j++){
+                if(i==example_path[j]){
+                g->set_line_width(10);
+                StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
+                drawSegment(g, tempInfo, i, ezgl::BLUE);
+                }
             }
         }
     }
+    resetPathHighlight = false;
     //set the scope to fit the path
     //determine the bounds of the path, then use ratios to determine best fit
 

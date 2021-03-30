@@ -60,13 +60,13 @@ int main(int argc, char** argv) {
     }
 
     //Load the map and related data structures
-    
+    /*
     bool load_OSM_success = loadOSMDatabaseBIN(map_name);
     if(!load_OSM_success) {
         std::cerr << "Failed to load OSM map '" << map_name << "'\n";
         return ERROR_EXIT_CODE;
     }
-    
+    */
     bool load_success = loadMap(map_path);
     if(!load_success) {
         std::cerr << "Failed to load map '" << map_path << "'\n";

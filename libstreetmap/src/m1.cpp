@@ -480,7 +480,14 @@ bool loadMap(std::string map_streets_database_filename) {
     std::cout << "loadMap: " << map_streets_database_filename << std::endl;
 
     // Load your map related data structures here.
-    //bool loading = loadOSMDatabaseBIN()
+    
+    //parsing the database name to OSM
+    std::string map_OSM_database_filename = map_streets_database_filename;
+    std::string toErase = "streets.bin";
+    map_OSM_database_filename.erase(map_OSM_database_filename.find(toErase), toErase.length());
+    map_OSM_database_filename += "osm.bin";
+    
+    bool loading = loadOSMDatabaseBIN(map_OSM_database_filename);
     load_successful = loadStreetsDatabaseBIN(map_streets_database_filename);
     
     //if the loading was not successful

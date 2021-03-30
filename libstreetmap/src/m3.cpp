@@ -79,7 +79,7 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
 
 bool bfsPath(Node* sourceNode, int destID){
     std::list<WaveElem> wavefront;  //stores the next set of nodes to be sweeped
-    wavefront.push_back(WaveElem(sourceNode, NO_EDGE, 20)); //initialize with source node
+    wavefront.push_back(WaveElem(sourceNode, NO_EDGE, 0)); //initialize with source node
     
     while(wavefront.size()!=0){
         //make the wavefront into a heap

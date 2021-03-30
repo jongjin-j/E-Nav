@@ -109,7 +109,7 @@ public:
 //extern Node** intersection_nodes;
 extern std::vector<Node*> intersection_nodes;
 
-bool bfsPath(Node* sourceNode, int destID);
+//bool bfsPath(Node* sourceNode, int destID);
 Node* getNodeByID(IntersectionIdx ID);
 std::vector<StreetSegmentIdx> bfsTraceBack(int destID);
 

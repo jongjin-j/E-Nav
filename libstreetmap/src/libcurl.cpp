@@ -180,7 +180,7 @@ void loadCityWeatherData(std::string cityFile) {
             int pressure = ptRoot.get<int>("main.pressure");
             int humidity = ptRoot.get<int>("main.humidity");
             double windSpeed = ptRoot.get<double>("wind.speed");
-            int windDegree = ptRoot.get<double>("wind.deg");
+            int windDegree = ptRoot.get<int>("wind.deg");
             
             // Store into vector weatherData
             weatherData.push_back(temp);

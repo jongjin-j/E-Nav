@@ -575,37 +575,29 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
 }
 
 void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
-    
-    /* idea:
-     * as long as the streetID is the same, add up
-     * if streetID changes; save the sum. print the streetID and travel distance so far, with instructions
-     * determine what kind of turn it is, and print directions
-     * as long as the streetID is the same, add up
-     * ...
-     * segment at i = pathForDirections.size()-1 is the final one
-     * this will reach the destination
-    
-    */
+
     double tempDistance = 0;
+    int precision = 0;
     
     for(int i=0; i < pathForDirections.size(); i++){
-        
+        //printing out the current street name
         std::string currentStreet = getStreetName(getStreetSegmentInfo(pathForDirections[i]).streetID);
-        
-        std::cout << getStreetName(getStreetSegmentInfo(pathForDirections[i]).streetID) << std::endl;
-        
+        tempDistance += findStreetSegmentLength(pathForDirections[i]);
+  
         if(i != pathForDirections.size()-1){
             if(currentStreet != getStreetName(getStreetSegmentInfo(pathForDirections[i+1]).streetID)){
-            std::cout << "Make a turn" << std::endl;
-            }     
+                std::cout << "Travel " << std::fixed << (int)tempDistance << "m on " << std::endl;
+                std::cout << currentStreet << std::endl;
+                std::cout << "Make a turn" << std::endl;
+                tempDistance = 0;
+            }
+        }else if(i == pathForDirections.size()-1){
+                std::cout << "Travel " << (int)tempDistance << "m onto your destination " << std::endl;
+                std::cout << getStreetName(getStreetSegmentInfo(pathForDirections[i]).streetID) << std::endl;
         }
         
-        tempDistance += findStreetSegmentLength(i);
-        
-     
-    }
-    
-    
+
+    }   
 }
 //initial setup, makes all the connections needed
 void initial_setup(ezgl::application *application, bool /*new_window*/){

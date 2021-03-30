@@ -39,29 +39,26 @@ Node* getNodeByID(IntersectionIdx ID){
 double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const double turn_penalty){
     int pathSize = path.size();
     double totalTime = 0;
-    double distance = 0;
     
     if(pathSize == 0){
         return 0;
     }
-    
-    for(int i=0; i<pathSize; i++){
-        
-        fromToPoints = std::make_pair(getIntersectionPosition(getStreetSegmentInfo(path[i]).from),getIntersectionPosition(getStreetSegmentInfo(path[i]).to));
-        
+
+    for(int i = 0; i < pathSize; i++){
+        /*fromToPoints = std::make_pair(getIntersectionPosition(getStreetSegmentInfo(path[i]).from),getIntersectionPosition(getStreetSegmentInfo(path[i]).to));
         distance = findDistanceBetweenTwoPoints(fromToPoints);
-             
-        totalTime += (distance / getStreetSegmentInfo(path[i]).speedLimit);
+        totalTime += (distance / getStreetSegmentInfo(path[i]).speedLimit);*/
         
-        if(i<pathSize-1){
+        totalTime += findStreetSegmentTravelTime(path[i]);
+        
+        if(i < pathSize - 1){
             if(getStreetSegmentInfo(path[i]).streetID != getStreetSegmentInfo(path[i+1]).streetID){
                 totalTime += turn_penalty;
             }
         }
-        
     }
-    return totalTime;
     
+    return totalTime;
 }
 //intersectionIDs are returned at (startIntersectionID, destIntersectionID)
 //take startIntersectionID and destIntersectionID as start and finish

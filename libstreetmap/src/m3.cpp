@@ -67,12 +67,14 @@ std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx
 const IntersectionIdx intersect_id_destination,const double turn_penalty){
     Node *sourceNode = getNodeByID(intersect_id_start);
     bool found = bfsPath(sourceNode, intersect_id_destination);
+    std::vector<StreetSegmentIdx> path;
     if(found){
         //make path a global variable so it can be accessed by bfsTraceBack
-        std::vector<StreetSegmentIdx> path = bfsTraceBack(intersect_id_destination);
+        path = bfsTraceBack(intersect_id_destination);
     }
     
     //take turn penalty into account by checking street name
+    return path;
 }
 
 bool bfsPath(Node* sourceNode, int destID){

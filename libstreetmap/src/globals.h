@@ -112,6 +112,7 @@ public:
     std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legal;
     StreetSegmentIdx reachingEdge;
     double bestTime = 10000000000;
+    bool turn = false;
     Node(int inter_id, std::vector<std::pair<int, int> > vec){
         id = inter_id;
         legal = vec;

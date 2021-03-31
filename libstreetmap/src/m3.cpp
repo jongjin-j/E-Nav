@@ -124,7 +124,13 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
         
         Node *currNode = wave.node;
         
-        if (wave.travelTime <= currNode->bestTime) {
+        double turnTime = 0;
+        
+        if(currNode->turn == true){
+            turnTime = timePenalty;
+        }
+        
+        if (wave.travelTime + turnTime <= currNode->bestTime) {
             // Was this a better path to this node? Update if so.
             currNode->reachingEdge = wave.edgeID;         
             currNode->bestTime = wave.travelTime;
@@ -136,22 +142,22 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
             for(int i = 0; i < currNode->legal.size(); i++){
                 it = intersections.find(currNode->legal[i].second);
                 
-                double turnTime = 0;
-                
-                if(currNode->reachingEdge != NO_EDGE){
-                    StreetSegmentInfo prev_segment = getStreetSegmentInfo(currNode->reachingEdge);
-                    StreetSegmentInfo next_segment = getStreetSegmentInfo(currNode->legal[i].first);
-
-                    if(prev_segment.streetID != next_segment.streetID){
-                        turnTime = timePenalty;
-                    }
-                }
-                
-                
                 if(it == intersections.end()){
                     std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(currNode->legal[i].second);
                     std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > valid = validSegmentsAndIntersections(adjacentSegments, currNode->legal[i].second);
                     Node *toNode = new Node(currNode->legal[i].second, valid);
+                    
+                    //---------------
+                    if(currNode->reachingEdge != NO_EDGE){
+                    StreetSegmentInfo prev_segment = getStreetSegmentInfo(currNode->reachingEdge);
+                    StreetSegmentInfo next_segment = getStreetSegmentInfo(currNode->legal[i].first);
+
+                        if(prev_segment.streetID != next_segment.streetID){
+                            toNode->turn = true;
+                        }
+                    }
+                    //-----------------
+                    
                     intersections.insert({currNode->legal[i].second, toNode});
                 }
                 
@@ -159,7 +165,7 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
 
                 //intersections.insert({currNode->legal[i].second, toNode});
                              
-                wavefront.push_back(WaveElem(it2->second, currNode->legal[i].first, currNode->bestTime + findStreetSegmentTravelTime(currNode->legal[i].first) + turnTime));
+                wavefront.push_back(WaveElem(it2->second, currNode->legal[i].first, currNode->bestTime + findStreetSegmentTravelTime(currNode->legal[i].first)));
             }
         }
     } 

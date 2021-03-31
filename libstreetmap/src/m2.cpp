@@ -419,9 +419,9 @@ void displayWeather(GtkWidget*, ezgl::application *application){
 
     //string to display on the dialog
     //convert to char array
-    std::string displayText1 = "Temperature: " + std::to_string(weatherData[0+cityNums]) + " (°C)\nFeels Like: " + std::to_string(weatherData[1+cityNums]) + " (°C)\nPressure: " + std::to_string(weatherData[2+cityNums]) + " (hPA)\nHumidity: "; 
-    std::string displayText2 = std::to_string(weatherData[3+cityNums]) + " (Rh)\nWind Speed: " + std::to_string(weatherData[4+cityNums]) + " (m/s)\nWind Direction: " + std::to_string(weatherData[5+cityNums]) + " (°)";
-    std::string displayText = displayText1 + displayText2;
+    std::string line1 = "Temperature: " + std::to_string(weatherData[0+cityNums]) + " (°C)\nFeels Like: " + std::to_string(weatherData[1+cityNums]) + " (°C)\nPressure: " + std::to_string(weatherData[2+cityNums]) + " (hPA)\nHumidity: "; 
+    std::string line2 = std::to_string(weatherData[3+cityNums]) + " (Rh)\nWind Speed: " + std::to_string(weatherData[4+cityNums]) + " (m/s)\nWind Direction: " + std::to_string(weatherData[5+cityNums]) + " (°)";
+    std::string displayText = line1 + line2;
     char *displayCharArray = new char[displayText.length()+1];
     strcpy(displayCharArray,displayText.c_str());
     
@@ -505,63 +505,110 @@ void selectTo(GtkWidget*, ezgl::application *application){
     }   
 }
 
+
+void displayErrorMessage(GtkWidget*, ezgl::application *application){
+        
+    //define variables to be used
+    GObject *window;
+    GtkWidget *content_area;
+    GtkWidget *label;
+    GtkWidget* dialog;
+    
+    //pointer to main winddow
+    window = application -> get_object(application->get_main_window_id().c_str());
+    
+    dialog = gtk_dialog_new_with_buttons(
+            "Using the map",
+            (GtkWindow*) window,
+            GTK_DIALOG_MODAL,
+            ("Close"),
+            //added to suppress warnings
+            GTK_RESPONSE_ACCEPT,
+            NULL,
+            GTK_RESPONSE_REJECT,
+            NULL
+            );
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+
+    //string to display on the dialog
+    //convert to char array
+    std::string row1 = "FINDING INTERSECTIONS:\n1. Enter Street1 and Street2. Make sure you press the enter key.\n";
+    std::string row2 = "2. Hit 'Find Intersections'. Corresponding intersections (if any) will be highlighted.";
+    std::string row3 = "\n\nFINDING DIRECTIONS:\n1. Highlight your starting intersection and press 'From'.\n2. Highlight your destination intersection and press 'To.";
+    std::string row4 = "\n3. Hit 'Find Directions'.\n4. The path will be highlighted and directions will be displayed.\n";
+
+    std::string displayText = row1 + row2 + row3 + row4;
+    char *displayCharArray = new char[displayText.length()+1];
+    strcpy(displayCharArray,displayText.c_str());
+    
+    //input char array into the label
+    label = gtk_label_new(displayCharArray);
+    //temperature (celsius) 0, feels like (celsius) 1, pressure (hPa) 2, humidity (g/m^3) 3, wind speed (m/s) 4, wind degrees (deg) 5
+    
+    gtk_container_add(GTK_CONTAINER(content_area), label);
+    
+    gtk_widget_show_all(dialog);
+    
+    //connect the OK button
+    g_signal_connect(
+        GTK_DIALOG(dialog),
+        "response",
+        G_CALLBACK(on_dialog_response),
+        NULL
+    );
+    application -> refresh_drawing();
+    delete[]displayCharArray;
+}
+
+
+
 std::vector<StreetSegmentIdx> example_path;    
 
 void displayPath(GtkWidget*, ezgl::application *application){
-    //call the pathfinder and insert result into the example path
-    //example_path = {188312, 188319}; 
-    example_path = findPathBetweenIntersections(109226, 15434, 0);
-    //example_path = findPathBetweenIntersections(1717, 1041, 0);
-    //example_path = {1328, 4095, 4094, 136214, 136643, 136642, 136641, 136646, 136645, 112083, 112082, 112081, 112080, 112079, 112078, 112077, 112076, 112075, 112074, 112073, 112072, 146885, 1660, 1659, 1658, 1657, 1656, 1655, 761};
-    //example_path = {188312, 188319};
-    int sum = destIntersectionID + startIntersectionID;
-    //example_path = {1328, 4095, 4094, 136214, 136643, 136642, 136641, 136646, 136645, 112083, 112082, 112081, 112080, 112079, 112078, 112077, 112076, 112075, 112074, 112073, 112072, 146885, 1660, 1659, 1658, 1657, 1656, 1655, 761};
-    //example_path = {1328};
-    //example_path = {175216, 102514, 102515, 175313};
-    //example_path = {190148, 190131, 190162, 190163, 190164, 211005, 190175, 190174, 190173, 254928, 254929, 254930, 254931, 254932, 254933, 274507, 274508, 274505, 274506, 274509, 274510, 274494, 274496, 274503, 274499, 274500, 274497, 274498, 254934, 254935, 254936, 254937, 254938, 254939, 254940, 254941, 254942, 254943, 254944, 254945, 254946, 254947, 254952, 254953, 254954, 254955, 274516, 191610, 188477, 188478, 188479, 188480, 188481, 188482, 188483, 188500, 188501, 188502, 188503, 189019, 189020, 189021, 274560, 274559, 196717, 196713, 180588, 180587, 180589, 198728, 1089, 1090, 1091, 1092, 309901, 304215, 304214, 198716, 198715, 309902, 47097, 47098, 47099, 47100, 47101, 47102, 47103, 47104, 47105, 47106, 47107, 47108, 309893, 309894, 182225, 1081, 1082, 1083, 198664, 198665, 221336, 136992, 136993, 136991, 195382, 221339, 95607, 95608, 136472, 136467, 136468, 136469, 136470, 187975, 239741, 265939, 181281, 265519, 265516, 138398, 138399, 265513, 265523, 181280, 107234, 107233, 107228, 107226, 107223, 87841, 193063, 193065, 181279, 228895, 248398, 31594, 240538, 193785, 181277, 265529, 217409, 136923, 136924, 136925, 136926, 181275, 265534, 265536, 265537, 217410, 168735, 190972, 151095, 217414, 265554, 173852, 91785, 91782, 91783, 150125, 150126, 265545, 265542, 265543, 265544, 106190, 106189, 106200, 106201, 106202, 106203, 148917, 148918, 228975, 217418, 151089, 123553, 202142, 221350, 221351, 188011, 215406, 123551, 123552, 189600, 266403, 266402, 266406, 266409, 266411, 266408, 266410, 189599, 189597, 237131, 189598, 189601, 266412, 266413, 142859, 142860, 122175, 122176, 142864, 254372, 142865, 229859, 229855, 167875, 216943, 161942, 237648, 237649, 265598, 120921, 233496, 181624, 141360, 14304, 14303, 14302, 14301, 14300, 14299, 14298, 14297, 14296, 14295, 35152, 35151, 35150, 35149, 35148, 35147, 35146, 35145, 35144, 35143, 35142, 35141, 35140, 35139, 35138, 35157, 35156, 35155, 35154, 35153, 30937, 143347, 35127, 35128, 35129, 35130, 35131, 35132, 35133, 35134, 35135, 35136, 35137, 30961, 248999, 30944, 30945, 30946, 30947, 30948, 30949, 30950, 30951, 30952, 30953, 245312, 245313, 245314, 245315, 290353, 290352, 37980};
-    std::cout << computePathTravelTime(example_path,0) << std::endl;
-        
-    //Node* sourceNode = getNodebyID(sourceID);
-    //bool found = bfsPath(sourceNode,100);
-    //std::cout<<found<<std::endl;
-    /*
-    Node* sourceNode;
     
-    for(int i=0; i<getNumIntersections(); i++){
-        if(intersection_nodes[i].id == input137276){
-            std::cout << bfsPath(intersection_nodes[i],137278) << std::endl;
+        //call the pathfinder and insert result into the example path
+        //example_path = {188312, 188319}; 
+        example_path = findPathBetweenIntersections(startIntersectionID,destIntersectionID,0);
+        
+        if((example_path.size()==0)|| (example_path.size()==1)){
+            return;
         }
-    }
-    */
-    //if found, return a vector<Edge> path = bfsTraceBack(destID);
-    //bool found = bfsPath(137276, 137278);
-    //std::vector<StreetSegmentIdx> pather = bfsTraceBack(137278);
 
-    //adjusting the scope based on the path size
-    std::vector<double> latIntersections;
-    std::vector<double> lonIntersections;
-    
-    for(int i=0; i < example_path.size();i++){
-        
-        lonIntersections.push_back(getIntersectionPosition(getStreetSegmentInfo(example_path[i]).to).longitude());
-        latIntersections.push_back(getIntersectionPosition(getStreetSegmentInfo(example_path[i]).to).latitude());
- 
-    }
-    double maxLon = *max_element(lonIntersections.begin(),lonIntersections.end())*(1.00007);
-    double minLon = *min_element(lonIntersections.begin(),lonIntersections.end())*(0.99995);
-    double maxLat = *max_element(latIntersections.begin(),latIntersections.end())*(1.00007);
-    double minLat = *min_element(latIntersections.begin(),latIntersections.end())*(0.99995);
-    
-    ezgl::point2d first = ezgl::point2d(x_from_lon(minLon), y_from_lat(minLat)); //x0,y0
-    ezgl::point2d second = ezgl::point2d(x_from_lon(maxLon), y_from_lat(maxLat)); //x1,y1
+        std::cout << startIntersectionID << " "  << destIntersectionID << std::endl;
+        //example_path = findPathBetweenIntersections(109226, 15434, 0);
+        //example_path = findPathBetweenIntersections(1717, 1041, 0);
+        //example_path = {188312, 188319};
+        //example_path = {1328, 4095, 4094, 136214, 136643, 136642, 136641, 136646, 136645, 112083, 112082, 112081, 112080, 112079, 112078, 112077, 112076, 112075, 112074, 112073, 112072, 146885, 1660, 1659, 1658, 1657, 1656, 1655, 761};
+        //example_path = {1328};
+        //example_path = {175216, 102514, 102515, 175313};
+        //example_path = {190148, 190131, 190162, 190163, 190164, 211005, 190175, 190174, 190173, 254928, 254929, 254930, 254931, 254932, 254933, 274507, 274508, 274505, 274506, 274509, 274510, 274494, 274496, 274503, 274499, 274500, 274497, 274498, 254934, 254935, 254936, 254937, 254938, 254939, 254940, 254941, 254942, 254943, 254944, 254945, 254946, 254947, 254952, 254953, 254954, 254955, 274516, 191610, 188477, 188478, 188479, 188480, 188481, 188482, 188483, 188500, 188501, 188502, 188503, 189019, 189020, 189021, 274560, 274559, 196717, 196713, 180588, 180587, 180589, 198728, 1089, 1090, 1091, 1092, 309901, 304215, 304214, 198716, 198715, 309902, 47097, 47098, 47099, 47100, 47101, 47102, 47103, 47104, 47105, 47106, 47107, 47108, 309893, 309894, 182225, 1081, 1082, 1083, 198664, 198665, 221336, 136992, 136993, 136991, 195382, 221339, 95607, 95608, 136472, 136467, 136468, 136469, 136470, 187975, 239741, 265939, 181281, 265519, 265516, 138398, 138399, 265513, 265523, 181280, 107234, 107233, 107228, 107226, 107223, 87841, 193063, 193065, 181279, 228895, 248398, 31594, 240538, 193785, 181277, 265529, 217409, 136923, 136924, 136925, 136926, 181275, 265534, 265536, 265537, 217410, 168735, 190972, 151095, 217414, 265554, 173852, 91785, 91782, 91783, 150125, 150126, 265545, 265542, 265543, 265544, 106190, 106189, 106200, 106201, 106202, 106203, 148917, 148918, 228975, 217418, 151089, 123553, 202142, 221350, 221351, 188011, 215406, 123551, 123552, 189600, 266403, 266402, 266406, 266409, 266411, 266408, 266410, 189599, 189597, 237131, 189598, 189601, 266412, 266413, 142859, 142860, 122175, 122176, 142864, 254372, 142865, 229859, 229855, 167875, 216943, 161942, 237648, 237649, 265598, 120921, 233496, 181624, 141360, 14304, 14303, 14302, 14301, 14300, 14299, 14298, 14297, 14296, 14295, 35152, 35151, 35150, 35149, 35148, 35147, 35146, 35145, 35144, 35143, 35142, 35141, 35140, 35139, 35138, 35157, 35156, 35155, 35154, 35153, 30937, 143347, 35127, 35128, 35129, 35130, 35131, 35132, 35133, 35134, 35135, 35136, 35137, 30961, 248999, 30944, 30945, 30946, 30947, 30948, 30949, 30950, 30951, 30952, 30953, 245312, 245313, 245314, 245315, 290353, 290352, 37980};
+        std::cout << "Total time in seconds is " << computePathTravelTime(example_path,0) << std::endl;
 
-    ezgl::rectangle r = {first,second};
+        //adjusting the scope based on the path size
+        std::vector<double> latIntersections;
+        std::vector<double> lonIntersections;
+
+        for(int i=0; i < example_path.size();i++){
+
+            lonIntersections.push_back(getIntersectionPosition(getStreetSegmentInfo(example_path[i]).to).longitude());
+            latIntersections.push_back(getIntersectionPosition(getStreetSegmentInfo(example_path[i]).to).latitude());
+
+        }
+        double maxLon = *max_element(lonIntersections.begin(),lonIntersections.end())*(1.00009);
+        double minLon = *min_element(lonIntersections.begin(),lonIntersections.end())*(0.99993);
+        double maxLat = *max_element(latIntersections.begin(),latIntersections.end())*(1.00009);
+        double minLat = *min_element(latIntersections.begin(),latIntersections.end())*(0.99993);
+
+        ezgl::point2d first = ezgl::point2d(x_from_lon(minLon), y_from_lat(minLat)); //x0,y0
+        ezgl::point2d second = ezgl::point2d(x_from_lon(maxLon), y_from_lat(maxLat)); //x1,y1
+
+        ezgl::rectangle r = {first,second};
+
+        application->get_renderer()->set_visible_world(r);
+        application->refresh_drawing();
+
+        directionPrinter(example_path);
     
-    application->get_renderer()->set_visible_world(r);
-    application->refresh_drawing();
-    
-    directionPrinter(example_path);
-     
 }
 
 //called by the reset button, removes all highlights from intersections
@@ -581,6 +628,10 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
     if(example_path.size()!=0){
         example_path.clear();
     }
+    //reset the from/to highlights
+    startIntersectionID = -1;
+    destIntersectionID = -1;
+    
     
     application->refresh_drawing();
 }
@@ -671,9 +722,6 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
         } 
     }
 }
-
-
-
 
 void displayHelp(GtkWidget*, ezgl::application *application){
         
@@ -1234,13 +1282,13 @@ void draw_main_canvas(ezgl::renderer *g) {
         for(int i = 0; i < getNumStreetSegments(); i++){
             for(int j = 0; j<example_path.size(); j++){
                 if(i==example_path[j]){
-                g->set_line_width(8);
+                g->set_line_width(3);
                 g->set_line_cap(ezgl::line_cap::butt);
                 StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
                 drawSegment(g, tempInfo, i, ezgl::BLUE);
                 }
             }
-        }
+        }     
     }
     
 }

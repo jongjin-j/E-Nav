@@ -84,11 +84,12 @@ int main(int argc, char** argv) {
 
     //You can now do something with the map data
     
-    std::vector<StreetSegmentIdx> path = findPathBetweenIntersections(1717, 1041, 0);
-    //std::cout << path.size() << std::endl;
+    std::vector<StreetSegmentIdx> path = findPathBetweenIntersections(1717, 1041, 15);
+    std::cout << path.size() << std::endl;
     for (int i = 0; i< path.size(); i++){
         std::cout << path[i] << std::endl; 
     }
+    std::cout << "total time: " << computePathTravelTime(path, 15) << std::endl;
     
     StreetSegmentInfo segment = getStreetSegmentInfo(29);
     std::string name = getStreetName(segment.streetID);

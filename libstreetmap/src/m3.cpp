@@ -99,7 +99,7 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
     
     intersections.insert({intersect_id_start, sourceNode});
     
-    bool found = bfsPath(intersections, intersect_id_start, intersect_id_destination);
+    bool found = bfsPath(intersections, intersect_id_start, intersect_id_destination, turn_penalty);
     
     std::vector<StreetSegmentIdx> path;
     if(found){
@@ -110,7 +110,7 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
     return path;
 }
 
-bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID){
+bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double timePenalty){
     std::list<WaveElem> wavefront;
     auto it = intersections.find(startID);
     wavefront.push_back(WaveElem(it->second, NO_EDGE, 0));
@@ -131,10 +131,22 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
             
             if(currNode->id == destID){
                 return true;
-            }   
+            }
             
             for(int i = 0; i < currNode->legal.size(); i++){
                 it = intersections.find(currNode->legal[i].second);
+                
+                double turnTime = 0;
+                
+                if(currNode->reachingEdge != NO_EDGE){
+                    StreetSegmentInfo prev_segment = getStreetSegmentInfo(currNode->reachingEdge);
+                    StreetSegmentInfo next_segment = getStreetSegmentInfo(currNode->legal[i].first);
+
+                    if(prev_segment.streetID != next_segment.streetID){
+                        turnTime = timePenalty;
+                    }
+                }
+                
                 
                 if(it == intersections.end()){
                     std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(currNode->legal[i].second);
@@ -147,7 +159,7 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
 
                 //intersections.insert({currNode->legal[i].second, toNode});
                              
-                wavefront.push_back(WaveElem(it2->second, currNode->legal[i].first, currNode->bestTime + findStreetSegmentTravelTime(currNode->legal[i].first)));
+                wavefront.push_back(WaveElem(it2->second, currNode->legal[i].first, currNode->bestTime + findStreetSegmentTravelTime(currNode->legal[i].first) + turnTime));
             }
         }
     } 

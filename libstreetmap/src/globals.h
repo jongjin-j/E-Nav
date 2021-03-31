@@ -127,7 +127,7 @@ public:
 //extern std::unordered_map<IntersectionIdx, Node*> intersections;
 //extern std::vector<Node*> intersection_nodes;
 
-bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID);
+bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double turnPenalty);
 Node* getNodeByID(IntersectionIdx ID);
 std::vector<StreetSegmentIdx> bfsTraceBack(std::unordered_map<IntersectionIdx, Node*>& intersections, int destID);
 

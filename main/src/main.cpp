@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
     //You can now do something with the map data
     
     std::vector<StreetSegmentIdx> path = findPathBetweenIntersections(1717, 1041, 0);
-    std::cout << path.size() << std::endl;
+    //std::cout << path.size() << std::endl;
     for (int i = 0; i< path.size(); i++){
         std::cout << path[i] << std::endl; 
     }

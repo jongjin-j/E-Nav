@@ -5,7 +5,7 @@
  */
 
 
-#include <iostream>
+/*#include <iostream>
 #include "m1.h"
 #include "globals.h"
 #include "StreetsDatabaseAPI.h"
@@ -172,4 +172,4 @@ std::vector<StreetSegmentIdx> TraceBack(int destID){
     }
     
     return pathToDest;
-}
+}*/

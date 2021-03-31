@@ -29,11 +29,15 @@ struct WaveElem{
     }
 };
 
-extern struct databases database;
-std::pair<LatLon,LatLon> fromToPoints;
+std::map<IntersectionIdx, Node*> intersections;
+
+//extern struct databases database;
+//std::pair<LatLon,LatLon> fromToPoints;
 
 Node* getNodeByID(IntersectionIdx ID){    
-    return intersection_nodes[ID];
+    auto it = intersections.find(ID);
+    Node *currNode = it->second;
+    return currNode;
 }
 
 double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const double turn_penalty){
@@ -45,10 +49,6 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
     }
 
     for(int i = 0; i < pathSize; i++){
-        /*fromToPoints = std::make_pair(getIntersectionPosition(getStreetSegmentInfo(path[i]).from),getIntersectionPosition(getStreetSegmentInfo(path[i]).to));
-        distance = findDistanceBetweenTwoPoints(fromToPoints);
-        totalTime += (distance / getStreetSegmentInfo(path[i]).speedLimit);*/
-        
         totalTime += findStreetSegmentTravelTime(path[i]);
         
         if(i < pathSize - 1){
@@ -63,12 +63,46 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
 //intersectionIDs are returned at (startIntersectionID, destIntersectionID)
 //take startIntersectionID and destIntersectionID as start and finish
 
-bool bfsPath(Node* sourceNode, int destID);
+std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > validSegmentsAndIntersections(std::vector<StreetSegmentIdx> segments, IntersectionIdx point){
+    std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legalSegmentsandIntersections;
+    
+    for(int i = 0; i < segments.size(); i++){
+        StreetSegmentInfo street_segment = getStreetSegmentInfo(segments[i]);
+        if(street_segment.from == point || street_segment.oneWay == false){
+            std::pair<StreetSegmentIdx, IntersectionIdx> pairing;
+                
+            if (street_segment.from == i){
+                pairing.first = segments[i];
+                pairing.second = street_segment.to;
+            }
+                
+            if (street_segment.to == i){
+                pairing.first = segments[i];
+                pairing.second = street_segment.from;
+            }
+                
+            legalSegmentsandIntersections.push_back(pairing);
+        }
+    }
+    
+    return legalSegmentsandIntersections;
+}
+
 
 std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx intersect_id_start, 
 const IntersectionIdx intersect_id_destination,const double turn_penalty){
-    Node *sourceNode = getNodeByID(intersect_id_start);
-    bool found = bfsPath(sourceNode, intersect_id_destination);
+    std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(intersect_id_start);
+    std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > valid = validSegmentsAndIntersections(adjacentSegments, intersect_id_start);
+    Node* sourceNode;
+    sourceNode->id = intersect_id_start;
+    sourceNode->legal = valid;
+    intersections.insert({intersect_id_start, sourceNode});
+    
+    bool found = bfsPath(intersect_id_start, intersect_id_destination);
+    
+    /*Node *sourceNode = getNodeByID(intersect_id_start);
+    bool found = bfsPath(sourceNode, intersect_id_destination);*/
+    
     std::vector<StreetSegmentIdx> path;
     if(found){
         //make path a global variable so it can be accessed by bfsTraceBack
@@ -79,9 +113,13 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
     return path;
 }
 
-bool bfsPath(Node* sourceNode, int destID){
-    std::list<WaveElem> wavefront;  //stores the next set of nodes to be sweeped
-    wavefront.push_back(WaveElem(sourceNode, NO_EDGE, 0)); //initialize with source node
+bool bfsPath(int startID, int destID){
+    //std::list<WaveElem> wavefront;  //stores the next set of nodes to be sweeped
+    //wavefront.push_back(WaveElem(sourceNode, NO_EDGE, 0)); //initialize with source node
+    
+    std::list<WaveElem> wavefront;
+    auto it = intersections.find(startID);
+    wavefront.push_back(WaveElem(it->second, NO_EDGE, 20)); 
     
     while(wavefront.size()!=0){
         //make the wavefront into a heap
@@ -102,16 +140,53 @@ bool bfsPath(Node* sourceNode, int destID){
                 return true;
             }   
             
-            for(int i = 0; i < currNode->outEdges.size(); i++){
+            for(int i = 0; i < currNode->legal.size(); i++){
+                std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(currNode->id);
+                std::vector<std::pair<StreetSegmentIdx, IntersectionIdx>> valid = validSegmentsAndIntersections(adjacentSegments, currNode->id);
+                Node *toNode;
+                toNode->id = currNode->legal[i].second;
+                toNode->legal = valid;             
+                wavefront.push_back(WaveElem(toNode, currNode->legal[i].second, currNode->bestTime + findStreetSegmentTravelTime(currNode->legal[i].first)));
+            }
+            
+            /*for(int i = 0; i < currNode->outEdges.size(); i++){
                 Node* toNode = currNode->outEdges[i].toNode;                    //accesses the toNodes of outgoing segments                  
                 wavefront.push_back(WaveElem(toNode,currNode->outEdges[i].id, currNode->bestTime + findStreetSegmentTravelTime(currNode->outEdges[i].id))); //adds that to the wavefront
-            }
+            }*/
         }
     } 
     return false;
 }
 
 std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
+    std::vector<StreetSegmentIdx> pathToDest; 
+    
+    auto it = intersections.find(destID);
+    Node *currNode = it->second;
+    StreetSegmentIdx prevEdge = currNode->reachingEdge;
+    
+    while(prevEdge != NO_EDGE){
+        pathToDest.push_back(prevEdge);
+        
+        StreetSegmentInfo street_segment = getStreetSegmentInfo(prevEdge);
+        
+        if(currNode->id == street_segment.from){
+            auto k = intersections.find(street_segment.to);
+            currNode = k->second;
+        }
+        
+        else if(currNode->id == street_segment.to){
+            auto k = intersections.find(street_segment.from);
+            currNode = k->second;
+        }
+        
+        prevEdge = currNode->reachingEdge;
+    }
+    
+    return pathToDest;
+}
+
+/*std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
     //vector stores the path to destination
     std::vector<StreetSegmentIdx> pathToDest; 
     
@@ -148,5 +223,5 @@ std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
     std::reverse(pathToDest.begin(),pathToDest.end());
  
     return pathToDest;
-}
+}*/
 

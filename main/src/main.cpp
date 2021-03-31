@@ -84,11 +84,11 @@ int main(int argc, char** argv) {
 
     //You can now do something with the map data
     
-    std::vector<StreetSegmentIdx> path = findPathBetweenIntersections(1, 2, 0);
+    /*std::vector<StreetSegmentIdx> path = findPathBetweenIntersections(1, 2, 0);
     for (int i=0; i<path.size();i++){
         std::cout << "h" << std::endl;
         std::cout << path[i] << std::endl; 
-    }
+    }*/
     
 
     //Clean-up the map data and related data structures

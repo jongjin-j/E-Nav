@@ -411,7 +411,7 @@ void POIDatabase_nonAmenity(){
 }
 
 
-void createNodesfromIntersections(){
+/*void createNodesfromIntersections(){
     //initializing database for intersection nodes
     intersection_nodes.resize(getNumIntersections());
             
@@ -449,7 +449,7 @@ void createNodesfromIntersections(){
             }
         }
     }
-}
+}*/
 
 
 //creating a vector of file names in a certain directory
@@ -510,7 +510,7 @@ bool loadMap(std::string map_streets_database_filename) {
     streets_database();
     OSMID_wayValue();
     POIDatabase_nonAmenity();
-    createNodesfromIntersections();
+    //createNodesfromIntersections();
     
   
     //load was successful
@@ -538,10 +538,10 @@ void closeMap() {
     std::vector<StreetIdx> ().swap(database.results2); //stores the results from user search street 2
     std::unordered_map<OSMID, std::string> ().swap(database.OSMID_wayType);
     
-    for (int i = 0; i < getNumIntersections(); i++){
+    /*for (int i = 0; i < getNumIntersections(); i++){
         delete intersection_nodes[i];
     }
-    std::vector<Node*> ().swap(intersection_nodes);
+    std::vector<Node*> ().swap(intersection_nodes);*/
     
     
     //close the street database

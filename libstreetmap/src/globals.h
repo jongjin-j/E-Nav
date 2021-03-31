@@ -25,7 +25,7 @@ extern int cityNums;
 
 extern IntersectionIdx startIntersectionID, destIntersectionID;
 
-class Node;
+//class Node;
 
 
 struct intersection_data {
@@ -59,10 +59,10 @@ struct street_data {
     std::string street_type;
 };
 
-struct outEdge{
+/*struct outEdge{
     StreetSegmentIdx id;               
     Node* toNode;
-};
+};*/
 
 struct databases {
     std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
@@ -98,19 +98,31 @@ extern std::vector<std::string> fileNames;
 //extern std::string path;
 
 //m3.cpp function declaration
-class Node{
+/*class Node{
 public:
     IntersectionIdx id = 0;
     std::vector<outEdge> outEdges;      //outgoing segments of current node
     StreetSegmentIdx reachingEdge = 0;      //segment used to get here
     double bestTime = 1000000000;
+};*/
+
+class Node{
+public:
+    IntersectionIdx id;
+    std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legal;
+    Node(int inter_id, std::vector<std::pair<int, int> > vec){
+        id = inter_id;
+        legal = vec;
+    }
+    StreetSegmentIdx reachingEdge;
+    double bestTime = 10000000;
 };
 
 
-//extern std::map<IntersectionIdx, Nodes*> intersections;
-extern std::vector<Node*> intersection_nodes;
+extern std::map<IntersectionIdx, Node*> intersections;
+//extern std::vector<Node*> intersection_nodes;
 
-bool bfsPath(Node* sourceNode, int destID);
+bool bfsPath(int startID, int destID);
 Node* getNodeByID(IntersectionIdx ID);
 std::vector<StreetSegmentIdx> bfsTraceBack(int destID);
 

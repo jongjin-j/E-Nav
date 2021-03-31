@@ -91,11 +91,12 @@ std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > validSegmentsAndInter
 
 std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx intersect_id_start, 
 const IntersectionIdx intersect_id_destination,const double turn_penalty){
+    
     std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(intersect_id_start);
     std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > valid = validSegmentsAndIntersections(adjacentSegments, intersect_id_start);
-    Node* sourceNode;
-    sourceNode->id = intersect_id_start;
-    sourceNode->legal = valid;
+    Node* sourceNode = new Node(intersect_id_start, valid);
+    //sourceNode->id = intersect_id_start;
+    //sourceNode->legal = valid;
     intersections.insert({intersect_id_start, sourceNode});
     
     bool found = bfsPath(intersect_id_start, intersect_id_destination);
@@ -119,7 +120,7 @@ bool bfsPath(int startID, int destID){
     
     std::list<WaveElem> wavefront;
     auto it = intersections.find(startID);
-    wavefront.push_back(WaveElem(it->second, NO_EDGE, 20)); 
+    wavefront.push_back(WaveElem(it->second, NO_EDGE, 0));
     
     while(wavefront.size()!=0){
         //make the wavefront into a heap
@@ -141,12 +142,14 @@ bool bfsPath(int startID, int destID){
             }   
             
             for(int i = 0; i < currNode->legal.size(); i++){
-                std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(currNode->id);
-                std::vector<std::pair<StreetSegmentIdx, IntersectionIdx>> valid = validSegmentsAndIntersections(adjacentSegments, currNode->id);
-                Node *toNode;
-                toNode->id = currNode->legal[i].second;
-                toNode->legal = valid;             
-                wavefront.push_back(WaveElem(toNode, currNode->legal[i].second, currNode->bestTime + findStreetSegmentTravelTime(currNode->legal[i].first)));
+                std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(currNode->legal[i].second);
+                std::vector<std::pair<StreetSegmentIdx, IntersectionIdx>> valid = validSegmentsAndIntersections(adjacentSegments, currNode->legal[i].second);
+                Node *toNode = new Node(currNode->legal[i].second, valid);
+                
+                intersections.insert({currNode->legal[i].second, toNode});
+                //toNode->id = currNode->legal[i].second;
+                //toNode->legal = valid;             
+                wavefront.push_back(WaveElem(toNode, currNode->legal[i].first, currNode->bestTime + findStreetSegmentTravelTime(currNode->legal[i].first)));
             }
             
             /*for(int i = 0; i < currNode->outEdges.size(); i++){

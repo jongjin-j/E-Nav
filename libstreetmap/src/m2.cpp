@@ -631,14 +631,12 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
     //reset the from/to highlights
     startIntersectionID = -1;
     destIntersectionID = -1;
-    
-    
+
     application->refresh_drawing();
 }
 
 //only give input that is 2 or 3 digits
 int integerRound(int x){
-    
     if((x%100)==0){
         x-=(x%10);
         return x;
@@ -651,22 +649,47 @@ double toKM(double x){
 }
 
 //returns a direction (N,S,W,E)
-std::string cardinalDirections(StreetSegmentIdx from, StreetSegmentIdx to){
+std::string cardinalDirections(StreetSegmentIdx curr){
     std::string northSouth, westEast;
-    LatLon goingFrom = getIntersectionPosition(getStreetSegmentInfo(from).from);
-    LatLon goingTo = getIntersectionPosition(getStreetSegmentInfo(to).from);
+    LatLon from = getIntersectionPosition(getStreetSegmentInfo(curr).from);
+    LatLon to = getIntersectionPosition(getStreetSegmentInfo(curr).to);
     
-        if(x_from_lon(goingFrom.longitude()) > x_from_lon(goingTo.longitude())){
+    //position of the starting intersection
+    double startX = x_from_lon(getIntersectionPosition(startIntersectionID).longitude());
+    double startY = y_from_lat(getIntersectionPosition(startIntersectionID).latitude());
+
+    //you have the current segment; compare from/to to see which is the one at the other end
+    
+    //if seg.from is start
+    if(from == getIntersectionPosition(startIntersectionID)){
+        
+        if(x_from_lon(from.longitude()) > x_from_lon(to.longitude())){
             westEast = "west";
         }else{
             westEast = "east";
         }
-        if(y_from_lat(goingFrom.latitude()) < y_from_lat(goingTo.latitude())){
+        if(y_from_lat(from.latitude()) < y_from_lat(to.latitude())){
+            northSouth = "North";
+        }else{
+            northSouth = "South";
+        }
+        
+    }else if(to == getIntersectionPosition(startIntersectionID)){
+        
+        if(x_from_lon(from.longitude()) > x_from_lon(to.longitude())){
+            westEast = "east";
+        }else{
+            westEast = "west";
+        }
+        if(y_from_lat(from.latitude()) < y_from_lat(to.latitude())){
             northSouth = "South";
         }else{
             northSouth = "North";
         }
-        return (northSouth + westEast);
+        
+    }
+    
+    return northSouth + westEast;
 }
 
 void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
@@ -696,8 +719,8 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
             tempDistance += findStreetSegmentLength(pathForDirections[i]);
 
             if(i==0){
-                std::cout << "Start on " << currentStreet << ", heading " << cardinalDirections(pathForDirections[i],pathForDirections[i+1]);  
-                std::cout << " towards " << nextStreet << std::endl;   
+                std::cout << "Head " << cardinalDirections(pathForDirections[i]) << " on " << currentStreet;
+                std::cout << " (towards " << nextStreet << ") " << std::endl;
             }
 
             if(i != pathForDirections.size()-1){

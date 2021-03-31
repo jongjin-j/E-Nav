@@ -653,10 +653,6 @@ std::string cardinalDirections(StreetSegmentIdx curr){
     std::string northSouth, westEast;
     LatLon from = getIntersectionPosition(getStreetSegmentInfo(curr).from);
     LatLon to = getIntersectionPosition(getStreetSegmentInfo(curr).to);
-    
-    //position of the starting intersection
-    double startX = x_from_lon(getIntersectionPosition(startIntersectionID).longitude());
-    double startY = y_from_lat(getIntersectionPosition(startIntersectionID).latitude());
 
     //you have the current segment; compare from/to to see which is the one at the other end
     
@@ -692,6 +688,10 @@ std::string cardinalDirections(StreetSegmentIdx curr){
     return northSouth + westEast;
 }
 
+void leftOrRight(){
+    
+}
+
 void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
 
     double tempDistance = 0;
@@ -713,14 +713,13 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
             currentStreet = getStreetName(getStreetSegmentInfo(pathForDirections[i]).streetID);
 
             if(i!=pathForDirections.size()-1){
-                nextStreet = getStreetName(getStreetSegmentInfo(pathForDirections[i+1]).streetID);
-            }
+                        nextStreet = getStreetName(getStreetSegmentInfo(pathForDirections[i+1]).streetID);
+                    }
 
             tempDistance += findStreetSegmentLength(pathForDirections[i]);
 
             if(i==0){
-                std::cout << "Head " << cardinalDirections(pathForDirections[i]) << " on " << currentStreet;
-                std::cout << " (towards " << nextStreet << ") " << std::endl;
+                std::cout << "Head " << cardinalDirections(pathForDirections[i]) << " on " << currentStreet << std::endl;
             }
 
             if(i != pathForDirections.size()-1){

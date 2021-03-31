@@ -110,21 +110,26 @@ class Node{
 public:
     IntersectionIdx id;
     std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legal;
+    StreetSegmentIdx reachingEdge;
+    double bestTime = 10000000000;
     Node(int inter_id, std::vector<std::pair<int, int> > vec){
         id = inter_id;
         legal = vec;
     }
-    StreetSegmentIdx reachingEdge;
-    double bestTime = 10000000;
+    Node(int inter_id, std::vector<std::pair<int, int> > vec, double time){
+        id = inter_id;
+        legal = vec;
+        bestTime = time;
+    }
 };
 
 
-extern std::map<IntersectionIdx, Node*> intersections;
+//extern std::unordered_map<IntersectionIdx, Node*> intersections;
 //extern std::vector<Node*> intersection_nodes;
 
-bool bfsPath(int startID, int destID);
+bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID);
 Node* getNodeByID(IntersectionIdx ID);
-std::vector<StreetSegmentIdx> bfsTraceBack(int destID);
+std::vector<StreetSegmentIdx> bfsTraceBack(std::unordered_map<IntersectionIdx, Node*>& intersections, int destID);
 
 //m2.cpp function declaration
 const ezgl::color chooseFeatureColour(FeatureType x); 

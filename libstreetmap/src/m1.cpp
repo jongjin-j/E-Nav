@@ -55,6 +55,8 @@ double min_lat;
 double max_lon; 
 double min_lon; 
 
+double maxSpeed = 0;
+
 //Node** intersection_nodes;
 //Node* intersection_nodes = new Node [getNumIntersections()];
 //std::string path; 
@@ -473,6 +475,22 @@ int createFileList(std::string directoryPath) {
     return 0;
 }
 
+//find the maximum speed limit in the city
+
+void findMaxSpeed(){
+    double limit;
+    
+    for (int i = 0; i < getNumStreetSegments(); i++){
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(i);
+        limit = ss_info.speedLimit;
+        
+        if (limit > maxSpeed){
+            maxSpeed = limit;
+        }
+    }
+    return;
+}
+
 //load the map and create all the databases needed 
 bool loadMap(std::string map_streets_database_filename) {
     bool load_successful = false; //Indicates whether the map has loaded 
@@ -510,6 +528,7 @@ bool loadMap(std::string map_streets_database_filename) {
     streets_database();
     OSMID_wayValue();
     POIDatabase_nonAmenity();
+    findMaxSpeed();
     //createNodesfromIntersections();
     
   

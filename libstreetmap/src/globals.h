@@ -93,6 +93,8 @@ extern double max_lat;
 extern double min_lon;
 extern double max_lon;
 
+extern double maxSpeed;
+
 extern std::vector<std::string> fileNames;
 
 //extern std::string path;

@@ -24,11 +24,16 @@
 struct WaveElem{
     Node *node;             //node of wave element
     int edgeID;             //id of segment used to get here
-    double travelTime = 0;      //total time taken to reach node   
-    WaveElem (Node *n, int id, float time){
+    double travelTime = 0;      //total time taken to reach node  
+    double timeToDest = 0;
+    double totalTime = 0;
+    WaveElem (Node *n, int id, float travel_time, float dest_time){
         node = n;
         edgeID = id;
-        travelTime = time;
+        travelTime = travel_time;
+        timeToDest = dest_time;
+        totalTime = travel_time + dest_time;
+        
     }
 };
 
@@ -37,9 +42,12 @@ class myComparator
 public:
     int operator() (const WaveElem& wave1, const WaveElem& wave2)
     {
-        return wave1.travelTime > wave2.travelTime;
+        return wave1.totalTime > wave2.totalTime;
     }
 };
+
+
+
 
 
 //extern struct databases database;
@@ -74,7 +82,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
 //intersectionIDs are returned at (startIntersectionID, destIntersectionID)
 //take startIntersectionID and destIntersectionID as start and finish
 
-std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > validSegmentsAndIntersections(std::vector<StreetSegmentIdx> segments, IntersectionIdx point){
+std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > validSegmentsAndIntersections(std::vector<StreetSegmentIdx> &segments, IntersectionIdx point){
     std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legalSegmentsandIntersections;
     
     for(int i = 0; i < segments.size(); i++){
@@ -130,7 +138,12 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
     std::priority_queue <WaveElem, std::vector<WaveElem>, myComparator> wavefront;
     
     auto it = intersections.find(startID);
-    wavefront.push(WaveElem(it->second, NO_EDGE, 0));
+    
+    std::pair<LatLon, LatLon> posPair (getIntersectionPosition(startID), getIntersectionPosition(destID));
+    double distToDest = findDistanceBetweenTwoPoints(posPair);
+    double timeToDest = distToDest/maxSpeed;
+                
+    wavefront.push(WaveElem(it->second, NO_EDGE, 0, timeToDest));
     
     while(wavefront.size()!=0){
         //make the wavefront into a heap
@@ -179,21 +192,29 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
                 it = intersections.find(currNode->legal[i].second);
 
                 //intersections.insert({currNode->legal[i].second, toNode});
+                
+                //heuristics 
+                std::pair<LatLon, LatLon> posPair (getIntersectionPosition(currNode->legal[i].second), getIntersectionPosition(destID));
+                double distToDest = findDistanceBetweenTwoPoints(posPair);
+                double timeToDest = distToDest/maxSpeed;
+                
+                double travel_time = findStreetSegmentTravelTime(currNode->legal[i].first);
                           
                 if (currNode->reachingEdge != NO_EDGE){
                     StreetSegmentInfo prev_segment = getStreetSegmentInfo(currNode->reachingEdge);
                     StreetSegmentInfo next_segment = getStreetSegmentInfo(currNode->legal[i].first);
                     
+                    
                     if (prev_segment.streetID == next_segment.streetID){
-                        wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + findStreetSegmentTravelTime(currNode->legal[i].first)));
+                        wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time, timeToDest));
                     }
                     else{
-                        wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + findStreetSegmentTravelTime(currNode->legal[i].first) + timePenalty));
+                        wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time + timePenalty, timeToDest));
 
                     }
                 }
                 else{
-                    wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + findStreetSegmentTravelTime(currNode->legal[i].first)));                
+                    wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time, timeToDest));                
                 }
             }
         }

@@ -21,7 +21,8 @@
 #include "libcurl.h"
 #include <iomanip>
 #include <camera.hpp>
-        
+#include <cassert>
+
 #define maxScopeAdjust 1.00009
 #define minScopeAdjustLon 1.00006
 #define minScopeAdjustLat 0.99993        
@@ -474,6 +475,7 @@ void selectFrom(GtkWidget*, ezgl::application *application){
     if(count==1){
       std::cout << "Starting intersection is " << intName << std::endl;      
       std::cout<< startIntersectionID << std::endl;
+      assert (count == 1);
       //save the destination intersection ID in startIntersectionID
       //later, add visuals to indicate destination
            
@@ -504,8 +506,10 @@ void selectTo(GtkWidget*, ezgl::application *application){
         }
     }
     if(count==1){
+        assert (count == 1);
       std::cout << "Destination intersection is " << intName << std::endl;
       std::cout<< destIntersectionID << std::endl;
+      
       //save the destination intersection ID
       //later, add visuals to indicate destination
       application->refresh_drawing();
@@ -531,9 +535,11 @@ void displayPath(GtkWidget*, ezgl::application *application){
     if(twoValidIDs!=2){
         return;
     }
+    assert(twoValidIDs == 2);
         //call the pathfinder and insert result into the example path
         //travelPath = {188312, 188319}; 
         travelPath = findPathBetweenIntersections(startIntersectionID,destIntersectionID,0);
+        assert (travelPath.size() != 0);
         
         if((travelPath.size()==0)|| (travelPath.size()==1)){
             return;
@@ -611,6 +617,7 @@ double toKM(double x){
 
 //returns a direction (N,S,W,E)
 std::string cardinalDirections(StreetSegmentIdx curr){
+    assert (curr>-1);
     std::string northSouth, westEast;
     LatLon from = getIntersectionPosition(getStreetSegmentInfo(curr).from);
     LatLon to = getIntersectionPosition(getStreetSegmentInfo(curr).to);
@@ -667,7 +674,6 @@ std::string leftOrRight(StreetSegmentIdx first, StreetSegmentIdx second){
 void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
 
     double tempDistance = 0;
-    int order = 0;
     std::string currentStreet, nextStreet;
     
     if(pathForDirections.size()==0){
@@ -689,6 +695,7 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
                     }
 
             tempDistance += findStreetSegmentLength(pathForDirections[i]);
+            assert (tempDistance != 0);
 
             if(i==0){
                 stringOfDirections += "Head " + cardinalDirections(pathForDirections[i]) + " on " + currentStreet + "\n";
@@ -696,7 +703,7 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
 
             if(i != pathForDirections.size()-1){
                 if(currentStreet != nextStreet){
-
+                    assert (tempDistance != 0);
                     //make a stringstream to set precision of the input
                     if(tempDistance<1000){
                     stringOfDirections += ">> Travel " + std::to_string(integerRound((int)tempDistance)) + "m\n\n";

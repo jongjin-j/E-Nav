@@ -473,6 +473,7 @@ void selectFrom(GtkWidget*, ezgl::application *application){
       //save the destination intersection ID in startIntersectionID
       //later, add visuals to indicate destination
            
+      application->refresh_drawing();
      
       //error cases
     }else if(count>1){
@@ -503,7 +504,7 @@ void selectTo(GtkWidget*, ezgl::application *application){
       std::cout<< destIntersectionID << std::endl;
       //save the destination intersection ID
       //later, add visuals to indicate destination
-      
+      application->refresh_drawing();
       
     }else if(count>1){
         std::cout << "Too many input arguments" << std::endl;
@@ -1216,12 +1217,21 @@ void draw_main_canvas(ezgl::renderer *g) {
             //this is where the png will be attached
             ezgl::point2d center(x, y);
             //retrieve png image
-            ezgl::surface *png_surface = ezgl::renderer::load_png("libstreetmap/resources/redpin.png");
+            ezgl::surface *png_surface;
             
-            //scope ratios are for adjusting where the image/text appears as a function of zoom distance
-            //adjust the center point so that the png fits nicely (by default, top left corner of the png is attached to the center point)
             double scopeRatioX = 0.00928098;
             double scopeRatioY = 0.05807086;
+            
+            if(database.intersections[id].start){
+                png_surface = ezgl::renderer::load_png("libstreetmap/resources/RedFlag.png");
+            }else if(database.intersections[id].dest){
+                png_surface = ezgl::renderer::load_png("libstreetmap/resources/GreenFlag.png");
+            }else{
+                png_surface = ezgl::renderer::load_png("libstreetmap/resources/redpin.png");
+            }
+            //scope ratios are for adjusting where the image/text appears as a function of zoom distance
+            //adjust the center point so that the png fits nicely (by default, top left corner of the png is attached to the center point)
+            
             g->draw_surface(png_surface, {center.x - scopeRatioX * scope_length, center.y + scopeRatioY * scope_height});
             ezgl::renderer::free_surface(png_surface);
             

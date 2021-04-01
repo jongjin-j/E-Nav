@@ -177,7 +177,7 @@
               </object>
               <packing>
                 <property name="left_attach">0</property>
-                <property name="top_attach">17</property>
+                <property name="top_attach">19</property>
                 <property name="width">3</property>
               </packing>
             </child>
@@ -264,28 +264,6 @@
               </packing>
             </child>
             <child>
-              <object class="GtkFrame">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label_xalign">0</property>
-                <property name="shadow_type">none</property>
-                <child>
-                  <placeholder/>
-                </child>
-                <child type="label">
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">16</property>
-                <property name="width">3</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkButton" id="WeatherButton">
                 <property name="label" translatable="yes">Live Weather Conditions</property>
                 <property name="visible">True</property>
@@ -356,20 +334,7 @@
             </child>
             <child>
               <object class="GtkButton" id="findPathButton">
-                <property name="label" translatable="yes">Find Directions</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-              </object>
-              <packing>
-                <property name="left_attach">0</property>
-                <property name="top_attach">5</property>
-                <property name="width">3</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="ToButton">
-                <property name="label" translatable="yes">To</property>
+                <property name="label" translatable="yes">Go!</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -380,20 +345,25 @@
               </packing>
             </child>
             <child>
+              <object class="GtkButton" id="ToButton">
+                <property name="label" translatable="yes">To</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">3</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkFrame">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label_xalign">0</property>
                 <property name="shadow_type">none</property>
                 <child>
-                  <object class="GtkAlignment">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="left_padding">12</property>
-                    <child>
-                      <placeholder/>
-                    </child>
-                  </object>
+                  <placeholder/>
                 </child>
                 <child type="label">
                   <object class="GtkLabel">
@@ -403,9 +373,41 @@
                 </child>
               </object>
               <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">3</property>
+                <property name="left_attach">0</property>
+                <property name="top_attach">17</property>
+                <property name="width">3</property>
               </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="HelpButton">
+                <property name="label" translatable="yes">Help</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">16</property>
+                <property name="width">3</property>
+              </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
             </child>
             <child>
               <placeholder/>

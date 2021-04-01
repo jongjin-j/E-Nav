@@ -78,6 +78,7 @@ struct databases {
     std::vector<StreetIdx> results1; //stores the results from user search street 1
     std::vector<StreetIdx> results2; //stores the results from user search street 2
     std::unordered_map<OSMID, std::string> OSMID_wayType;
+    std::vector<StreetIdx>streetSegmentID_streetID;
     //Node **intersection_nodes = new Node[getNumIntersections()];
     //std::unordered_map<OSMID, std::string> OSMID_nodeType;
     //std::unordered_map<OSMID, const OSMNode*> OSMID_nodePtr;

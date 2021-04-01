@@ -131,6 +131,17 @@ void streetID_streetSegments(){
     }
 }
 
+//create a vector to store the street ID for each street segment ID
+void street_SegmentID_streetID(){
+    database.streetSegmentID_streetID.resize(getNumStreetSegments());
+    
+    //loop through the segments and push street IDs 
+    for (int i = 0; i < getNumStreetSegments(); i++){
+        StreetSegmentInfo ss_info = getStreetSegmentInfo(i);
+        database.streetSegmentID_streetID[i] = ss_info.streetID;
+    }
+}
+
 //create a 2D vector to store corresponding intersection IDs for each street 
 void streetID_Intersections(){
     (database.streetID_intersections).resize(getNumStreets());
@@ -529,6 +540,7 @@ bool loadMap(std::string map_streets_database_filename) {
     OSMID_wayValue();
     POIDatabase_nonAmenity();
     findMaxSpeed();
+    street_SegmentID_streetID();
     //createNodesfromIntersections();
     
   

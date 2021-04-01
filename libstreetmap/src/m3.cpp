@@ -201,11 +201,12 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
                 double travel_time = findStreetSegmentTravelTime(currNode->legal[i].first);
                           
                 if (currNode->reachingEdge != NO_EDGE){
-                    StreetSegmentInfo prev_segment = getStreetSegmentInfo(currNode->reachingEdge);
-                    StreetSegmentInfo next_segment = getStreetSegmentInfo(currNode->legal[i].first);
+                    //StreetSegmentInfo prev_segment = getStreetSegmentInfo(currNode->reachingEdge);
+                    //StreetSegmentInfo next_segment = getStreetSegmentInfo(currNode->legal[i].first);
                     
                     
-                    if (prev_segment.streetID == next_segment.streetID){
+                    //if (prev_segment.streetID == next_segment.streetID){
+                    if (database.streetSegmentID_streetID[currNode->reachingEdge] == database.streetSegmentID_streetID[currNode->legal[i].first]){
                         wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time, timeToDest));
                     }
                     else{

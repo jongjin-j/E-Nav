@@ -242,6 +242,7 @@ void intersections_database(){
     
     //change intersection points to Cartesian coordinates
     for (int i = 0; i < getNumIntersections(); i++) {
+        database.intersections[i].pos = getIntersectionPosition(i);
         database.intersections[i].name = getIntersectionName(i);
         database.intersections[i].x = x_from_lon(getIntersectionPosition(i).longitude());
         database.intersections[i].y = y_from_lat(getIntersectionPosition(i).latitude());

@@ -30,6 +30,7 @@ extern IntersectionIdx startIntersectionID, destIntersectionID;
 
 struct intersection_data {
     std::string name;
+    LatLon pos;
     double x = 0;
     double y = 0;
     bool highlight = false;

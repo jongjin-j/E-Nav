@@ -16,17 +16,19 @@
 #include <unordered_map>
 #include <queue>
 #include <bits/stdc++.h>
+#include "ezgl/application.hpp"
+#include "ezgl/graphics.hpp"
 
 #define NO_EDGE -1
 
 
 //waveElems have nodes with directions on how they got here
 struct WaveElem{
-    Node *node;             //node of wave element
-    int edgeID;             //id of segment used to get here
+    Node *node;                 //node of wave element
+    int edgeID;                 //id of segment used to get here
     double travelTime = 0;      //total time taken to reach node  
-    double timeToDest = 0;
-    double totalTime = 0;
+    double timeToDest = 0;      //estimated time to reach destination from current Node
+    double totalTime = 0;       //total estimated time
     WaveElem (Node *n, int id, float travel_time, float dest_time){
         node = n;
         edgeID = id;
@@ -46,18 +48,6 @@ public:
     }
 };
 
-
-
-
-
-//extern struct databases database;
-//std::pair<LatLon,LatLon> fromToPoints;
-
-/*Node* getNodeByID(IntersectionIdx ID){    
-    auto it = intersections.find(ID);
-    Node *currNode = it->second;
-    return currNode;
-}*/
 
 double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const double turn_penalty){
     int pathSize = path.size();
@@ -110,9 +100,12 @@ std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > validSegmentsAndInter
 
 std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx intersect_id_start, 
 const IntersectionIdx intersect_id_destination,const double turn_penalty){
+    //create database of unordered map for intersections as nodes
     std::unordered_map<IntersectionIdx, Node*> intersections;
     
+    //find the adjacent street segments of the start intersection
     std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(intersect_id_start);
+    //check whether the street segments are legal and store it in valid
     std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > valid = validSegmentsAndIntersections(adjacentSegments, intersect_id_start);
     Node* sourceNode = new Node(intersect_id_start, valid, 10000000000);
     
@@ -121,20 +114,21 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
     bool found = bfsPath(intersections, intersect_id_start, intersect_id_destination, turn_penalty);
     
     std::vector<StreetSegmentIdx> path;
+    //return a path if a path exists between the intersections
     if(found){
         path = bfsTraceBack(intersections, intersect_id_destination);
     }
     
+    //delete the unordered map
     for (int i = 0; i < intersections.size(); i++){
         delete intersections[i];
     }
     
-    //take turn penalty into account by checking street name
     return path;
 }
 
 bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double timePenalty){
-    //std::list<WaveElem> wavefront;
+    //set a priority queue for the wave elements in the wavefront
     std::priority_queue <WaveElem, std::vector<WaveElem>, myComparator> wavefront;
     
     auto it = intersections.find(startID);
@@ -144,54 +138,52 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
     double timeToDest = distToDest/maxSpeed;
                 
     wavefront.push(WaveElem(it->second, NO_EDGE, 0, timeToDest));
+    /*ezgl::renderer *g;
+    g->set_color(ezgl::BLUE);*/
     
     while(wavefront.size()!=0){
-        //make the wavefront into a heap
-        //std::make_heap(wavefront.begin(), wavefront.end());
-        
-        //WaveElem wave = wavefront.front();      //take the first in wavefront to be currentNode
-        WaveElem wave = wavefront.top();
-        
-        //wavefront.pop_front();                  //remove node from wavefront
+        //take the first in wavefront to be currentNode
+        WaveElem wave = wavefront.top();  
+        //remove the first element
         wavefront.pop();
         
         Node *currNode = wave.node;
         
-        //std::cout << "id: " << currNode->id << std::endl;
-        //std::cout << "time: " << currNode->bestTime << std::endl;
-        //std::cout << "wave time: " << wave.travelTime << std::endl;
+        /*std::cout << "id: " << currNode->id << std::endl;
+        std::cout << "time: " << currNode->bestTime << std::endl;
+        std::cout << "wave time: " << wave.travelTime << std::endl;*/
         
-        //double turnTime = 0;
-        /*
-        if(currNode->turn == true){
-            turnTime = timePenalty;
-        }
-        */
         if (wave.travelTime < currNode->bestTime) {
-            // Was this a better path to this node? Update if so.
+            //check whether the bath was better to this node
             currNode->reachingEdge = wave.edgeID;         
             currNode->bestTime = wave.travelTime;
             
+            //check whether path reached the destination intersection
             if(currNode->id == destID){
                 return true;
             }
             
             for(int i = 0; i < currNode->legal.size(); i++){
+                /*LatLon p1(getIntersectionPosition(currNode->id).latitude(), getIntersectionPosition(currNode->id).longitude());
+                LatLon p2(getIntersectionPosition(currNode->legal[i].second).latitude(), getIntersectionPosition(currNode->legal[i].second).longitude());
+                ezgl::point2d point1(x_from_lon(p1.longitude()), y_from_lat(p1.latitude()));
+                ezgl::point2d point2(x_from_lon(p2.longitude()), y_from_lat(p2.latitude()));
+                
+                g->draw_line(point1, point2);*/
+                
                 it = intersections.find(currNode->legal[i].second);
                 
+                //check whether the node was visited or not(exists in the database or not)
+                //add a node to the database(unordered map) if it wasn't visited
                 if(it == intersections.end()){
                     std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(currNode->legal[i].second);
                     std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > valid = validSegmentsAndIntersections(adjacentSegments, currNode->legal[i].second);
                     Node *toNode = new Node(currNode->legal[i].second, valid);
                    
-                    
                     intersections.insert({currNode->legal[i].second, toNode});
-                    //auto it = intersections.find(currNode->legal[i].second);
                 }
                 
                 it = intersections.find(currNode->legal[i].second);
-
-                //intersections.insert({currNode->legal[i].second, toNode});
                 
                 //heuristics 
                 std::pair<LatLon, LatLon> posPair (getIntersectionPosition(currNode->legal[i].second), getIntersectionPosition(destID));
@@ -200,18 +192,15 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
                 
                 double travel_time = findStreetSegmentTravelTime(currNode->legal[i].first);
                           
+                //check whether the node's previous edge is not the starting edge
                 if (currNode->reachingEdge != NO_EDGE){
-                    //StreetSegmentInfo prev_segment = getStreetSegmentInfo(currNode->reachingEdge);
-                    //StreetSegmentInfo next_segment = getStreetSegmentInfo(currNode->legal[i].first);
-                    
-                    
-                    //if (prev_segment.streetID == next_segment.streetID){
+                    //if the previous edge and the current edge has the same streetID, don't apply the turn penalty and add to the wavefront
                     if (database.streetSegmentID_streetID[currNode->reachingEdge] == database.streetSegmentID_streetID[currNode->legal[i].first]){
                         wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time, timeToDest));
                     }
+                    //if the previous edge and the current edge do not have the same streetID, apply the turn penalty and add to the wavefront
                     else{
                         wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time + timePenalty, timeToDest));
-
                     }
                 }
                 else{
@@ -226,15 +215,18 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
 std::vector<StreetSegmentIdx> bfsTraceBack(std::unordered_map<IntersectionIdx, Node*>& intersections, int destID){
     std::vector<StreetSegmentIdx> pathToDest; 
     
+    //find the Node with the destination intersection ID
     auto it = intersections.find(destID);
     Node *currNode = it->second;
     StreetSegmentIdx prevEdge = currNode->reachingEdge;
     
     while(prevEdge != NO_EDGE){
+        //add the previous edge to the path
         pathToDest.push_back(prevEdge);
         
         StreetSegmentInfo street_segment = getStreetSegmentInfo(prevEdge);
         
+        //set the next Node to the intersection that is on the other side of the street segment
         if(currNode->id == street_segment.from){
             auto k = intersections.find(street_segment.to);
             currNode = k->second;
@@ -245,50 +237,12 @@ std::vector<StreetSegmentIdx> bfsTraceBack(std::unordered_map<IntersectionIdx, N
             currNode = k->second;
         }
         
+        //update the previous edge to the reaching edge
         prevEdge = currNode->reachingEdge;
     }
     
+    //reverse the vector since it started from the destination
     std::reverse(pathToDest.begin(),pathToDest.end());
     
     return pathToDest;
 }
-
-/*std::vector<StreetSegmentIdx> bfsTraceBack(int destID){
-    //vector stores the path to destination
-    std::vector<StreetSegmentIdx> pathToDest; 
-    
-    Node* currNode = getNodeByID(destID);
-    
-    //prevEdge stores what segment was used to get to destID
-    StreetSegmentIdx prevEdge = currNode->reachingEdge;
-    //std::cout << prevEdge << std::endl;
-    //return pathToDest;
-    
-    while(prevEdge!=NO_EDGE){
-        //std::cout << prevEdge << std::endl;
-        //if (prevEdge == 9043){
-            //break;
-        //}
-        //add the segment used to get to destID
-        pathToDest.push_back(prevEdge);
-        //find the prevNode of the prevNode
-        //store that into currNode
-        StreetSegmentInfo ss_info = getStreetSegmentInfo(prevEdge);
-        //std::cout << getStreetName(ss_info.streetID) << std::endl;
-        
-        if (currNode->id == ss_info.to){
-            currNode = intersection_nodes[ss_info.from];
-        }
-        else if (currNode->id == ss_info.from){
-            currNode = intersection_nodes[ss_info.to];
-        }
-        //obtain reaching edge and insert into vector
-        prevEdge = currNode->reachingEdge;
-    }
-
-    //reverse vector
-    std::reverse(pathToDest.begin(),pathToDest.end());
- 
-    return pathToDest;
-}*/
-

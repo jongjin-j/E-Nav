@@ -702,6 +702,11 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
                     }else if(tempDistance>999){
                     stringOfDirections += ">> Travel " + std::to_string(toKM(tempDistance)) + "km\n\n";
                     }
+                    
+                    if(nextStreet == "<unknown>"){
+                        nextStreet = "a local street";
+                    }
+
                     stringOfDirections += "Make a " + leftOrRight(pathForDirections[i],pathForDirections[i+1]) + " to " + nextStreet + "\n";
                     tempDistance = 0;
                 }
@@ -1355,7 +1360,7 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* , double x, doub
     else
         database.intersections[id].highlight = true;
     
-    if (database.intersections[id].start == true )
+    if (database.intersections[id].start == true)
         database.intersections[id].start = false;
     
     if(database.intersections[id].dest == true)

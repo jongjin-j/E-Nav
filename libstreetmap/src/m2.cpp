@@ -605,8 +605,7 @@ int integerRound(int x){
 
 //converts into km (for large travel distances)
 double toKM(double x){
-    std::setprecision(1);
-    x /= 1000;
+    x = round(x/100)/10;
     return x;
 }
 
@@ -651,7 +650,12 @@ std::string cardinalDirections(StreetSegmentIdx curr){
 }
 
 //determines turn directions
-std::string leftOrRight(){
+std::string leftOrRight(StreetSegmentIdx first, StreetSegmentIdx second){
+    
+    //implementation: get the segment vector of i, and segment vector of i+1 (when the turn is made)
+    //obtain the cross product of the two vectors
+    //use the angle between segment[i] and the projected vector;
+    //depending where the angle stretches, give it left or right
     
     return "right";
     
@@ -663,6 +667,7 @@ std::string leftOrRight(){
 void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
 
     double tempDistance = 0;
+    int order = 0;
     std::string currentStreet, nextStreet;
     
     if(pathForDirections.size()==0){
@@ -693,18 +698,18 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
                 if(currentStreet != nextStreet){
 
                     if(tempDistance<1000){
-                    stringOfDirections += "Travel " + std::to_string(integerRound((int)tempDistance)) + "m\n\n";
+                    stringOfDirections += ">> Travel " + std::to_string(integerRound((int)tempDistance)) + "m\n\n";
                     }else if(tempDistance>999){
-                    stringOfDirections += "Travel " + std::to_string(toKM(tempDistance)) + "km\n\n";
+                    stringOfDirections += ">> Travel " + std::to_string(toKM(tempDistance)) + "km\n\n";
                     }
-                    stringOfDirections += "Make a " + leftOrRight() + " to " + nextStreet + "\n";
+                    stringOfDirections += "Make a " + leftOrRight(pathForDirections[i],pathForDirections[i+1]) + " to " + nextStreet + "\n";
                     tempDistance = 0;
                 }
             }else if(i == pathForDirections.size()-1){
                 if(tempDistance<1000){
-                    stringOfDirections += "Travel " + std::to_string(integerRound((int)tempDistance)) + "m";
+                    stringOfDirections += ">> Travel " + std::to_string(integerRound((int)tempDistance)) + "m";
                 }else if(tempDistance>999){
-                    stringOfDirections += "Travel " + std::to_string(toKM(tempDistance)) + "km";
+                    stringOfDirections += ">> Travel " + std::to_string(toKM(tempDistance)) + "km";
                 }
                     stringOfDirections += " to arrive at your destination\n";
             }
@@ -1349,6 +1354,12 @@ void act_on_mouse_click(ezgl::application* app, GdkEventButton* , double x, doub
         database.intersections[id].highlight = false;
     else
         database.intersections[id].highlight = true;
+    
+    if (database.intersections[id].start == true )
+        database.intersections[id].start = false;
+    
+    if(database.intersections[id].dest == true)
+        database.intersections[id].dest = false;
 
     app -> refresh_drawing();
 }

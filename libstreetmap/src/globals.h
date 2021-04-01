@@ -65,6 +65,22 @@ struct street_data {
     Node* toNode;
 };*/
 
+struct vector{
+    double i;
+    double j;
+    vector(){
+        i = 0;
+        j = 0;
+    }
+    double vectorCosine(vector a, vector b){
+        //cosineTheta = dot product / product of magnitudes
+        double cosineAngle = (a.i*b.i + a.j*b.j) / sqrt(a.i*a.i + a.j*a.j + b.i*b.i + b.j*b.j);
+        double angle = acos(cosineAngle) / kDegreeToRadian;
+        
+        return angle;
+    }
+};
+
 struct databases {
     std::vector<std::vector<StreetSegmentIdx>> intersection_street_segments;
     std::vector<std::vector<StreetSegmentIdx>> streetID_street_segments;

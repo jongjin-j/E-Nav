@@ -682,7 +682,12 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
     
     else if(pathForDirections.size()==1){
         tempDistance = findStreetSegmentLength(pathForDirections[0]);
-        stringOfDirections += "You are currently on " + getStreetName(getStreetSegmentInfo(pathForDirections[0]).streetID) + "\n";
+        std::string streetName = getStreetName(getStreetSegmentInfo(pathForDirections[0]).streetID);
+        if(streetName == "<unknown>"){
+            streetName = "a local street";
+            assert (streetName!="<unknown>");
+        }
+        stringOfDirections += "You are currently on " + streetName + "\n";
         stringOfDirections += "Travel " + std::to_string(integerRound((int)tempDistance)) + "m on " + getStreetName(getStreetSegmentInfo(pathForDirections[0]).streetID) + " towards your destination\n ";
     }
     
@@ -698,6 +703,9 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
             assert (tempDistance != 0);
 
             if(i==0){
+                if(currentStreet == "<unknown>"){
+                    currentStreet = "a local street";
+                }
                 stringOfDirections += "Head " + cardinalDirections(pathForDirections[i]) + " on " + currentStreet + "\n";
             }
 

@@ -72,29 +72,29 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
 //intersectionIDs are returned at (startIntersectionID, destIntersectionID)
 //take startIntersectionID and destIntersectionID as start and finish
 
-std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > validSegmentsAndIntersections(std::vector<StreetSegmentIdx> &segments, IntersectionIdx point){
-    std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legalSegmentsandIntersections;
+ void validSegmentsAndIntersections(std::vector<std::pair<StreetSegmentIdx, IntersectionIdx>>& valid, std::vector<StreetSegmentIdx> segments, IntersectionIdx point){
+    //std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legalSegmentsandIntersections;
     
     for(int i = 0; i < segments.size(); i++){
         StreetSegmentInfo street_segment = getStreetSegmentInfo(segments[i]);
         if(street_segment.from == point || street_segment.oneWay == false){
             std::pair<StreetSegmentIdx, IntersectionIdx> pairing;
+            
+            pairing.first = segments[i];
                 
             if (street_segment.from == point){
-                pairing.first = segments[i];
                 pairing.second = street_segment.to;
             }
                 
             if (street_segment.to == point){
-                pairing.first = segments[i];
                 pairing.second = street_segment.from;
             }
                 
-            legalSegmentsandIntersections.push_back(pairing);
+            valid.push_back(pairing);
         }
     }
     
-    return legalSegmentsandIntersections;
+    //return legalSegmentsandIntersections;
 }
 
 
@@ -106,7 +106,8 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
     //find the adjacent street segments of the start intersection
     std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(intersect_id_start);
     //check whether the street segments are legal and store it in valid
-    std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > valid = validSegmentsAndIntersections(adjacentSegments, intersect_id_start);
+    std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > valid;
+    validSegmentsAndIntersections(valid, adjacentSegments, intersect_id_start);
     Node* sourceNode = new Node(intersect_id_start, valid, 10000000000);
     
     intersections.insert({intersect_id_start, sourceNode});
@@ -177,7 +178,8 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
                 //add a node to the database(unordered map) if it wasn't visited
                 if(it == intersections.end()){
                     std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(currNode->legal[i].second);
-                    std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > valid = validSegmentsAndIntersections(adjacentSegments, currNode->legal[i].second);
+                    std::vector<std::pair<StreetSegmentIdx, IntersectionIdx>> valid;
+                    validSegmentsAndIntersections(valid, adjacentSegments, currNode->legal[i].second);
                     Node *toNode = new Node(currNode->legal[i].second, valid);
                    
                     intersections.insert({currNode->legal[i].second, toNode});

@@ -26,6 +26,7 @@
 extern struct databases database;
 std::vector<std::string> fileNames;
 std::vector<StreetSegmentIdx> travelPath;    
+std::string stringOfDirections;
 
 
 //number of cities loaded so far (needed in libcurl)
@@ -222,7 +223,7 @@ void setSecondStreet(GtkWidget*, ezgl::application *application){
 
 //called when Find Intersections button is clicked
 void displayIntersections(GtkWidget*, ezgl::application *application){
-    
+    //stringOfDirections
     //deal with different cases
     if(findIntersectionsOfTwoStreets(resultStreets).size() == 0){
         //if no intersections found
@@ -515,7 +516,18 @@ void selectTo(GtkWidget*, ezgl::application *application){
 
 //highlights the path in blue
 void displayPath(GtkWidget*, ezgl::application *application){
-    
+    int twoValidIDs = 0;
+    //if there isn't a start and end, return
+    for(int i=0; i<getNumIntersections(); i++){
+        if(database.intersections[i].start){
+            twoValidIDs += 1;
+        }else if(database.intersections[i].dest){
+            twoValidIDs +=1;
+        }
+    }
+    if(twoValidIDs!=2){
+        return;
+    }
         //call the pathfinder and insert result into the example path
         //travelPath = {188312, 188319}; 
         travelPath = findPathBetweenIntersections(startIntersectionID,destIntersectionID,0);
@@ -695,6 +707,59 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
     }
 }
 
+void displayPathUI(GtkWidget*, ezgl::application *application){
+    
+    if(travelPath.size()==0){
+        return;
+    }
+    //define variables to be used
+    GObject *window;
+    GtkWidget *content_area;
+    GtkWidget *label;
+    GtkWidget* dialog;
+    
+    //pointer to main winddow
+    window = application -> get_object(application->get_main_window_id().c_str());
+    
+    dialog = gtk_dialog_new_with_buttons(
+            "DIRECTIONS",
+            (GtkWindow*) window,
+            GTK_DIALOG_MODAL,
+            ("Close"),
+            //added to suppress warnings
+            GTK_RESPONSE_ACCEPT,
+            NULL,
+            GTK_RESPONSE_REJECT,
+            NULL
+            );
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+
+    //string to display on the dialog
+    //convert to char array
+    
+    char *displayCharArray = new char[stringOfDirections.length()+1];
+    strcpy(displayCharArray,stringOfDirections.c_str());
+    
+    //input char array into the label
+    label = gtk_label_new(displayCharArray);
+    //temperature (celsius) 0, feels like (celsius) 1, pressure (hPa) 2, humidity (g/m^3) 3, wind speed (m/s) 4, wind degrees (deg) 5
+    
+    gtk_container_add(GTK_CONTAINER(content_area), label);
+    
+    gtk_widget_show_all(dialog);
+    
+    //connect the OK button
+    g_signal_connect(
+        GTK_DIALOG(dialog),
+        "response",
+        G_CALLBACK(on_dialog_response),
+        NULL
+    );
+    application -> refresh_drawing();
+    delete[]displayCharArray;
+    
+}
+
 //displays intructions
 void displayHelp(GtkWidget*, ezgl::application *application){
         
@@ -733,7 +798,6 @@ void displayHelp(GtkWidget*, ezgl::application *application){
     
     //input char array into the label
     label = gtk_label_new(displayCharArray);
-    //temperature (celsius) 0, feels like (celsius) 1, pressure (hPa) 2, humidity (g/m^3) 3, wind speed (m/s) 4, wind degrees (deg) 5
     
     gtk_container_add(GTK_CONTAINER(content_area), label);
     
@@ -774,6 +838,8 @@ void initial_setup(ezgl::application *application, bool /*new_window*/){
     g_signal_connect(application->get_object("ToButton"), "clicked", G_CALLBACK(selectTo), application);
     //find path button
     g_signal_connect(application->get_object("findPathButton"), "clicked", G_CALLBACK(displayPath), application);
+    
+    g_signal_connect(application->get_object("findPathButton"), "clicked", G_CALLBACK(displayPathUI), application);
 }
 
 //function to draw a POI

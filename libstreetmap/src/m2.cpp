@@ -21,7 +21,10 @@
 #include "libcurl.h"
 #include <iomanip>
 #include <camera.hpp>
-
+        
+#define maxScopeAdjust 1.00009
+#define minScopeAdjustLon 1.00006
+#define minScopeAdjustLat 0.99993        
 
 extern struct databases database;
 std::vector<std::string> fileNames;
@@ -549,10 +552,10 @@ void displayPath(GtkWidget*, ezgl::application *application){
             latIntersections.push_back(getIntersectionPosition(getStreetSegmentInfo(travelPath[i]).to).latitude());
 
         }
-        double maxLon = *max_element(lonIntersections.begin(),lonIntersections.end())*(1.00009);
-        double minLon = *min_element(lonIntersections.begin(),lonIntersections.end())*(0.99993);
-        double maxLat = *max_element(latIntersections.begin(),latIntersections.end())*(1.00009);
-        double minLat = *min_element(latIntersections.begin(),latIntersections.end())*(0.99993);
+        double maxLon = *max_element(lonIntersections.begin(),lonIntersections.end())*(maxScopeAdjust);
+        double minLon = *min_element(lonIntersections.begin(),lonIntersections.end())*(minScopeAdjustLon);
+        double maxLat = *max_element(latIntersections.begin(),latIntersections.end())*(maxScopeAdjust);
+        double minLat = *min_element(latIntersections.begin(),latIntersections.end())*(minScopeAdjustLat);
 
         ezgl::point2d first = ezgl::point2d(x_from_lon(minLon), y_from_lat(minLat)); //x0,y0
         ezgl::point2d second = ezgl::point2d(x_from_lon(maxLon), y_from_lat(maxLat)); //x1,y1
@@ -586,6 +589,8 @@ void resetIntersections(GtkWidget*, ezgl::application *application){
     //reset the from/to highlights
     startIntersectionID = -1;
     destIntersectionID = -1;
+    
+    stringOfDirections = "";
 
     application->refresh_drawing();
 }
@@ -600,6 +605,7 @@ int integerRound(int x){
 
 //converts into km (for large travel distances)
 double toKM(double x){
+    std::setprecision(1);
     x /= 1000;
     return x;
 }
@@ -660,18 +666,17 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
     std::string currentStreet, nextStreet;
     
     if(pathForDirections.size()==0){
-        std::cout << "Error: no input path detected" << std::endl;
+        stringOfDirections += "Error: no input path detected\n";
     }
     
     else if(pathForDirections.size()==1){
         tempDistance = findStreetSegmentLength(pathForDirections[0]);
-        std::cout << "You are currently on " << getStreetName(getStreetSegmentInfo(pathForDirections[0]).streetID) << std::endl;
-        std::cout << "Travel " << integerRound((int)tempDistance) << "m on " << getStreetName(getStreetSegmentInfo(pathForDirections[0]).streetID) << " towards your destination " <<  std::endl;
+        stringOfDirections += "You are currently on " + getStreetName(getStreetSegmentInfo(pathForDirections[0]).streetID) + "\n";
+        stringOfDirections += "Travel " + std::to_string(integerRound((int)tempDistance)) + "m on " + getStreetName(getStreetSegmentInfo(pathForDirections[0]).streetID) + " towards your destination\n ";
     }
     
     else if(pathForDirections.size()>1){
         for(int i=0; i < pathForDirections.size(); i++){
-
             currentStreet = getStreetName(getStreetSegmentInfo(pathForDirections[i]).streetID);
 
             if(i!=pathForDirections.size()-1){
@@ -681,27 +686,27 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
             tempDistance += findStreetSegmentLength(pathForDirections[i]);
 
             if(i==0){
-                std::cout << "Head " << cardinalDirections(pathForDirections[i]) << " on " << currentStreet << std::endl;
+                stringOfDirections += "Start: Head " + cardinalDirections(pathForDirections[i]) + " on " + currentStreet + "\n";
             }
 
             if(i != pathForDirections.size()-1){
                 if(currentStreet != nextStreet){
 
                     if(tempDistance<1000){
-                    std::cout << "Travel " << std::fixed << integerRound((int)tempDistance) << "m" << std::endl;
+                    stringOfDirections += "Travel " + std::to_string(integerRound((int)tempDistance)) + "m\n\n";
                     }else if(tempDistance>999){
-                    std::cout << "Travel " << std::fixed << std::setprecision(1) << toKM(tempDistance) << "km" << std::endl; 
+                    stringOfDirections += "Travel " + std::to_string(toKM(tempDistance)) + "km\n\n";
                     }
-                    std::cout << "Make a " << leftOrRight() << " to " << nextStreet << std::endl;
+                    stringOfDirections += "Make a " + leftOrRight() + " to " + nextStreet + "\n";
                     tempDistance = 0;
                 }
             }else if(i == pathForDirections.size()-1){
                 if(tempDistance<1000){
-                    std::cout << "Travel " << integerRound((int)tempDistance) << "m";
+                    stringOfDirections += "Travel " + std::to_string(integerRound((int)tempDistance)) + "m";
                 }else if(tempDistance>999){
-                    std::cout << "Travel " << std::setprecision(1) << toKM(tempDistance) << "km";
+                    stringOfDirections += "Travel " + std::to_string(toKM(tempDistance)) + "km";
                 }
-                    std::cout << " to your destination" << std::endl;
+                    stringOfDirections += " to arrive at your destination\n";
             }
         } 
     }

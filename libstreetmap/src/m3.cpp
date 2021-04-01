@@ -186,9 +186,9 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
                 it = intersections.find(currNode->legal[i].second);
                 
                 //heuristics 
-                std::pair<LatLon, LatLon> posPair (getIntersectionPosition(currNode->legal[i].second), getIntersectionPosition(destID));
-                double distToDest = findDistanceBetweenTwoPoints(posPair);
-                double timeToDest = distToDest/maxSpeed;
+                std::pair<LatLon, LatLon> currentPosPair (getIntersectionPosition(currNode->legal[i].second), getIntersectionPosition(destID));
+                double currentDistToDest = findDistanceBetweenTwoPoints(currentPosPair);
+                double currentTimeToDest = currentDistToDest/maxSpeed;
                 
                 double travel_time = findStreetSegmentTravelTime(currNode->legal[i].first);
                           
@@ -196,15 +196,15 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
                 if (currNode->reachingEdge != NO_EDGE){
                     //if the previous edge and the current edge has the same streetID, don't apply the turn penalty and add to the wavefront
                     if (database.streetSegmentID_streetID[currNode->reachingEdge] == database.streetSegmentID_streetID[currNode->legal[i].first]){
-                        wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time, timeToDest));
+                        wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time, currentTimeToDest));
                     }
                     //if the previous edge and the current edge do not have the same streetID, apply the turn penalty and add to the wavefront
                     else{
-                        wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time + timePenalty, timeToDest));
+                        wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time + timePenalty, currentTimeToDest));
                     }
                 }
                 else{
-                    wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time, timeToDest));                
+                    wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time, currentTimeToDest));                
                 }
             }
         }

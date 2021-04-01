@@ -127,12 +127,9 @@ public:
     }
 };
 
-
-//extern std::unordered_map<IntersectionIdx, Node*> intersections;
-//extern std::vector<Node*> intersection_nodes;
+std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > validSegmentsAndIntersections(std::vector<StreetSegmentIdx> &segments, IntersectionIdx point);
 
 bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double turnPenalty);
-Node* getNodeByID(IntersectionIdx ID);
 std::vector<StreetSegmentIdx> bfsTraceBack(std::unordered_map<IntersectionIdx, Node*>& intersections, int destID);
 
 //m2.cpp function declaration

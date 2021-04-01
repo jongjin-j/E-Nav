@@ -691,16 +691,19 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
             tempDistance += findStreetSegmentLength(pathForDirections[i]);
 
             if(i==0){
-                stringOfDirections += "Start: Head " + cardinalDirections(pathForDirections[i]) + " on " + currentStreet + "\n";
+                stringOfDirections += "Head " + cardinalDirections(pathForDirections[i]) + " on " + currentStreet + "\n";
             }
 
             if(i != pathForDirections.size()-1){
                 if(currentStreet != nextStreet){
 
+                    //make a stringstream to set precision of the input
                     if(tempDistance<1000){
                     stringOfDirections += ">> Travel " + std::to_string(integerRound((int)tempDistance)) + "m\n\n";
                     }else if(tempDistance>999){
-                    stringOfDirections += ">> Travel " + std::to_string(toKM(tempDistance)) + "km\n\n";
+                    std::stringstream ss;
+                    ss << std::fixed << std::setprecision(1) << toKM(tempDistance);
+                    stringOfDirections += ">> Travel " + ss.str() + "km\n\n";
                     }
                     
                     if(nextStreet == "<unknown>"){

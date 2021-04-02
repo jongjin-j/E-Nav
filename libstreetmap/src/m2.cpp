@@ -24,7 +24,7 @@
 #include <cassert>
 
 #define maxScopeAdjust 1.00009
-#define minScopeAdjustLon 1.00006
+#define minScopeAdjustLon 1.00003
 #define minScopeAdjustLat 0.99993        
 
 extern struct databases database;
@@ -684,47 +684,42 @@ std::string leftOrRight(StreetSegmentIdx current, StreetSegmentIdx next){
     
     vector currSeg, nextSeg;
 
+
+    currSeg.x = x_from_lon(currToPos.longitude() - currFromPos.longitude());
+    currSeg.y = y_from_lat(currToPos.latitude() - currFromPos.latitude());
+    nextSeg.x = x_from_lon(nextToPos.longitude() - nextFromPos.longitude());
+    nextSeg.y = y_from_lat(nextToPos.latitude() - nextFromPos.latitude());
+    
     //orientation possibility 1
     //intersection in common is curr.to and next.from
     if(currTo == nextFrom){
-        currSeg.x = x_from_lon(currToPos.longitude() - currFromPos.longitude());
-        currSeg.y = y_from_lat(currToPos.latitude() - currFromPos.latitude());
-        
-        nextSeg.x = x_from_lon(nextToPos.longitude() - nextFromPos.longitude());
-        nextSeg.y = y_from_lat(nextToPos.latitude() - nextFromPos.latitude());
-        
+        //initialized values already correspond to this case, move on
     }
     //orientation possibility 2
     //intersection in common is curr.from and next.from
     else if(currFrom == nextFrom){
-        currSeg.x = x_from_lon(currFromPos.longitude() - currToPos.longitude());
-        currSeg.y = y_from_lat(currFromPos.latitude() - currToPos.latitude());
-        
-        nextSeg.x = x_from_lon(nextToPos.longitude() - nextFromPos.longitude());
-        nextSeg.y = y_from_lat(nextToPos.latitude() - nextFromPos.latitude());
-        
+        //reverse currSeg vector
+        currSeg.x = -(currSeg.x);
+        currSeg.y = -(currSeg.y);
     }
     //orientation possibility 3
     //intersection in common is curr.to and next.to
     else if(currTo == nextTo){
-        currSeg.x = x_from_lon(currToPos.longitude() - currFromPos.longitude());
-        currSeg.y = y_from_lat(currToPos.latitude() - currFromPos.latitude());
-        
-        nextSeg.x = x_from_lon(nextFromPos.longitude() - nextToPos.longitude());
-        nextSeg.y = y_from_lat(nextFromPos.latitude() - nextToPos.latitude());
+        //reverse nextSeg vector
+        nextSeg.x = -(nextSeg.x);
+        nextSeg.y = -(nextSeg.y);
     }
     //orientation possibility 4
     //intersection in commin is curr.to and next.from
     else if(currFrom == nextTo){
-        currSeg.x = x_from_lon(currFromPos.longitude() - currToPos.longitude());
-        currSeg.y = y_from_lat(currFromPos.latitude() - currToPos.latitude());
-        
-        nextSeg.x = x_from_lon(nextFromPos.longitude() - nextToPos.longitude());
-        nextSeg.y = y_from_lat(nextFromPos.latitude() - nextToPos.latitude());
+        //reverse both vectors
+        currSeg.x = -(currSeg.x);
+        currSeg.y = -(currSeg.y);
+        nextSeg.x = -(nextSeg.x);
+        nextSeg.y = -(nextSeg.y);
     }
     
     //two vectors currSeg and nextSeg now oriented to direction of travel
-
     //declare angle between vectors
     double vectorAngle = angleBetweenVectors(currSeg, nextSeg);
     assert (vectorAngle != 0);
@@ -733,9 +728,9 @@ std::string leftOrRight(StreetSegmentIdx current, StreetSegmentIdx next){
     if(vectorAngle > 0){
         assert (vectorAngle < 360);
         if(vectorAngle < 160){
-            return "Turn left";
+            return "Make a Left";
         }else if(vectorAngle > 200){
-            return "Turn right";
+            return "Make a Right";
         }else{
             return "Continue straight";
         }
@@ -749,10 +744,7 @@ std::string leftOrRight(StreetSegmentIdx current, StreetSegmentIdx next){
         }else{
             return "Continue straight";
         }
-        
     }
-    assert (vectorAngle != 0);
-
 }
 
 //prints out directions

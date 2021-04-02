@@ -18,6 +18,8 @@
 #include "ezgl/application.hpp"
 #include "ezgl/graphics.hpp"
 
+#define initial_bestTime 1000000000
+
 extern struct databases database;
 
 
@@ -120,7 +122,7 @@ public:
     IntersectionIdx id;
     std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legal;
     StreetSegmentIdx reachingEdge;
-    double bestTime = 10000000000;
+    double bestTime = initial_bestTime;
     bool turn = false;
     Node(int inter_id, std::vector<std::pair<int, int> > vec){
         id = inter_id;
@@ -134,7 +136,7 @@ public:
 };
 
 //std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > validSegmentsAndIntersections(std::vector<StreetSegmentIdx> &segments, IntersectionIdx point);
-void validSegmentsAndIntersections(std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> >& valid, std::vector<StreetSegmentIdx> segments, IntersectionIdx point);
+void validSegmentsAndIntersections(std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> >& valid, std::vector<StreetSegmentIdx> &segments, IntersectionIdx point);
 
 
 bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double turnPenalty);

@@ -20,6 +20,7 @@
 #include "ezgl/graphics.hpp"
 
 #define NO_EDGE -1
+#define initial_bestTime 1000000000
 
 
 //waveElems have nodes with directions on how they got here
@@ -72,7 +73,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
 //intersectionIDs are returned at (startIntersectionID, destIntersectionID)
 //take startIntersectionID and destIntersectionID as start and finish
 
- void validSegmentsAndIntersections(std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> >& valid, std::vector<StreetSegmentIdx> segments, IntersectionIdx point){
+void validSegmentsAndIntersections(std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> >& valid, std::vector<StreetSegmentIdx>& segments, IntersectionIdx point){
     //std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legalSegmentsandIntersections;
     
     for(int i = 0; i < segments.size(); i++){
@@ -108,7 +109,7 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
     //check whether the street segments are legal and store it in valid
     std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > valid;
     validSegmentsAndIntersections(valid, adjacentSegments, intersect_id_start);
-    Node* sourceNode = new Node(intersect_id_start, valid, 10000000000);
+    Node* sourceNode = new Node(intersect_id_start, valid, initial_bestTime);
     
     intersections.insert({intersect_id_start, sourceNode});
     

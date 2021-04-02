@@ -1030,7 +1030,7 @@ void drawSegment(ezgl::renderer *g, StreetSegmentInfo tempInfo, int i, ezgl::col
     g->set_color(colorChoice);
     
     if(tempInfo.numCurvePoints == 0){
-         g->draw_line({database.streets[i].start_x, database.streets[i].start_y}, {database.streets[i].end_x, database.streets[i].end_y});
+         g->draw_line({database.street_segments[i].start_x, database.street_segments[i].start_y}, {database.street_segments[i].end_x, database.street_segments[i].end_y});
     }   
     else{
             int curvePoints = tempInfo.numCurvePoints;
@@ -1255,12 +1255,12 @@ void draw_main_canvas(ezgl::renderer *g) {
 
         
         if (scope_length < 1500 && scope_height < 1200) {
-            if (findStreetSegmentLength(i) > 70 && scope.m_first.x < database.streets[i].mid_x && scope.m_second.x > database.streets[i].mid_x && scope.m_first.y < database.streets[i].mid_y && scope.m_second.y > database.streets[i].mid_y) {
-                ezgl::point2d centerPoint(database.streets[i].mid_x, database.streets[i].mid_y);
+            if (findStreetSegmentLength(i) > 70 && scope.m_first.x < database.street_segments[i].mid_x && scope.m_second.x > database.street_segments[i].mid_x && scope.m_first.y < database.street_segments[i].mid_y && scope.m_second.y > database.street_segments[i].mid_y) {
+                ezgl::point2d centerPoint(database.street_segments[i].mid_x, database.street_segments[i].mid_y);
                 StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
                 
                 //display the street names
-                g->set_text_rotation(database.streets[i].angle);
+                g->set_text_rotation(database.street_segments[i].angle);
                 g->set_font_size(8);
                 g->set_color(ezgl::BLACK);
                 
@@ -1268,19 +1268,19 @@ void draw_main_canvas(ezgl::renderer *g) {
                     g->set_font_size(12);
                 }
                 
-                if (database.streets[i].oneWay){
-                    if (database.streets[i].reverse){
+                if (database.street_segments[i].oneWay){
+                    if (database.street_segments[i].reverse){
                        //g->draw_text(centerPoint, "< " + streets[i].name + " <");
-                       writeStreetName(g, centerPoint, tempInfo, "< " + database.streets[i].name + " <", i);
+                       writeStreetName(g, centerPoint, tempInfo, "< " + database.street_segments[i].name + " <", i);
                     }
                     else {
                        //g->draw_text(centerPoint, "> " + streets[i].name + " >");
-                       writeStreetName(g, centerPoint, tempInfo, "> " + database.streets[i].name + " >", i);
+                       writeStreetName(g, centerPoint, tempInfo, "> " + database.street_segments[i].name + " >", i);
                     }
                 }
                 else {
                     //g->draw_text(centerPoint, streets[i].name);
-                    writeStreetName(g, centerPoint, tempInfo, database.streets[i].name, i);
+                    writeStreetName(g, centerPoint, tempInfo, database.street_segments[i].name, i);
                     
                 }
             }

@@ -61,7 +61,7 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
         totalTime += findStreetSegmentTravelTime(path[i]);
         
         if(i < pathSize - 1){
-            if(getStreetSegmentInfo(path[i]).streetID != getStreetSegmentInfo(path[i+1]).streetID){
+            if(database.street_segments[path[i]].ID != database.street_segments[path[i + 1]].ID){
                 totalTime += turn_penalty;
             }
         }
@@ -76,18 +76,18 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
     //std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legalSegmentsandIntersections;
     
     for(int i = 0; i < segments.size(); i++){
-        StreetSegmentInfo street_segment = getStreetSegmentInfo(segments[i]);
-        if(street_segment.from == point || street_segment.oneWay == false){
+        //StreetSegmentInfo street_segment = getStreetSegmentInfo(segments[i]);
+        if(database.street_segments[segments[i]].intersection_from == point || database.street_segments[segments[i]].oneWay == false){
             std::pair<StreetSegmentIdx, IntersectionIdx> pairing;
             
             pairing.first = segments[i];
                 
-            if (street_segment.from == point){
-                pairing.second = street_segment.to;
+            if (database.street_segments[segments[i]].intersection_from == point){
+                pairing.second = database.street_segments[segments[i]].intersection_to;
             }
                 
-            if (street_segment.to == point){
-                pairing.second = street_segment.from;
+            if (database.street_segments[segments[i]].intersection_to == point){
+                pairing.second = database.street_segments[segments[i]].intersection_from;
             }
                 
             valid.push_back(pairing);
@@ -226,16 +226,16 @@ std::vector<StreetSegmentIdx> bfsTraceBack(std::unordered_map<IntersectionIdx, N
         //add the previous edge to the path
         pathToDest.push_back(prevEdge);
         
-        StreetSegmentInfo street_segment = getStreetSegmentInfo(prevEdge);
+        //StreetSegmentInfo street_segment = getStreetSegmentInfo(prevEdge);
         
         //set the next Node to the intersection that is on the other side of the street segment
-        if(currNode->id == street_segment.from){
-            auto k = intersections.find(street_segment.to);
+        if(currNode->id == database.street_segments[prevEdge].intersection_from){
+            auto k = intersections.find(database.street_segments[prevEdge].intersection_to);
             currNode = k->second;
         }
         
-        else if(currNode->id == street_segment.to){
-            auto k = intersections.find(street_segment.from);
+        else if(currNode->id == database.street_segments[prevEdge].intersection_to){
+            auto k = intersections.find(database.street_segments[prevEdge].intersection_from);
             currNode = k->second;
         }
         

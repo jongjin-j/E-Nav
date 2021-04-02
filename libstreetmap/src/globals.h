@@ -48,6 +48,8 @@ struct POI_data {
 
 struct street_data {
     std::string name;
+    IntersectionIdx intersection_from;
+    IntersectionIdx intersection_to;
     double start_x = 0;
     double start_y = 0;
     double end_x = 0;
@@ -58,12 +60,9 @@ struct street_data {
     bool oneWay;
     bool reverse = false;
     std::string street_type;
+    StreetIdx ID;
 };
 
-/*struct outEdge{
-    StreetSegmentIdx id;               
-    Node* toNode;
-};*/
 
 struct vector{
     double i;
@@ -91,14 +90,11 @@ struct databases {
     std::vector<intersection_data> intersections;
     std::vector<POI_data> POIs;
     std::vector<std::vector<StreetSegmentIdx>> streetSegments;
-    std::vector<street_data> streets;
+    std::vector<street_data> street_segments;
     std::vector<StreetIdx> results1; //stores the results from user search street 1
     std::vector<StreetIdx> results2; //stores the results from user search street 2
     std::unordered_map<OSMID, std::string> OSMID_wayType;
     std::vector<StreetIdx>streetSegmentID_streetID;
-    //Node **intersection_nodes = new Node[getNumIntersections()];
-    //std::unordered_map<OSMID, std::string> OSMID_nodeType;
-    //std::unordered_map<OSMID, const OSMNode*> OSMID_nodePtr;
 };
 
 
@@ -118,13 +114,6 @@ extern std::vector<std::string> fileNames;
 //extern std::string path;
 
 //m3.cpp function declaration
-/*class Node{
-public:
-    IntersectionIdx id = 0;
-    std::vector<outEdge> outEdges;      //outgoing segments of current node
-    StreetSegmentIdx reachingEdge = 0;      //segment used to get here
-    double bestTime = 1000000000;
-};*/
 
 class Node{
 public:

@@ -270,26 +270,30 @@ void POI_database(){
 
 //set streets database
 void streets_database(){
-    database.streets.resize(getNumStreetSegments());
+    database.street_segments.resize(getNumStreetSegments());
 
     for (int i = 0; i < getNumStreetSegments(); i++) {
 
-        //for each street segment, obtain its intersection IDs "from" and "to"
-        //obtain each intersection ID's position via calling getIntersectionPosition (type LatLon)
-        LatLon startingSeg = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).from).latitude(), getIntersectionPosition(getStreetSegmentInfo(i).from).longitude());
-        LatLon endingSeg = LatLon(getIntersectionPosition(getStreetSegmentInfo(i).to).latitude(), getIntersectionPosition(getStreetSegmentInfo(i).to).longitude());
-
-        //convert LatLon into Cartesian coord and draw line for each segment
-        database.streets[i].start_x = x_from_lon(startingSeg.longitude());
-        database.streets[i].start_y = y_from_lat(startingSeg.latitude());
-        database.streets[i].end_x = x_from_lon(endingSeg.longitude());
-        database.streets[i].end_y = y_from_lat(endingSeg.latitude());
-        database.streets[i].mid_x = 0.5 * (database.streets[i].start_x + database.streets[i].end_x);
-        database.streets[i].mid_y = 0.5 * (database.streets[i].start_y + database.streets[i].end_y);
+        database.street_segments[i].intersection_from = getStreetSegmentInfo(i).from;
+        database.street_segments[i].intersection_to = getStreetSegmentInfo(i).to;
 
         
-        double start_x = database.streets[i].start_x, start_y = database.streets[i].start_y;
-        double end_x = database.streets[i].end_x, end_y = database.streets[i].end_y;
+        //for each street segment, obtain its intersection IDs "from" and "to"
+        //obtain each intersection ID's position via calling getIntersectionPosition (type LatLon)
+        LatLon startingSeg = LatLon(getIntersectionPosition(database.street_segments[i].intersection_from).latitude(), getIntersectionPosition(database.street_segments[i].intersection_from).longitude());
+        LatLon endingSeg = LatLon(getIntersectionPosition(database.street_segments[i].intersection_to).latitude(), getIntersectionPosition(database.street_segments[i].intersection_to).longitude());
+
+        //convert LatLon into Cartesian coord and draw line for each segment
+        database.street_segments[i].start_x = x_from_lon(startingSeg.longitude());
+        database.street_segments[i].start_y = y_from_lat(startingSeg.latitude());
+        database.street_segments[i].end_x = x_from_lon(endingSeg.longitude());
+        database.street_segments[i].end_y = y_from_lat(endingSeg.latitude());
+        database.street_segments[i].mid_x = 0.5 * (database.street_segments[i].start_x + database.street_segments[i].end_x);
+        database.street_segments[i].mid_y = 0.5 * (database.street_segments[i].start_y + database.street_segments[i].end_y);
+
+        
+        double start_x = database.street_segments[i].start_x, start_y = database.street_segments[i].start_y;
+        double end_x = database.street_segments[i].end_x, end_y = database.street_segments[i].end_y;
         
         //set rotation of names
         double rotation = 0;
@@ -300,7 +304,7 @@ void streets_database(){
             
             //if end y and start y are in reverse
             if (end_y < start_y){
-                database.streets[i].reverse = true;
+                database.street_segments[i].reverse = true;
             }
         } 
         else {
@@ -310,42 +314,46 @@ void streets_database(){
         //setting the correct rotations of the names and figuring out the directions of the ways
         //when from is seen as the origin and to is in first quadrant 
         if (end_x > start_x && end_y > start_y) {
-            database.streets[i].angle = rotation;
+            database.street_segments[i].angle = rotation;
         } 
         
         //to is in second quadrant
         if (end_x < start_x && end_y > start_y){
-            database.streets[i].angle = -1 * rotation;
-            database.streets[i].reverse = true;
+            database.street_segments[i].angle = -1 * rotation;
+            database.street_segments[i].reverse = true;
         }
         
         //to is in third quadrant
         if (end_x < start_x && end_y < start_y){
-            database.streets[i].angle = rotation;
-            database.streets[i].reverse = true;
+            database.street_segments[i].angle = rotation;
+            database.street_segments[i].reverse = true;
         }
         
         //to is in fourth quadrant
         if (end_x > start_x && end_y < start_y){
-            database.streets[i].angle = -1 * rotation;
+            database.street_segments[i].angle = -1 * rotation;
         }
         
         //to is on positive x axis
         if (end_x > start_x && end_y == start_y){
-            database.streets[i].angle = rotation;
+            database.street_segments[i].angle = rotation;
         }
         
         //to is on negative x axis
         if (end_x < start_x && end_y == start_y){
-            database.streets[i].angle = rotation;
-            database.streets[i].reverse = true;
+            database.street_segments[i].angle = rotation;
+            database.street_segments[i].reverse = true;
         }
         
+        database.street_segments[i].ID = getStreetSegmentInfo(i).streetID;
+        
         //set name of the street
-        database.streets[i].name = getStreetName(getStreetSegmentInfo(i).streetID);
+        database.street_segments[i].name = getStreetName(database.street_segments[i].ID);
         
         //set one way boolean
-        database.streets[i].oneWay = getStreetSegmentInfo(i).oneWay;
+        database.street_segments[i].oneWay = getStreetSegmentInfo(i).oneWay;
+        
+        
     }
 }
 
@@ -425,45 +433,6 @@ void POIDatabase_nonAmenity(){
 }
 
 
-/*void createNodesfromIntersections(){
-    //initializing database for intersection nodes
-    intersection_nodes.resize(getNumIntersections());
-            
-    //loop through the intersections
-    for(int i = 0; i < getNumIntersections(); i++){
-        //intersection_nodes[i]->outEdges.resize(getNumIntersectionStreetSegment(i));
-        Node* temp = new Node;
-        temp->id = i;
-        intersection_nodes[i] = temp;
-        //std::cout << intersection_nodes[i]->id << std::endl;
-    }
-    
-    
-    for(int i = 0; i < getNumIntersections(); i++){
-        //loop through the street segments of the intersection
-        for (int j = 0; j < getNumIntersectionStreetSegment(i); j++){
-            
-            StreetSegmentInfo street_segment = getStreetSegmentInfo(getIntersectionStreetSegment(i,j));
-            
-            if(street_segment.from == i || street_segment.oneWay == false){
-                struct outEdge edge;
-                
-                edge.id = getIntersectionStreetSegment(i, j);
-                
-                
-                if (street_segment.from == i){
-                    edge.toNode = getNodeByID(street_segment.to);
-                }
-
-                if (street_segment.to == i){
-                    edge.toNode = getNodeByID(street_segment.from);
-                }
-                
-                intersection_nodes[i]->outEdges.push_back(edge);
-            }
-        }
-    }
-}*/
 
 
 //creating a vector of file names in a certain directory
@@ -568,7 +537,7 @@ void closeMap() {
     std::vector<intersection_data> ().swap(database.intersections);
     std::vector<POI_data> ().swap(database.POIs);
     std::vector<std::vector<StreetSegmentIdx>> ().swap(database.streetSegments);
-    std::vector<street_data> ().swap(database.streets);
+    std::vector<street_data> ().swap(database.street_segments);
     std::vector<StreetIdx> ().swap(database.results1); //stores the results from user search street 1
     std::vector<StreetIdx> ().swap(database.results2); //stores the results from user search street 2
     std::unordered_map<OSMID, std::string> ().swap(database.OSMID_wayType);

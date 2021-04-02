@@ -537,7 +537,6 @@ void displayPath(GtkWidget*, ezgl::application *application){
     }
     assert(twoValidIDs == 2);
         //call the pathfinder and insert result into the example path
-        //travelPath = {188312, 188319}; 
         travelPath = findPathBetweenIntersections(startIntersectionID,destIntersectionID,0);
         assert (travelPath.size() != 0);
         
@@ -658,12 +657,13 @@ std::string cardinalDirections(StreetSegmentIdx curr){
 
 //computes cosine of vectors and returns angle
 double angleBetweenVectors(vector a, vector b){
-        //cosineTheta = dot product / product of magnitudes
-        double cosineAngle = (a.x*b.x + a.y*b.y) / sqrt((a.x*a.x + a.y*a.y) * (b.x*b.x + b.y*b.y));
-        double angle = acos(cosineAngle) / kDegreeToRadian;
-        //returns angle in degrees
-        return angle;
-    }
+    
+    double dotProduct = a.x*b.x + a.y*b.y;
+    double determinant = a.x*b.y - b.x*a.y;
+    double angle = (atan2(dotProduct,determinant) / kDegreeToRadian)+90;
+    //returns angle in degrees
+    return angle;
+}
 
 //determines turn directions
 std::string leftOrRight(StreetSegmentIdx current, StreetSegmentIdx next){
@@ -683,7 +683,7 @@ std::string leftOrRight(StreetSegmentIdx current, StreetSegmentIdx next){
     LatLon nextToPos = getIntersectionPosition(nextTo);
     
     vector currSeg, nextSeg;
-    
+
     //orientation possibility 1
     //intersection in common is curr.to and next.from
     if(currTo == nextFrom){
@@ -716,43 +716,43 @@ std::string leftOrRight(StreetSegmentIdx current, StreetSegmentIdx next){
     //orientation possibility 4
     //intersection in commin is curr.to and next.from
     else if(currFrom == nextTo){
-        currSeg.x = x_from_lon(currToPos.longitude() - currFromPos.longitude());
-        currSeg.y = y_from_lat(currToPos.latitude() - currFromPos.latitude());
+        currSeg.x = x_from_lon(currFromPos.longitude() - currToPos.longitude());
+        currSeg.y = y_from_lat(currFromPos.latitude() - currToPos.latitude());
         
         nextSeg.x = x_from_lon(nextFromPos.longitude() - nextToPos.longitude());
         nextSeg.y = y_from_lat(nextFromPos.latitude() - nextToPos.latitude());
     }
     
-    //now there are two vectors currSeg and nextSeg oriented to direction of travel
+    //two vectors currSeg and nextSeg now oriented to direction of travel
+
+    //declare angle between vectors
+    double vectorAngle = angleBetweenVectors(currSeg, nextSeg);
+    assert (vectorAngle != 0);
     
-    //this string holds the angle at which the turn is made
-    std::string s = std::to_string(angleBetweenVectors(currSeg,nextSeg));
-    
-    std::cout << "curr: " << currSeg.x << " " << currSeg.y << std::endl;
-    std::cout << "next: " << nextSeg.x << " " << nextSeg.y << std::endl;
-    
-    /*if(currSeg.x < nextSeg.x){
-        if(currSeg.y < 0){
-            return "left";
+    //returns the angle of the vector, measured from currSeg to nextSeg, CCW
+    if(vectorAngle > 0){
+        assert (vectorAngle < 360);
+        if(vectorAngle < 160){
+            return "Turn left";
+        }else if(vectorAngle > 200){
+            return "Turn right";
+        }else{
+            return "Continue straight";
         }
-        else{
-            return "right";
+        
+    }else if(vectorAngle < 0){
+        assert (vectorAngle > -360);
+        if(vectorAngle > -160){
+            return "Turn right";
+        }else if(vectorAngle < -200){
+            return "Turn left";
+        }else{
+            return "Continue straight";
         }
-    }else if(currSeg.x > nextSeg.x){
-        if(currSeg.y < 0){
-            return "right";
-        }
-        else{
-            return "left";
-        }
-    }*/
-            
-    return s;
-    
-    /*return "right";
-    
-    return "left";*/
-    
+        
+    }
+    assert (vectorAngle != 0);
+
 }
 
 //prints out directions
@@ -810,8 +810,7 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
                     if(nextStreet == "<unknown>"){
                         nextStreet = "a local street";
                     }
-
-                    stringOfDirections += "Make a " + leftOrRight(pathForDirections[i],pathForDirections[i+1]) + " to " + nextStreet + "\n";
+                    stringOfDirections += leftOrRight(pathForDirections[i],pathForDirections[i+1]) + " onto " + nextStreet + "\n";
                     tempDistance = 0;
                 }
             }else if(i == pathForDirections.size()-1){

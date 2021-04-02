@@ -135,7 +135,8 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
     
     auto it = intersections.find(startID);
     
-    std::pair<LatLon, LatLon> posPair (getIntersectionPosition(startID), getIntersectionPosition(destID));
+    std::pair<LatLon, LatLon> posPair (database.intersections[startID].pos, database.intersections[destID].pos);
+    
     double distToDest = findDistanceBetweenTwoPoints(posPair);
     double timeToDest = distToDest/maxSpeed;
                 

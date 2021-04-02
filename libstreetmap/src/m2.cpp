@@ -40,20 +40,20 @@ IntersectionIdx startIntersectionID = 0;
 IntersectionIdx destIntersectionID = 0;
 
 void setFirstStreet(GtkWidget*, ezgl::application *application);
-
 void setSecondStreet(GtkWidget*, ezgl::application *application);
-
 void resetIntersections(GtkWidget*, ezgl::application *application);
-
 void on_dialog_response(GtkDialog *dialog);
-
 void reloadMap(GtkWidget*, ezgl::application *application);
-
 void displayWeather(GtkWidget*, ezgl::application *application);
-
 void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections);
-
 void displayPath(GtkWidget*, ezgl::application *application);
+void selectFrom(GtkWidget*, ezgl::application *application);
+void selectTo(GtkWidget*, ezgl::application *application);
+std::string cardinalDirections(StreetSegmentIdx curr);
+double angleBetweenVectors(vector a, vector b);
+std::string leftOrRight(StreetSegmentIdx current, StreetSegmentIdx next);
+void displayPathUI(GtkWidget*, ezgl::application *application);
+void displayHelp(GtkWidget*, ezgl::application *application);
 
 int integerRound(int x);
 
@@ -607,6 +607,7 @@ int integerRound(int x){
         x-=(x%10);
         return x;
     }
+    return x;
 }
 
 //converts into km (for large travel distances)
@@ -746,6 +747,7 @@ std::string leftOrRight(StreetSegmentIdx current, StreetSegmentIdx next){
             return "Continue straight";
         }
     }
+    return "";
 }
 
 //prints out directions
@@ -903,9 +905,10 @@ void displayHelp(GtkWidget*, ezgl::application *application){
     std::string row1 = "FINDING INTERSECTIONS:\n1. Enter Street1 and Street2. Make sure you press the enter key.\n";
     std::string row2 = "2. Hit 'Find Intersections'. Corresponding intersections (if any) will be highlighted.";
     std::string row3 = "\n\nFINDING DIRECTIONS:\n1. Highlight your starting intersection and press 'From'.\n2. Highlight your destination intersection and press 'To.";
-    std::string row4 = "\n3. Hit 'Find Directions'.\n4. The path will be highlighted and directions will be displayed.\n";
+    std::string row4 = "\n3. Hit 'Go!'.\n4. The path will be highlighted and directions will be displayed.\n\n";
+    std::string row5 = "RESETTING:\n1. To reset all intersections and paths, click on 'Reset'.\n2. To reset a specific intersection, click on it.\n";
 
-    std::string displayText = row1 + row2 + row3 + row4;
+    std::string displayText = row1 + row2 + row3 + row4 + row5;
     char *displayCharArray = new char[displayText.length()+1];
     strcpy(displayCharArray,displayText.c_str());
     

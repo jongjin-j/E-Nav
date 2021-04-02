@@ -403,6 +403,7 @@ void reloadMap(GtkWidget*, ezgl::application *application){
 void displayWeather(GtkWidget*, ezgl::application *application){
         
     //define variables to be used
+    
     GObject *window;
     GtkWidget *content_area;
     GtkWidget *label;

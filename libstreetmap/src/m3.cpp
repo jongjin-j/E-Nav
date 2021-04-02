@@ -151,10 +151,6 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
         
         Node *currNode = wave.node;
         
-        /*std::cout << "id: " << currNode->id << std::endl;
-        std::cout << "time: " << currNode->bestTime << std::endl;
-        std::cout << "wave time: " << wave.travelTime << std::endl;*/
-        
         if (wave.travelTime < currNode->bestTime) {
             //check whether the bath was better to this node
             currNode->reachingEdge = wave.edgeID;         
@@ -179,10 +175,9 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
                 //add a node to the database(unordered map) if it wasn't visited
                 if(it == intersections.end()){
                     std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(currNode->legal[i].second);
-                    std::vector<std::pair<StreetSegmentIdx, IntersectionIdx>> valid;
-                    validSegmentsAndIntersections(valid, adjacentSegments, currNode->legal[i].second);
-                    Node *toNode = new Node(currNode->legal[i].second, valid);
-                   
+                    Node *toNode = new Node(currNode->legal[i].second);
+                    validSegmentsAndIntersections(toNode->legal, adjacentSegments, currNode->legal[i].second);
+                    
                     intersections.insert({currNode->legal[i].second, toNode});
                 }
                 

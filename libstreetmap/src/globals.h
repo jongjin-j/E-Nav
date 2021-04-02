@@ -124,9 +124,8 @@ public:
     StreetSegmentIdx reachingEdge;
     double bestTime = initial_bestTime;
     bool turn = false;
-    Node(int inter_id, std::vector<std::pair<int, int> > vec){
+    Node(int inter_id){
         id = inter_id;
-        legal = vec;
     }
     Node(int inter_id, std::vector<std::pair<int, int> > vec, double time){
         id = inter_id;
@@ -135,8 +134,8 @@ public:
     }
 };
 
-//std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > validSegmentsAndIntersections(std::vector<StreetSegmentIdx> &segments, IntersectionIdx point);
-void validSegmentsAndIntersections(std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> >& valid, std::vector<StreetSegmentIdx> &segments, IntersectionIdx point);
+void validSegmentsAndIntersections(std::vector<std::pair<StreetSegmentIdx, IntersectionIdx>>& valid, std::vector<StreetSegmentIdx> &segments, IntersectionIdx point);
+//void validSegmentsAndIntersections(std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> >& valid, std::vector<StreetSegmentIdx> &segments, IntersectionIdx point);
 
 
 bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double turnPenalty);

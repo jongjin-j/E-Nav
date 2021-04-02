@@ -67,18 +67,11 @@ struct street_data {
 
 
 struct vector{
-    double i;
-    double j;
+    double x;
+    double y;
     vector(){
-        i = 0;
-        j = 0;
-    }
-    double vectorCosine(vector a, vector b){
-        //cosineTheta = dot product / product of magnitudes
-        double cosineAngle = (a.i*b.i + a.j*b.j) / sqrt(a.i*a.i + a.j*a.j + b.i*b.i + b.j*b.j);
-        double angle = acos(cosineAngle) / kDegreeToRadian;
-        
-        return angle;
+        x = 0;
+        y = 0;
     }
 };
 

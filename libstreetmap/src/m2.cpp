@@ -656,17 +656,102 @@ std::string cardinalDirections(StreetSegmentIdx curr){
     return northSouth + westEast;
 }
 
+//computes cosine of vectors and returns angle
+double angleBetweenVectors(vector a, vector b){
+        //cosineTheta = dot product / product of magnitudes
+        double cosineAngle = (a.x*b.x + a.y*b.y) / sqrt((a.x*a.x + a.y*a.y) * (b.x*b.x + b.y*b.y));
+        double angle = acos(cosineAngle) / kDegreeToRadian;
+        //returns angle in degrees
+        return angle;
+    }
+
 //determines turn directions
-std::string leftOrRight(StreetSegmentIdx first, StreetSegmentIdx second){
+std::string leftOrRight(StreetSegmentIdx current, StreetSegmentIdx next){
+
+    //if any of these two are equal, that is the meeting point
+    //new variable names to simplify code
+    IntersectionIdx currFrom = getStreetSegmentInfo(current).from;
+    LatLon currFromPos = getIntersectionPosition(currFrom);
     
-    //implementation: get the segment vector of i, and segment vector of i+1 (when the turn is made)
-    //obtain the cross product of the two vectors
-    //use the angle between segment[i] and the projected vector;
-    //depending where the angle stretches, give it left or right
+    IntersectionIdx currTo = getStreetSegmentInfo(current).to;
+    LatLon currToPos = getIntersectionPosition(currTo);
+            
+    IntersectionIdx nextFrom = getStreetSegmentInfo(next).from;
+    LatLon nextFromPos = getIntersectionPosition(nextFrom);
     
-    return "right";
+    IntersectionIdx nextTo = getStreetSegmentInfo(next).to;
+    LatLon nextToPos = getIntersectionPosition(nextTo);
     
-    return "left";
+    vector currSeg, nextSeg;
+    
+    //orientation possibility 1
+    //intersection in common is curr.to and next.from
+    if(currTo == nextFrom){
+        currSeg.x = x_from_lon(currToPos.longitude() - currFromPos.longitude());
+        currSeg.y = y_from_lat(currToPos.latitude() - currFromPos.latitude());
+        
+        nextSeg.x = x_from_lon(nextToPos.longitude() - nextFromPos.longitude());
+        nextSeg.y = y_from_lat(nextToPos.latitude() - nextFromPos.latitude());
+        
+    }
+    //orientation possibility 2
+    //intersection in common is curr.from and next.from
+    else if(currFrom == nextFrom){
+        currSeg.x = x_from_lon(currFromPos.longitude() - currToPos.longitude());
+        currSeg.y = y_from_lat(currFromPos.latitude() - currToPos.latitude());
+        
+        nextSeg.x = x_from_lon(nextToPos.longitude() - nextFromPos.longitude());
+        nextSeg.y = y_from_lat(nextToPos.latitude() - nextFromPos.latitude());
+        
+    }
+    //orientation possibility 3
+    //intersection in common is curr.to and next.to
+    else if(currTo == nextTo){
+        currSeg.x = x_from_lon(currToPos.longitude() - currFromPos.longitude());
+        currSeg.y = y_from_lat(currToPos.latitude() - currFromPos.latitude());
+        
+        nextSeg.x = x_from_lon(nextFromPos.longitude() - nextToPos.longitude());
+        nextSeg.y = y_from_lat(nextFromPos.latitude() - nextToPos.latitude());
+    }
+    //orientation possibility 4
+    //intersection in commin is curr.to and next.from
+    else if(currFrom == nextTo){
+        currSeg.x = x_from_lon(currToPos.longitude() - currFromPos.longitude());
+        currSeg.y = y_from_lat(currToPos.latitude() - currFromPos.latitude());
+        
+        nextSeg.x = x_from_lon(nextFromPos.longitude() - nextToPos.longitude());
+        nextSeg.y = y_from_lat(nextFromPos.latitude() - nextToPos.latitude());
+    }
+    
+    //now there are two vectors currSeg and nextSeg oriented to direction of travel
+    
+    //this string holds the angle at which the turn is made
+    std::string s = std::to_string(angleBetweenVectors(currSeg,nextSeg));
+    
+    std::cout << "curr: " << currSeg.x << " " << currSeg.y << std::endl;
+    std::cout << "next: " << nextSeg.x << " " << nextSeg.y << std::endl;
+    
+    /*if(currSeg.x < nextSeg.x){
+        if(currSeg.y < 0){
+            return "left";
+        }
+        else{
+            return "right";
+        }
+    }else if(currSeg.x > nextSeg.x){
+        if(currSeg.y < 0){
+            return "right";
+        }
+        else{
+            return "left";
+        }
+    }*/
+            
+    return s;
+    
+    /*return "right";
+    
+    return "left";*/
     
 }
 
@@ -675,6 +760,7 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
 
     double tempDistance = 0;
     std::string currentStreet, nextStreet;
+    stringOfDirections = "";
     
     if(pathForDirections.size()==0){
         stringOfDirections += "Error: no input path detected\n";
@@ -732,7 +818,9 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
                 if(tempDistance<1000){
                     stringOfDirections += ">> Travel " + std::to_string(integerRound((int)tempDistance)) + "m";
                 }else if(tempDistance>999){
-                    stringOfDirections += ">> Travel " + std::to_string(toKM(tempDistance)) + "km";
+                    std::stringstream mySS;
+                    mySS << std::fixed << std::setprecision(1) << toKM(tempDistance);
+                    stringOfDirections += ">> Travel " + mySS.str() + "km\n\n";
                 }
                     stringOfDirections += " to arrive at your destination\n";
             }

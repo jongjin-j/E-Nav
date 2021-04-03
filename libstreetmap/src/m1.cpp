@@ -457,22 +457,24 @@ int createFileList(std::string directoryPath) {
 }
 
 //find the maximum speed limit in the city
-
 void findMaxSpeed(){
     double limit;
     
+    //loop through the street segments and find the max speed
     for (int i = 0; i < getNumStreetSegments(); i++){
         StreetSegmentInfo ss_info = getStreetSegmentInfo(i);
         limit = ss_info.speedLimit;
         
+        //update the speed if found a larger one
         if (limit > maxSpeed){
             maxSpeed = limit;
         }
     }
-    //maxSpeed = 23;
-    //maxSpeed *= 0.7885705;
+    
+    //optimal speed ratio for fastest A*
+    //value calculated through extreme test cases
     maxSpeed *= 0.76;
-    //std::cout << maxSpeed << std::endl;
+    
     return;
 }
 
@@ -491,8 +493,7 @@ bool loadMap(std::string map_streets_database_filename) {
     map_OSM_database_filename.erase(map_OSM_database_filename.find(toErase), toErase.length());
     map_OSM_database_filename += "osm.bin";
     
-    bool loading = loadOSMDatabaseBIN(map_OSM_database_filename);
-    load_successful = loadStreetsDatabaseBIN(map_streets_database_filename);
+    load_successful = (loadStreetsDatabaseBIN(map_streets_database_filename) && loadOSMDatabaseBIN(map_OSM_database_filename));
     
     //if the loading was not successful
     if(load_successful == false){
@@ -515,7 +516,6 @@ bool loadMap(std::string map_streets_database_filename) {
     POIDatabase_nonAmenity();
     findMaxSpeed();
     street_SegmentID_streetID();
-    //createNodesfromIntersections();
     
   
     //load was successful
@@ -542,11 +542,7 @@ void closeMap() {
     std::vector<StreetIdx> ().swap(database.results1); //stores the results from user search street 1
     std::vector<StreetIdx> ().swap(database.results2); //stores the results from user search street 2
     std::unordered_map<OSMID, std::string> ().swap(database.OSMID_wayType);
-    
-    /*for (int i = 0; i < getNumIntersections(); i++){
-        delete intersection_nodes[i];
-    }
-    std::vector<Node*> ().swap(intersection_nodes);*/
+//    
     
     
     //close the street database

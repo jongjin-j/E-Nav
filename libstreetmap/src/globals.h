@@ -18,17 +18,14 @@
 #include "ezgl/application.hpp"
 #include "ezgl/graphics.hpp"
 
+//initial best time must be a large number
 #define initial_bestTime 1000000000
 
 extern struct databases database;
 
-
 extern int cityNums;
 
 extern IntersectionIdx startIntersectionID, destIntersectionID;
-
-//class Node;
-
 
 struct intersection_data {
     std::string name;
@@ -92,46 +89,32 @@ struct databases {
     std::vector<StreetIdx>streetSegmentID_streetID;
 };
 
-
-
-
 extern float avg_lat;
-
 extern double min_lat;
 extern double max_lat;
 extern double min_lon;
 extern double max_lon;
-
 extern double maxSpeed;
-
 extern std::vector<std::string> fileNames;
 
-//extern std::string path;
 
 //m3.cpp function declaration
 
+//class for a node (intersection)
 class Node{
 public:
     IntersectionIdx id;
-    //std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legal;
     StreetSegmentIdx reachingEdge;
     double bestTime = initial_bestTime;
     bool turn = false;
     Node(int inter_id){
         id = inter_id;
     }
-    /*Node(int inter_id, std::vector<std::pair<int, int> > vec, double time){
-        id = inter_id;
-        legal = vec;
-        bestTime = time;
-    }*/
 };
 
 void validSegmentsAndIntersections(std::vector<std::pair<StreetSegmentIdx, IntersectionIdx>>& valid, std::vector<StreetSegmentIdx> &segments, IntersectionIdx point);
-//void validSegmentsAndIntersections(std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> >& valid, std::vector<StreetSegmentIdx> &segments, IntersectionIdx point);
 
-
-bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double turnPenalty);
+bool AStarPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double turnPenalty);
 std::vector<StreetSegmentIdx> bfsTraceBack(std::unordered_map<IntersectionIdx, Node*>& intersections, int destID);
 
 //m2.cpp function declaration
@@ -167,6 +150,8 @@ void OSMID_wayValue();
 void POIDatabase_nonAmenity();
 int createFileList(std::string directoryPath);
 void createNodesfromIntersections();
+void street_SegmentID_streetID();
+void findMaxSpeed();
 
 extern std::vector<int> weatherData;
 

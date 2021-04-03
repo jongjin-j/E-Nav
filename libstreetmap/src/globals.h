@@ -113,18 +113,18 @@ extern std::vector<std::string> fileNames;
 class Node{
 public:
     IntersectionIdx id;
-    std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legal;
+    //std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legal;
     StreetSegmentIdx reachingEdge;
     double bestTime = initial_bestTime;
     bool turn = false;
     Node(int inter_id){
         id = inter_id;
     }
-    Node(int inter_id, std::vector<std::pair<int, int> > vec, double time){
+    /*Node(int inter_id, std::vector<std::pair<int, int> > vec, double time){
         id = inter_id;
         legal = vec;
         bestTime = time;
-    }
+    }*/
 };
 
 void validSegmentsAndIntersections(std::vector<std::pair<StreetSegmentIdx, IntersectionIdx>>& valid, std::vector<StreetSegmentIdx> &segments, IntersectionIdx point);

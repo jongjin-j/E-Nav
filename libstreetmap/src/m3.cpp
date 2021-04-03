@@ -73,30 +73,6 @@ double computePathTravelTime(const std::vector<StreetSegmentIdx>& path, const do
 //intersectionIDs are returned at (startIntersectionID, destIntersectionID)
 //take startIntersectionID and destIntersectionID as start and finish
 
-void validSegmentsAndIntersections(std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> >& valid, std::vector<StreetSegmentIdx>& segments, IntersectionIdx point){
-    //std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > legalSegmentsandIntersections;
-    
-    for(int i = 0; i < segments.size(); i++){
-        //StreetSegmentInfo street_segment = getStreetSegmentInfo(segments[i]);
-        if(database.street_segments[segments[i]].intersection_from == point || database.street_segments[segments[i]].oneWay == false){
-            std::pair<StreetSegmentIdx, IntersectionIdx> pairing;
-            
-            pairing.first = segments[i];
-                
-            if (database.street_segments[segments[i]].intersection_from == point){
-                pairing.second = database.street_segments[segments[i]].intersection_to;
-            }
-                
-            if (database.street_segments[segments[i]].intersection_to == point){
-                pairing.second = database.street_segments[segments[i]].intersection_from;
-            }
-                
-            valid.push_back(pairing);
-        }
-    }
-    
-    //return legalSegmentsandIntersections;
-}
 
 
 std::vector<StreetSegmentIdx> findPathBetweenIntersections(const IntersectionIdx intersect_id_start, 
@@ -105,11 +81,13 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
     std::unordered_map<IntersectionIdx, Node*> intersections;
     
     //find the adjacent street segments of the start intersection
-    std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(intersect_id_start);
+    //std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(intersect_id_start);
     //check whether the street segments are legal and store it in valid
-    std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > valid;
-    validSegmentsAndIntersections(valid, adjacentSegments, intersect_id_start);
-    Node* sourceNode = new Node(intersect_id_start, valid, initial_bestTime);
+    //std::vector<std::pair<StreetSegmentIdx, IntersectionIdx> > valid;
+    //validSegmentsAndIntersections(valid, adjacentSegments, intersect_id_start);
+    //Node* sourceNode = new Node(intersect_id_start, valid, initial_bestTime);
+    Node* sourceNode = new Node(intersect_id_start);
+    sourceNode -> bestTime = initial_bestTime;
     
     intersections.insert({intersect_id_start, sourceNode});
     
@@ -128,6 +106,7 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
     
     return path;
 }
+
 
 bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double timePenalty){
     //set a priority queue for the wave elements in the wavefront
@@ -162,48 +141,68 @@ bool bfsPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int star
                 return true;
             }
             
-            for(int i = 0; i < currNode->legal.size(); i++){
-                /*LatLon p1(getIntersectionPosition(currNode->id).latitude(), getIntersectionPosition(currNode->id).longitude());
-                LatLon p2(getIntersectionPosition(currNode->legal[i].second).latitude(), getIntersectionPosition(currNode->legal[i].second).longitude());
-                ezgl::point2d point1(x_from_lon(p1.longitude()), y_from_lat(p1.latitude()));
-                ezgl::point2d point2(x_from_lon(p2.longitude()), y_from_lat(p2.latitude()));
+            std::vector<StreetSegmentIdx> adjacentStreetSegments = findStreetSegmentsOfIntersection(currNode->id);
+            
+            for(int i = 0; i < adjacentStreetSegments.size(); i++){
                 
-                g->draw_line(point1, point2);*/
                 
-                it = intersections.find(currNode->legal[i].second);
+                IntersectionIdx legalIntersection;
+                bool legal = false;
                 
-                //check whether the node was visited or not(exists in the database or not)
-                //add a node to the database(unordered map) if it wasn't visited
-                if(it == intersections.end()){
-                    std::vector<StreetSegmentIdx> adjacentSegments = findStreetSegmentsOfIntersection(currNode->legal[i].second);
-                    Node *toNode = new Node(currNode->legal[i].second);
-                    validSegmentsAndIntersections(toNode->legal, adjacentSegments, currNode->legal[i].second);
+                if(database.street_segments[adjacentStreetSegments[i]].intersection_from == currNode->id || database.street_segments[adjacentStreetSegments[i]].oneWay == false){
+
+                    legal = true;
                     
-                    intersections.insert({currNode->legal[i].second, toNode});
-                }
-                
-                it = intersections.find(currNode->legal[i].second);
-                
-                //heuristics 
-                std::pair<LatLon, LatLon> currentPosPair (database.intersections[currNode->legal[i].second].pos, database.intersections[destID].pos);
-                double currentDistToDest = findDistanceBetweenTwoPoints(currentPosPair);
-                double currentTimeToDest = currentDistToDest/maxSpeed;
-                
-                double travel_time = findStreetSegmentTravelTime(currNode->legal[i].first);
-                          
-                //check whether the node's previous edge is not the starting edge
-                if (currNode->reachingEdge != NO_EDGE){
-                    //if the previous edge and the current edge has the same streetID, don't apply the turn penalty and add to the wavefront
-                    if (database.streetSegmentID_streetID[currNode->reachingEdge] == database.streetSegmentID_streetID[currNode->legal[i].first]){
-                        wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time, currentTimeToDest));
+                    if (database.street_segments[adjacentStreetSegments[i]].intersection_from == currNode->id){
+                        legalIntersection = database.street_segments[adjacentStreetSegments[i]].intersection_to;
                     }
-                    //if the previous edge and the current edge do not have the same streetID, apply the turn penalty and add to the wavefront
+
+                    if (database.street_segments[adjacentStreetSegments[i]].intersection_to == currNode->id){
+                        legalIntersection = database.street_segments[adjacentStreetSegments[i]].intersection_from;
+                    }
+                }
+               
+                if (legal){
+                    /*LatLon p1(getIntersectionPosition(currNode->id).latitude(), getIntersectionPosition(currNode->id).longitude());
+                    LatLon p2(getIntersectionPosition(legalIntersection).latitude(), getIntersectionPosition(legalIntersection).longitude());
+                    ezgl::point2d point1(x_from_lon(p1.longitude()), y_from_lat(p1.latitude()));
+                    ezgl::point2d point2(x_from_lon(p2.longitude()), y_from_lat(p2.latitude()));
+
+                    g->draw_line(point1, point2);*/
+                    
+                    it = intersections.find(legalIntersection);
+                
+                    //check whether the node was visited or not(exists in the database or not)
+                    //add a node to the database(unordered map) if it wasn't visited
+                    if(it == intersections.end()){
+                        Node *toNode = new Node(legalIntersection);
+
+                        intersections.insert({legalIntersection, toNode});
+                    }
+
+                    it = intersections.find(legalIntersection);
+
+                    //heuristics 
+                    std::pair<LatLon, LatLon> currentPosPair (database.intersections[legalIntersection].pos, database.intersections[destID].pos);
+                    double currentDistToDest = findDistanceBetweenTwoPoints(currentPosPair);
+                    double currentTimeToDest = currentDistToDest/maxSpeed;
+
+                    double travel_time = findStreetSegmentTravelTime(adjacentStreetSegments[i]);
+
+                    //check whether the node's previous edge is not the starting edge
+                    if (currNode->reachingEdge != NO_EDGE){
+                        //if the previous edge and the current edge has the same streetID, don't apply the turn penalty and add to the wavefront
+                        if (database.streetSegmentID_streetID[currNode->reachingEdge] == database.streetSegmentID_streetID[adjacentStreetSegments[i]]){
+                            wavefront.push(WaveElem(it->second, adjacentStreetSegments[i], currNode->bestTime + travel_time, currentTimeToDest));
+                        }
+                        //if the previous edge and the current edge do not have the same streetID, apply the turn penalty and add to the wavefront
+                        else{
+                            wavefront.push(WaveElem(it->second, adjacentStreetSegments[i], currNode->bestTime + travel_time + timePenalty, currentTimeToDest));
+                        }
+                    }
                     else{
-                        wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time + timePenalty, currentTimeToDest));
+                        wavefront.push(WaveElem(it->second, adjacentStreetSegments[i], currNode->bestTime + travel_time, currentTimeToDest));                
                     }
-                }
-                else{
-                    wavefront.push(WaveElem(it->second, currNode->legal[i].first, currNode->bestTime + travel_time, currentTimeToDest));                
                 }
             }
         }

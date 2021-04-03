@@ -102,7 +102,7 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
     
     //return a path if a path exists between the intersections
     if(found){
-        path = bfsTraceBack(intersections, intersect_id_destination);
+        path = AStarTraceBack(intersections, intersect_id_destination);
     }
     
     //delete the unordered map
@@ -222,7 +222,7 @@ bool AStarPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int st
 }
 
 //trace back the path and store the segment IDs in a vector
-std::vector<StreetSegmentIdx> bfsTraceBack(std::unordered_map<IntersectionIdx, Node*>& intersections, int destID){
+std::vector<StreetSegmentIdx> AStarTraceBack(std::unordered_map<IntersectionIdx, Node*>& intersections, int destID){
     std::vector<StreetSegmentIdx> pathToDest; 
     
     //find the Node with the destination intersection ID

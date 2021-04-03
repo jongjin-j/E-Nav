@@ -115,7 +115,7 @@ public:
 void validSegmentsAndIntersections(std::vector<std::pair<StreetSegmentIdx, IntersectionIdx>>& valid, std::vector<StreetSegmentIdx> &segments, IntersectionIdx point);
 
 bool AStarPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double turnPenalty);
-std::vector<StreetSegmentIdx> bfsTraceBack(std::unordered_map<IntersectionIdx, Node*>& intersections, int destID);
+std::vector<StreetSegmentIdx> AStarTraceBack(std::unordered_map<IntersectionIdx, Node*>& intersections, int destID);
 
 //m2.cpp function declaration
 const ezgl::color chooseFeatureColour(FeatureType x); 

@@ -23,8 +23,8 @@
 #include <camera.hpp>
 #include <cassert>
 
-#define maxScopeAdjust 1.00009
-#define minScopeAdjustLon 1.00003
+#define maxScopeAdjust 1.0001
+#define minScopeAdjustLon 1.00001
 #define minScopeAdjustLat 0.99993        
 
 extern struct databases database;

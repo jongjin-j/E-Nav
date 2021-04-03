@@ -1463,19 +1463,23 @@ void draw_main_canvas(ezgl::renderer *g) {
             ezgl::surface *png_surface;
             
             double scopeRatioX = 0.00928098;
-            double scopeRatioY = 0.05807086;
+            double scopeRatioY = 0.05307086;
+            double scopeRatioFlagY = 0.049;
             
             if(database.intersections[id].start){
                 png_surface = ezgl::renderer::load_png("libstreetmap/resources/RedFlag.png");
+                g->draw_surface(png_surface, {center.x, center.y + scopeRatioFlagY * scope_height});
             }else if(database.intersections[id].dest){
                 png_surface = ezgl::renderer::load_png("libstreetmap/resources/GreenFlag.png");
+                g->draw_surface(png_surface, {center.x, center.y + scopeRatioFlagY * scope_height});
             }else{
                 png_surface = ezgl::renderer::load_png("libstreetmap/resources/redpin.png");
+                g->draw_surface(png_surface, {center.x - scopeRatioX * scope_length, center.y + scopeRatioY * scope_height});
             }
             //scope ratios are for adjusting where the image/text appears as a function of zoom distance
             //adjust the center point so that the png fits nicely (by default, top left corner of the png is attached to the center point)
             
-            g->draw_surface(png_surface, {center.x - scopeRatioX * scope_length, center.y + scopeRatioY * scope_height});
+            //g->draw_surface(png_surface, {center.x - scopeRatioX * scope_length, center.y + scopeRatioY * scope_height});
             ezgl::renderer::free_surface(png_surface);
             
             //print name of intersection

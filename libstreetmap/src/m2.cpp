@@ -823,16 +823,21 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
     }
 }
 
+
+
 void displayPathUI(GtkWidget*, ezgl::application *application){
     
     if(travelPath.size()==0){
         return;
     }
+    assert (travelPath.size()>0);
     //define variables to be used
     GObject *window;
     GtkWidget *content_area;
     GtkWidget *label;
     GtkWidget* dialog;
+    
+    GtkWidget *scrolled_window = gtk_scrolled_window_new (NULL, NULL);
     
     //pointer to main winddow
     window = application -> get_object(application->get_main_window_id().c_str());
@@ -850,6 +855,11 @@ void displayPathUI(GtkWidget*, ezgl::application *application){
             );
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
+    gtk_container_add (GTK_CONTAINER (scrolled_window),
+                   dialog);
+    
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    
     //string to display on the dialog
     //convert to char array
     
@@ -858,7 +868,6 @@ void displayPathUI(GtkWidget*, ezgl::application *application){
     
     //input char array into the label
     label = gtk_label_new(displayCharArray);
-    //temperature (celsius) 0, feels like (celsius) 1, pressure (hPa) 2, humidity (g/m^3) 3, wind speed (m/s) 4, wind degrees (deg) 5
     
     gtk_container_add(GTK_CONTAINER(content_area), label);
     
@@ -1505,7 +1514,7 @@ void draw_main_canvas(ezgl::renderer *g) {
         for(int i = 0; i < getNumStreetSegments(); i++){
             for(int j = 0; j<travelPath.size(); j++){
                 if(i==travelPath[j]){
-                g->set_line_width(3);
+                g->set_line_width(4);
                 g->set_line_cap(ezgl::line_cap::butt);
                 StreetSegmentInfo tempInfo = getStreetSegmentInfo(i);
                 drawSegment(g, tempInfo, i, ezgl::BLUE);

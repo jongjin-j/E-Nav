@@ -25,6 +25,10 @@ typedef struct MyCustomStruct {
 static size_t write_data(void *buffer, size_t size, size_t nmemb, void *userp) {
     if (buffer && nmemb && userp) {
         MyCustomStruct *pMyStruct = (MyCustomStruct *)userp;
+        
+        if(size != 0){
+            std::cout << " " << std::endl;
+        }
 
         // Reads from struct passed in from loadCityWeatherData
         cout << "Successfully queried page at URL: " << pMyStruct->url << endl;

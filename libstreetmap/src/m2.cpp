@@ -55,6 +55,7 @@ double angleBetweenVectors(vector a, vector b);
 std::string leftOrRight(StreetSegmentIdx current, StreetSegmentIdx next);
 void displayPathUI(GtkWidget*, ezgl::application *application);
 void displayHelp(GtkWidget*, ezgl::application *application);
+void displayErrorMessage(GtkWidget*, ezgl::application *application);
 
 int integerRound(int x);
 
@@ -759,6 +760,7 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
     stringOfDirections = "";
     
     if(pathForDirections.size()==0){
+        std::cout << "Error: no input path detected\n";
         stringOfDirections += "Error: no input path detected\n";
     }
     
@@ -769,9 +771,11 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
             streetName = "a local street";
             assert (streetName!="<unknown>");
         }
+        std::cout << "You are currently on " << streetName << "\n";
+        std::cout << "Travel " << std::to_string(integerRound((int)tempDistance)) << "m on " << getStreetName(getStreetSegmentInfo(pathForDirections[0]).streetID) << " towards your destination\n ";
         stringOfDirections += "You are currently on " + streetName + "\n";
         stringOfDirections += "Travel " + std::to_string(integerRound((int)tempDistance)) + "m on " + getStreetName(getStreetSegmentInfo(pathForDirections[0]).streetID) + " towards your destination\n ";
-    }
+        }
     
     else if(pathForDirections.size()>1){
         for(int i=0; i < pathForDirections.size(); i++){
@@ -788,6 +792,7 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
                 if(currentStreet == "<unknown>"){
                     currentStreet = "a local street";
                 }
+                std::cout << "Head " << cardinalDirections(pathForDirections[i]) << " on " << currentStreet << "\n";
                 stringOfDirections += "Head " + cardinalDirections(pathForDirections[i]) + " on " + currentStreet + "\n";
             }
 
@@ -796,27 +801,33 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
                     assert (tempDistance != 0);
                     //make a stringstream to set precision of the input
                     if(tempDistance<1000){
-                    stringOfDirections += ">> Travel " + std::to_string(integerRound((int)tempDistance)) + "m\n\n";
+                        std::cout<< ">> Travel " << std::to_string(integerRound((int)tempDistance)) << "m\n\n";
+                        stringOfDirections += ">> Travel " + std::to_string(integerRound((int)tempDistance)) + "m\n\n";
                     }else if(tempDistance>999){
                     std::stringstream ss;
                     ss << std::fixed << std::setprecision(1) << toKM(tempDistance);
+                    std::cout << ">> Travel " << ss.str() << "km\n\n";
                     stringOfDirections += ">> Travel " + ss.str() + "km\n\n";
                     }
                     
                     if(nextStreet == "<unknown>"){
                         nextStreet = "a local street";
                     }
+                    std::cout << leftOrRight(pathForDirections[i],pathForDirections[i+1]) << " onto " << nextStreet << "\n";
                     stringOfDirections += leftOrRight(pathForDirections[i],pathForDirections[i+1]) + " onto " + nextStreet + "\n";
                     tempDistance = 0;
                 }
             }else if(i == pathForDirections.size()-1){
                 if(tempDistance<1000){
+                    std::cout << ">> Travel " << std::to_string(integerRound((int)tempDistance)) << "m";
                     stringOfDirections += ">> Travel " + std::to_string(integerRound((int)tempDistance)) + "m";
                 }else if(tempDistance>999){
                     std::stringstream mySS;
                     mySS << std::fixed << std::setprecision(1) << toKM(tempDistance);
+                    std::cout << ">> Travel " << mySS.str() << "km\n\n";
                     stringOfDirections += ">> Travel " + mySS.str() + "km\n\n";
                 }
+                std::cout << " to arrive at your destination\n";
                     stringOfDirections += " to arrive at your destination\n";
             }
         } 
@@ -826,61 +837,31 @@ void directionPrinter(std::vector<StreetSegmentIdx> pathForDirections){
 
 
 void displayPathUI(GtkWidget*, ezgl::application *application){
-    
+    application->get_renderer();
     if(travelPath.size()==0){
         return;
     }
     assert (travelPath.size()>0);
-    //define variables to be used
-    GObject *window;
-    GtkWidget *content_area;
-    GtkWidget *label;
-    GtkWidget* dialog;
-    
-    GtkWidget *scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-    
-    //pointer to main winddow
-    window = application -> get_object(application->get_main_window_id().c_str());
-    
-    dialog = gtk_dialog_new_with_buttons(
-            "DIRECTIONS",
-            (GtkWindow*) window,
-            GTK_DIALOG_MODAL,
-            ("Close"),
-            //added to suppress warnings
-            GTK_RESPONSE_ACCEPT,
-            NULL,
-            GTK_RESPONSE_REJECT,
-            NULL
-            );
-    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-
-    gtk_container_add (GTK_CONTAINER (scrolled_window),
-                   dialog);
-    
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    
-    //string to display on the dialog
-    //convert to char array
     
     char *displayCharArray = new char[stringOfDirections.length()+1];
     strcpy(displayCharArray,stringOfDirections.c_str());
+    //define variables to be used   
+    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    GtkWidget *scrolledwindow = gtk_scrolled_window_new(NULL, NULL); 
+    GtkWidget *label = gtk_label_new(displayCharArray);
+ 
+    gtk_scrolled_window_set_min_content_width
+                               ((GtkScrolledWindow*)scrolledwindow,
+                                305);
     
-    //input char array into the label
-    label = gtk_label_new(displayCharArray);
+    gtk_scrolled_window_set_min_content_height
+                               ((GtkScrolledWindow*)scrolledwindow,
+                                350);
+
+    gtk_container_add(GTK_CONTAINER(scrolledwindow), label);
+    gtk_container_add(GTK_CONTAINER(window), scrolledwindow);
+    gtk_widget_show_all(window);
     
-    gtk_container_add(GTK_CONTAINER(content_area), label);
-    
-    gtk_widget_show_all(dialog);
-    
-    //connect the OK button
-    g_signal_connect(
-        GTK_DIALOG(dialog),
-        "response",
-        G_CALLBACK(on_dialog_response),
-        NULL
-    );
-    application -> refresh_drawing();
     delete[]displayCharArray;
     
 }

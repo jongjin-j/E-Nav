@@ -11,6 +11,7 @@
 #include <string>
 #include <string.h>
 #include <list>
+#include "m3.h"
 #include "m4.h"
 #include <unordered_map>
 #include <queue>
@@ -19,63 +20,55 @@
 //initial time has to be a large number
 #define initial_bestTime 1000000000
 
-//comparator for the priority queue
-class myComparator
-{
-public:
-    int operator() (const WaveElem& wave1, const WaveElem& wave2)
-    {
-        //compares the total time
-        return wave1.travelTime > wave2.travelTime;
-    }
-};
 
-bool multiDestDijkstra(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double timePenalty);
+
+bool multiDestDijkstra(int startIdx, int startID, int numOfImportantIntersections, std::vector<std::vector<int>>& pathTimes, std::unordered_map<IntersectionIdx, int> pickupIndexes, 
+        std::unordered_map<IntersectionIdx, int> dropoffIndexes, std::unordered_map<IntersectionIdx, int> depotIndexes, double timePenalty);
 
 std::vector<StreetSegmentIdx> traceBack(std::unordered_map<IntersectionIdx, Node*>& intersections, int destID);
 
 
 
 std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, const float turn_penalty){
-    auto const startTime = std::chrono::high_resolution_clock::now();
+    int N = deliveries.size();
+    int M = depots.size();
     
-    std::unordered_map<IntersectionIdx, int> importantIntersections;
-    for (int i = 0; i < deliveries.size(); i++){
-        importantIntersections[deliveries[i].pickUp] = 1;
-        importantIntersections[deliveries[i].dropOff] = 1;
+    //database for all path times
+    std::vector<std::vector<int>> timeForAllPaths;
+    timeForAllPaths.resize(2*N+M);
+    for (int i = 0; i < 2*N+M; ++i){
+        timeForAllPaths[i].resize(2*N+M);
     }
     
-    for (int i = 0; i < depots.size(); i++){
-        importantIntersections[depots[i]] = 1;
-    }
     
-    std::unordered_map<IntersectionIdx, Node*> intersections;
-    
-    
-    //vector that contains all path from each Delivery Location to another or to a Depot
-    //std::vector<std::vector<std::vector<StreetSegmentIdx>>> pathFromDeliveryLoc [2 * deliveries.size()][2 * deliveries.size() + depots.size()][];
-    std::unordered_map<IntersectionIdx, std::unordered_map<IntersectionIdx, std::vector<StreetSegmentIdx>>> pathFromDeliveryLoc;
 
-    //vector that contains all path from each Depot to any Delivery Pickup Location
-    //std::unordered_map<std::vector<std::vector<StreetSegmentIdx>>> pathFromDepot;
-    std::unordered_map<IntersectionIdx, std::unordered_map<IntersectionIdx, std::vector<StreetSegmentIdx>>> pathFromDepot;
+    //store the indexes of the important intersections
+    std::unordered_map<IntersectionIdx, int> pickupIndexes;
+    std::unordered_map<IntersectionIdx, int> dropoffIndexes;
+    std::unordered_map<IntersectionIdx, int> depotIndexes;
     
-    int numOfIntersectionsOfInterest = deliveries.size()*2 + depots.size() - 1;
-
+    
+    //set up database for important intersections
     for (int i = 0; i < deliveries.size(); i++){
-        multiDestDijkstra(intersections, deliveries[i].pickUp, importantIntersections, pathFromDeliveryLoc, pathFromDepot, numOfIntersectionsOfInterest, turn_penalty);
-        multiDestDijkstra(intersections, deliveries[i].dropOff, importantIntersections, pathFromDeliveryLoc, pathFromDepot, numOfIntersectionsOfInterest, turn_penalty);
+        pickupIndexes[deliveries[i].pickUp] = i;
+    }
+    for (int i = 0; i < deliveries.size(); i++){
+        dropoffIndexes[deliveries[i].dropOff] = i;
     }
     for (int i = 0; i < depots.size(); i++){
-        multiDestDijkstra(intersections, depots[i], deliveries.size(), turn_penalty);
+        depotIndexes[depots[i]] = i;
     }
     
+    //travel time using Dijkstra
+    for (int i = 0; i < deliveries.size(); i++){
+        multiDestDijkstra(i, deliveries[i].pickUp, 2*N+M, timeForAllPaths, pickupIndexes, dropoffIndexes, depotIndexes, turn_penalty);
+        multiDestDijkstra(i+N, deliveries[i].dropOff, 2*N+M, timeForAllPaths, pickupIndexes, dropoffIndexes, depotIndexes, turn_penalty);
+    }
     
-    auto const endTime = std::chrono::high_resolution_clock::now();
-    auto const timeElapsed = std::chrono::duration_cast<std::chrono::seconds>(endTime-startTime);
-    std::cout << "time taken to find path is " << timeElapsed.count() << std::endl;
-    
-    //return path
+
+    for (int i = 0; i < depots.size(); i++){
+        multiDestDijkstra(i+2*N, depots[i], 2*N+M, timeForAllPaths, pickupIndexes, dropoffIndexes, depotIndexes, turn_penalty);
+    }
 }
 
 
@@ -91,18 +84,38 @@ struct WaveElem{
         node = n;
         edgeID = id;
         travelTime = travel_time;
-        
     }
 };
 
+//comparator for the priority queue
+class myComparator
+{
+public:
+    int operator() (const WaveElem& wave1, const WaveElem& wave2)
+    {
+        //compares the total time
+        return wave1.travelTime > wave2.travelTime;
+    }
+};
 
-bool multiDestDijkstra(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, std::unordered_map<IntersectionIdx, int> importantIntersections,std::unordered_map<IntersectionIdx, std::unordered_map<IntersectionIdx, std::vector<StreetSegmentIdx>>> pathFromDeliveryLoc,
-        std::unordered_map<IntersectionIdx, std::unordered_map<IntersectionIdx, std::vector<StreetSegmentIdx>>> pathFromDepot, int numOfIntersectionsOfInterest, double timePenalty){
+bool multiDestDijkstra(int startIdx, int startID, int numOfImportantIntersections, std::vector<std::vector<int>>& pathTimes, std::unordered_map<IntersectionIdx, int> pickupIndexes, 
+        std::unordered_map<IntersectionIdx, int> dropoffIndexes, std::unordered_map<IntersectionIdx, int> depotIndexes, double timePenalty){
     
-    int interestedIntersectionCount = 0;
+    std::unordered_map<IntersectionIdx, Node*> intersections;
+    //starting node 
+    Node* sourceNode = new Node(startID);
+    sourceNode -> bestTime = initial_bestTime;
+    
+    //insert into the unordered map intersection database
+    intersections.insert({startID, sourceNode});
+    
+    int importantIntersectionCount = 0;
+    /*int pickupCount = 0;
+    int dropoffCount = 0;
+    int depotCount = 0;*/
     
     //set a priority queue for the wave elements in the wavefront
-    std::priority_queue <WaveElem, std::vector<WaveElem>> wavefront;
+    std::priority_queue <WaveElem, std::vector<WaveElem>, myComparator> wavefront;
     
     auto it = intersections.find(startID);
     
@@ -113,6 +126,8 @@ bool multiDestDijkstra(std::unordered_map<IntersectionIdx, Node*>& intersections
                 
     //push in the first wave element
     wavefront.push(WaveElem(it->second, NO_EDGE, 0));
+    
+    
     
     //checking the wavefronts until it is empty
     while(wavefront.size()!=0){
@@ -133,14 +148,40 @@ bool multiDestDijkstra(std::unordered_map<IntersectionIdx, Node*>& intersections
             currNode->bestTime = wave.travelTime;
             
             
-            auto it = importantIntersections.find(currNode->id);
-            if(it != importantIntersections.end() && currNode.processed == false){
-                currNode.processed = true;
-                interestedIntersectionCount++;
+            auto pickupIt = pickupIndexes.find(currNode->id);
+            auto dropoffIt = dropoffIndexes.find(currNode->id);
+            auto depotIt = depotIndexes.find(currNode->id);
+            
+            if(pickupIt != pickupIndexes.end() && currNode->processed == false){
+                currNode->processed = true;
+                
+                //move the path vector into the 3d database
+                std::vector<StreetSegmentIdx> path = traceBack(intersections, currNode->id);
+                double time = computePathTravelTime(path, timePenalty);
+                pathTimes[startIdx][pickupIt->second] = time;
+                importantIntersectionCount++;
+            }
+            if(dropoffIt != dropoffIndexes.end() && currNode->processed == false){
+                currNode->processed = true;
+                
+                //move the path vector into the 3d database
+                std::vector<StreetSegmentIdx> path = traceBack(intersections, currNode->id);
+                double time = computePathTravelTime(path, timePenalty);
+                pathTimes[startIdx][pickupIndexes.size()+dropoffIt->second] = time;
+                importantIntersectionCount++;
+            }
+            if(depotIt != depotIndexes.end() && currNode->processed == false){
+                currNode->processed = true;
+                
+                //move the path vector into the 3d database
+                std::vector<StreetSegmentIdx> path = traceBack(intersections, currNode->id);
+                double time = computePathTravelTime(path, timePenalty);
+                pathTimes[startIdx][pickupIndexes.size()+dropoffIndexes.size()+depotIt->second] = time;
+                importantIntersectionCount++;
             }
             
             //check whether path reached the destination intersection
-            if(interestedIntersectionCount == numOfIntersectionsOfInterest){
+            if(importantIntersectionCount == numOfImportantIntersections){
                 return true;
             }
             
@@ -171,17 +212,17 @@ bool multiDestDijkstra(std::unordered_map<IntersectionIdx, Node*>& intersections
                 //if the street segment was legal
                 if (legal){
                     
-                    it = intersections.find(legalIntersection);
+                    auto legalIt = intersections.find(legalIntersection);
                 
                     //check whether the node was visited or not(exists in the database or not)
                     //add a node to the database(unordered map) if it wasn't visited
-                    if(it == intersections.end()){
+                    if(legalIt == intersections.end()){
                         Node *toNode = new Node(legalIntersection);
 
                         intersections.insert({legalIntersection, toNode});
                     }
 
-                    it = intersections.find(legalIntersection);
+                    legalIt = intersections.find(legalIntersection);
 
                     //find the travel time of the segment
                     double travel_time = findStreetSegmentTravelTime(adjacentStreetSegments[i]);
@@ -190,16 +231,16 @@ bool multiDestDijkstra(std::unordered_map<IntersectionIdx, Node*>& intersections
                     if (currNode->reachingEdge != NO_EDGE){
                         //if the previous edge and the current edge has the same streetID, don't apply the turn penalty and add to the wavefront
                         if (database.streetSegmentID_streetID[currNode->reachingEdge] == database.streetSegmentID_streetID[adjacentStreetSegments[i]]){
-                            wavefront.push(WaveElem(it->second, adjacentStreetSegments[i], currNode->bestTime + travel_time));
+                            wavefront.push(WaveElem(legalIt->second, adjacentStreetSegments[i], currNode->bestTime + travel_time));
                         }
                         //if the previous edge and the current edge do not have the same streetID, apply the turn penalty and add to the wavefront
                         else{
-                            wavefront.push(WaveElem(it->second, adjacentStreetSegments[i], currNode->bestTime + travel_time + timePenalty));
+                            wavefront.push(WaveElem(legalIt->second, adjacentStreetSegments[i], currNode->bestTime + travel_time + timePenalty));
                         }
                     }
                     //if it is a starting node
                     else{
-                        wavefront.push(WaveElem(it->second, adjacentStreetSegments[i], currNode->bestTime + travel_time));                
+                        wavefront.push(WaveElem(legalIt->second, adjacentStreetSegments[i], currNode->bestTime + travel_time));                
                     }
                 }
             }
@@ -242,4 +283,4 @@ std::vector<StreetSegmentIdx> traceBack(std::unordered_map<IntersectionIdx, Node
     std::reverse(pathToDest.begin(),pathToDest.end());
     
     return pathToDest;
-}*/
+}

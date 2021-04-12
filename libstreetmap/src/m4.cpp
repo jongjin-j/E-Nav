@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
+#include <chrono>
 #include <iostream>
 #include "m1.h"
 #include "globals.h"
@@ -37,6 +37,8 @@ std::vector<StreetSegmentIdx> traceBack(std::unordered_map<IntersectionIdx, Node
 
 
 std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, const float turn_penalty){
+    auto const startTime = std::chrono::high_resolution_clock::now();
+    
     std::unordered_map<IntersectionIdx, int> importantIntersections;
     for (int i = 0; i < deliveries.size(); i++){
         importantIntersections[deliveries[i].pickUp] = 1;
@@ -48,7 +50,6 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     }
     
     std::unordered_map<IntersectionIdx, Node*> intersections;
-    
     
     
     //vector that contains all path from each Delivery Location to another or to a Depot
@@ -69,6 +70,12 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         multiDestDijkstra(intersections, depots[i], deliveries.size(), turn_penalty);
     }
     
+    
+    auto const endTime = std::chrono::high_resolution_clock::now();
+    auto const timeElapsed = std::chrono::duration_cast<std::chrono::seconds>(endTime-startTime);
+    std::cout << "time taken to find path is " << timeElapsed.count() << std::endl;
+    
+    //return path
 }
 
 

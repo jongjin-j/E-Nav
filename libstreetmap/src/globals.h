@@ -107,6 +107,7 @@ public:
     StreetSegmentIdx reachingEdge;
     double bestTime = initial_bestTime;
     bool turn = false;
+    bool processed = false;
     Node(int inter_id){
         id = inter_id;
     }

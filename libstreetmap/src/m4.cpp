@@ -19,6 +19,16 @@
 //initial time has to be a large number
 #define initial_bestTime 1000000000
 
+//comparator for the priority queue
+class myComparator
+{
+public:
+    int operator() (const WaveElem& wave1, const WaveElem& wave2)
+    {
+        //compares the total time
+        return wave1.travelTime > wave2.travelTime;
+    }
+};
 
 bool multiDestDijkstra(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double timePenalty);
 
@@ -27,12 +37,37 @@ std::vector<StreetSegmentIdx> traceBack(std::unordered_map<IntersectionIdx, Node
 
 
 std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, const float turn_penalty){
+    std::unordered_map<IntersectionIdx, int> importantIntersections;
+    for (int i = 0; i < deliveries.size(); i++){
+        importantIntersections[deliveries[i].pickUp] = 1;
+        importantIntersections[deliveries[i].dropOff] = 1;
+    }
+    
+    for (int i = 0; i < depots.size(); i++){
+        importantIntersections[depots[i]] = 1;
+    }
+    
+    std::unordered_map<IntersectionIdx, Node*> intersections;
+    
+    
+    
     //vector that contains all path from each Delivery Location to another or to a Depot
-    std::vector<std::vector<std::vector<StreetSegmentIdx>>> pathFromDeliveryLoc [2 * deliveries.size()][2 * deliveries.size() + depots.size()];
+    //std::vector<std::vector<std::vector<StreetSegmentIdx>>> pathFromDeliveryLoc [2 * deliveries.size()][2 * deliveries.size() + depots.size()][];
+    std::unordered_map<IntersectionIdx, std::unordered_map<IntersectionIdx, std::vector<StreetSegmentIdx>>> pathFromDeliveryLoc;
 
     //vector that contains all path from each Depot to any Delivery Pickup Location
-    std::vector<std::vector<std::vector<StreetSegmentIdx>>> pathFromDepot [depots.size()][deliveries.size()];
+    //std::unordered_map<std::vector<std::vector<StreetSegmentIdx>>> pathFromDepot;
+    std::unordered_map<IntersectionIdx, std::unordered_map<IntersectionIdx, std::vector<StreetSegmentIdx>>> pathFromDepot;
+    
+    int numOfIntersectionsOfInterest = deliveries.size()*2 + depots.size() - 1;
 
+    for (int i = 0; i < deliveries.size(); i++){
+        multiDestDijkstra(intersections, deliveries[i].pickUp, importantIntersections, pathFromDeliveryLoc, pathFromDepot, numOfIntersectionsOfInterest, turn_penalty);
+        multiDestDijkstra(intersections, deliveries[i].dropOff, importantIntersections, pathFromDeliveryLoc, pathFromDepot, numOfIntersectionsOfInterest, turn_penalty);
+    }
+    for (int i = 0; i < depots.size(); i++){
+        multiDestDijkstra(intersections, depots[i], deliveries.size(), turn_penalty);
+    }
     
 }
 
@@ -54,17 +89,20 @@ struct WaveElem{
 };
 
 
-/*bool multiDestDijkstra(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double timePenalty){
+bool multiDestDijkstra(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, std::unordered_map<IntersectionIdx, int> importantIntersections,std::unordered_map<IntersectionIdx, std::unordered_map<IntersectionIdx, std::vector<StreetSegmentIdx>>> pathFromDeliveryLoc,
+        std::unordered_map<IntersectionIdx, std::unordered_map<IntersectionIdx, std::vector<StreetSegmentIdx>>> pathFromDepot, int numOfIntersectionsOfInterest, double timePenalty){
+    
+    int interestedIntersectionCount = 0;
     
     //set a priority queue for the wave elements in the wavefront
     std::priority_queue <WaveElem, std::vector<WaveElem>> wavefront;
     
     auto it = intersections.find(startID);
     
-    //find the distance and the time to the destination
+    /*//find the distance and the time to the destination
     std::pair<LatLon, LatLon> posPair (database.intersections[startID].pos, database.intersections[destID].pos);
     double distToDest = findDistanceBetweenTwoPoints(posPair);
-    double timeToDest = distToDest/maxSpeed;
+    double timeToDest = distToDest/maxSpeed;*/
                 
     //push in the first wave element
     wavefront.push(WaveElem(it->second, NO_EDGE, 0));
@@ -87,8 +125,15 @@ struct WaveElem{
             currNode->reachingEdge = wave.edgeID;         
             currNode->bestTime = wave.travelTime;
             
+            
+            auto it = importantIntersections.find(currNode->id);
+            if(it != importantIntersections.end() && currNode.processed == false){
+                currNode.processed = true;
+                interestedIntersectionCount++;
+            }
+            
             //check whether path reached the destination intersection
-            if(currNode->id == destID){
+            if(interestedIntersectionCount == numOfIntersectionsOfInterest){
                 return true;
             }
             

@@ -30,6 +30,7 @@ std::vector<StreetSegmentIdx> traceBack(std::unordered_map<IntersectionIdx, Node
 
 
 std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, const float turn_penalty){
+    std::vector<CourierSubPath> travelRoute;
     int N = deliveries.size();
     int M = depots.size();
     
@@ -64,11 +65,57 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         multiDestDijkstra(i, deliveries[i].pickUp, 2*N+M, timeForAllPaths, pickupIndexes, dropoffIndexes, depotIndexes, turn_penalty);
         multiDestDijkstra(i+N, deliveries[i].dropOff, 2*N+M, timeForAllPaths, pickupIndexes, dropoffIndexes, depotIndexes, turn_penalty);
     }
-    
 
     for (int i = 0; i < depots.size(); i++){
         multiDestDijkstra(i+2*N, depots[i], 2*N+M, timeForAllPaths, pickupIndexes, dropoffIndexes, depotIndexes, turn_penalty);
     }
+    
+    
+    //Greedy Algorithm
+    //need a data structure to keep track of visited index
+    //1. loop through all depots -> find closest pickup point
+    //2. loop through the pickup point -> find closest pickup or dropoff
+    //3. loop until no pickups / dropoffs left
+    //4. find closest depot
+    
+    int shortestTimeFromDepot = 10000000;
+    int startDepotIndex = 0;
+    int firstPickupIndex = 0;
+    int travelCount = 0;
+    
+    std::unordered_map<int, bool> visitedIndex;
+    
+    for(int i = 2 * N; i < 2 * N + depots.size(); i++){
+        for(int j = 0; j < N; j++){
+            if(timeForAllPaths[i][j] < shortestTimeFromDepot){
+                shortestTimeFromDepot = timeForAllPaths[i][j];
+                startDepotIndex = i - 2*N;
+                firstPickupIndex = j;
+            }
+        }
+    }
+    
+    std::unordered_map<IntersectionIdx, Node*> intersections;
+    Node* sourceNode = new Node(depots[startDepotIndex]);
+    sourceNode -> bestTime = initial_bestTime;
+    intersections.insert({depots[startDepotIndex], sourceNode});
+ 
+    AStarPath(intersections, depots[startDepotIndex], deliveries[firstPickupIndex].pickUp, turn_penalty);
+    
+    //later use function
+    CourierSubPath firstPath;
+    firstPath.start_intersection = depots[startDepotIndex];
+    firstPath.end_intersection = deliveries[firstPickupIndex].pickUp;
+    firstPath.subpath = AStarTraceBack(intersections, deliveries[firstPickupIndex].pickUp);
+    travelRoute.push_back(firstPath);
+    visitedIndex.insert({startDepotIndex, true});
+    travelCount++;
+    
+    
+    /*while(travelCount != 200){
+        
+    }*/
+    
 }
 
 

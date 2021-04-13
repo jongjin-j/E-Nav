@@ -24,6 +24,7 @@
 #include "m1.h"
 #include "m2.h"
 #include "m3.h"
+#include "m4.h"
 #include "OSMDatabaseAPI.h"
 #include "libcurl.h"
 #include "globals.h"
@@ -95,7 +96,18 @@ int main(int argc, char** argv) {
     std::string name = getStreetName(segment.streetID);
     std::cout << name << std::endl;*/
     
-
+    std::vector<int> depots = {1,2,3,4};
+    std::vector<DeliveryInf> deliveries;
+    DeliveryInf one(5, 6);
+    DeliveryInf two(7, 8);
+    deliveries.push_back(one);
+    deliveries.push_back(two);
+    
+    std::vector<CourierSubPath> k = travelingCourier(deliveries, depots, 15);
+    /*for(int i = 0; i < k.size(); i++){
+        std::cout << k[i].start_intersection << std::endl;
+    }*/
+    
     //Clean-up the map data and related data structures
     std::cout << "Closing map\n";
  

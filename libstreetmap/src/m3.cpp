@@ -115,7 +115,9 @@ const IntersectionIdx intersect_id_destination,const double turn_penalty){
 
 //find the path using A* algorithm
 bool AStarPath(std::unordered_map<IntersectionIdx, Node*>& intersections, int startID, int destID, double timePenalty){
-    
+    if(startID == destID){
+        return false;
+    }
     //set a priority queue for the wave elements in the wavefront
     std::priority_queue <WaveElem, std::vector<WaveElem>, myComparator> wavefront;
     

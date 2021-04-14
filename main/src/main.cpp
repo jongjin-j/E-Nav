@@ -101,26 +101,7 @@ int main(int argc, char** argv) {
     std::vector<CourierSubPath> result_path;
     float turn_penalty;
     
-    /*deliveries = {DeliveryInf(122474, 97031), DeliveryInf(71346, 53400), DeliveryInf(50160, 73642), DeliveryInf(122474, 53400), DeliveryInf(52922, 99578), DeliveryInf(122474, 53400), DeliveryInf(122474, 20263), DeliveryInf(71346, 73642), DeliveryInf(119721, 73642)};
-    depots = {11072, 5162, 100304};
-    turn_penalty = 15.000000000;
-    result_path = travelingCourier(deliveries, depots, turn_penalty);*/
     
-    /*deliveries = {DeliveryInf(23975, 52829), DeliveryInf(28343, 20239), DeliveryInf(100949, 118269)};
-    depots = {11317, 1263, 141824};
-    turn_penalty = 15.000000000;
-    result_path = travelingCourier(deliveries, depots, turn_penalty);
-    
-    std::vector<CourierSubPath> k = travelingCourier(deliveries, depots, 15);
-    */
-    
-    
-    
-
-        /*deliveries = {DeliveryInf(68520, 96047), DeliveryInf(36149, 18461), DeliveryInf(36121, 146650), DeliveryInf(20823, 146187), DeliveryInf(93239, 18461), DeliveryInf(145396, 18461), DeliveryInf(94555, 146187), DeliveryInf(123302, 109833)};
-        depots = {15009, 115194, 22009};
-        turn_penalty = 15.000000000;
-        result_path = travelingCourier(deliveries, depots, turn_penalty);*/
     
     deliveries = {DeliveryInf(33543, 131865), DeliveryInf(96806, 131865), DeliveryInf(33543, 59623), DeliveryInf(96806, 42871), DeliveryInf(91583, 59623), DeliveryInf(96806, 101696), DeliveryInf(96806, 131865), DeliveryInf(91724, 59623), DeliveryInf(51383, 123952)};
     depots = {14091, 78131, 81358};

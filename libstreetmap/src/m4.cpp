@@ -283,7 +283,6 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     
     //Step 4 of Algorithm
     
-    std::cout << currentIndex << std::endl;
     int shortestTimeToDepot = initial_bestTime;
     int lastDepotIndex = 0;
     

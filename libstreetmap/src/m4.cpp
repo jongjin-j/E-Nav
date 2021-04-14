@@ -76,7 +76,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     
     
     //travel time using Dijkstra
-#pragma omp parallel for
+    #pragma omp parallel for
     for (int i = 0; i < deliveries.size(); i++){
         multiDestDijkstra(i, deliveries[i].pickUp, 2 * N + M, timeForAllPaths, pickupIndexes, dropoffIndexes, depotIndexes, turn_penalty);
         multiDestDijkstra(i + N, deliveries[i].dropOff, 2 * N + M, timeForAllPaths, pickupIndexes, dropoffIndexes, depotIndexes, turn_penalty);
@@ -89,12 +89,12 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     
     std::cout << "After Dijkstra" << std::endl;
     
-    for(int i = 0; i < 2 * N + M; i++){
+    /*for(int i = 0; i < 2 * N + M; i++){
         for(int j = 0; j < 2 * N + M; j++){
             std::cout << timeForAllPaths[i][j] << " ";
         }
         std::cout << std::endl;
-    }
+    }*/
 
     
     //set all points going to the same point as a big number
@@ -105,14 +105,10 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
         }
     }
+    
     /*for(int i = 0; i < 2 * N + M; i++){
-        std::cout << "time: " << timeForAllPaths[i][i] << std::endl;
-    }
-    for(int i = 0; i < 2 * N + M; i++){
         timeForAllPaths[i][i] = initial_bestTime;
     }*/
-    
-    
     
     
     //Greedy Algorithm
@@ -121,6 +117,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     //2. loop through the pickup point -> find closest pickup or dropoff
     //3. loop until no pickups / dropoffs left
     //4. find closest depot
+    
     
     //Step 1 of Algorithm
     int shortestTimeFromDepot = initial_bestTime;
@@ -154,7 +151,6 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         firstPath.subpath = AStarTraceBack(initialIntersections, deliveries[firstPickupIndex].pickUp);
     }
     travelRoute.push_back(firstPath);
-    //visitedIndex.insert({startDepotIndex, true});
     
     std::cout << "After First Depot" << std::endl;
     
@@ -193,8 +189,6 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             intersections.insert({deliveries[currentIndex - N].dropOff, sourceNode});
         }
         
-        
-        //currentIndex = nextIndex;
         std::vector<int> nextIndexes;
         
         for(int i = 0; i < 2 * N; i++){
@@ -237,7 +231,6 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             travelCount++;
         }
         
-        //std::cout << "Count: " << travelCount << std::endl;
         
         bool pathFound = false;
 
@@ -278,20 +271,17 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         travelRoute.push_back(middlePath);
         
         
-        std::cout << currentIndex << std::endl;
         currentIndex = nextIndex;
       
     }
     
-    for (auto it = visitedIndex.begin(); it != visitedIndex.end(); it++){
-        //std::cout << it->first << std::endl;
-    }
+    /*for (auto it = visitedIndex.begin(); it != visitedIndex.end(); it++){
+        std::cout << it->first << std::endl;
+    }*/
     
-    //std::cout << "Before Last Depot" << std::endl;
 
     
     //Step 4 of Algorithm
-    //currentIndex = nextIndex;
     
     std::cout << currentIndex << std::endl;
     int shortestTimeToDepot = initial_bestTime;

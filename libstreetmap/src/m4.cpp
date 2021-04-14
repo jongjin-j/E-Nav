@@ -75,7 +75,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     
     
     
-    //travel time using Dijkstra
+    //travel time using Multi-Destination Dijkstra
     #pragma omp parallel for
     for (int i = 0; i < deliveries.size(); i++){
         multiDestDijkstra(i, deliveries[i].pickUp, 2 * N + M, timeForAllPaths, pickupIndexes, dropoffIndexes, depotIndexes, turn_penalty);
@@ -151,6 +151,10 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         firstPath.subpath = AStarTraceBack(initialIntersections, deliveries[firstPickupIndex].pickUp);
     }
     travelRoute.push_back(firstPath);
+    
+    for (int i = 0; i < initialIntersections.size(); i++){
+        delete initialIntersections[i];
+    }
     
     std::cout << "After First Depot" << std::endl;
     
@@ -272,6 +276,10 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         
         
         currentIndex = nextIndex;
+        
+        for (int i = 0; i < intersections.size(); i++){
+            delete intersections[i];
+        }
       
     }
     
@@ -310,6 +318,10 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     }
     
     travelRoute.push_back(lastPath);
+    
+    for (int i = 0; i < finalIntersections.size(); i++){
+        delete finalIntersections[i];
+    }
     
     std::cout << "After Last Depot" << std::endl;
     
@@ -508,7 +520,11 @@ bool multiDestDijkstra(int startIdx, int startID, int numOfImportantIntersection
                 }
             }
         }
-    } 
+    }
+    
+    for (int i = 0; i < intersections.size(); i++){
+        delete intersections[i];
+    }
     
     return false;
 }

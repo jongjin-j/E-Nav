@@ -117,6 +117,27 @@ int main(int argc, char** argv) {
         std::cout << result_path[i].start_intersection << std::endl;
         //std::cout << k[i].end_intersection << std::endl;
     }
+    std::cout << result_path[result_path.size()-1].end_intersection;
+    
+    /*deliveries = {DeliveryInf(40220, 37954), DeliveryInf(90705, 82446), DeliveryInf(29107, 44932), DeliveryInf(28232, 60062), DeliveryInf(28232, 82070), DeliveryInf(45899, 26959), DeliveryInf(28232, 120267), DeliveryInf(90705, 120353)};
+        depots = {26612, 45787, 77377};
+        turn_penalty = 15.000000000;
+        result_path = travelingCourier(deliveries, depots, turn_penalty);
+
+        deliveries = {DeliveryInf(46812, 71491), DeliveryInf(133567, 126914), DeliveryInf(29206, 127536), DeliveryInf(122540, 35334), DeliveryInf(100594, 108615)};
+        depots = {48279, 73609, 123137};
+        turn_penalty = 15.000000000;
+        result_path = travelingCourier(deliveries, depots, turn_penalty);
+
+        deliveries = {DeliveryInf(49969, 12547), DeliveryInf(60078, 74045), DeliveryInf(67523, 34896), DeliveryInf(67523, 51623), DeliveryInf(2201, 21690), DeliveryInf(67523, 31728), DeliveryInf(2201, 62560), DeliveryInf(52690, 111006)};
+        depots = {71331, 147022, 141242};
+        turn_penalty = 15.000000000;
+        result_path = travelingCourier(deliveries, depots, turn_penalty);*/
+
+        deliveries = {DeliveryInf(68520, 96047), DeliveryInf(36149, 18461), DeliveryInf(36121, 146650), DeliveryInf(20823, 146187), DeliveryInf(93239, 18461), DeliveryInf(145396, 18461), DeliveryInf(94555, 146187), DeliveryInf(123302, 109833)};
+        depots = {15009, 115194, 22009};
+        turn_penalty = 15.000000000;
+        result_path = travelingCourier(deliveries, depots, turn_penalty);
     
     //Clean-up the map data and related data structures
     std::cout << "Closing map\n";

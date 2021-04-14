@@ -57,6 +57,8 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
   //set up database for important intersections
     for (int i = 0; i < deliveries.size(); i++){
         pickupIndexes[deliveries[i].pickUp] = i;
+        //auto it = pickupIndexes.find(deliveries[i].pickUp);
+        //std::cout << it->first << std::endl;
     }
     for (int i = 0; i < deliveries.size(); i++){
         dropoffIndexes[deliveries[i].dropOff] = i;
@@ -76,12 +78,31 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     }
     
     std::cout << "After Dijkstra" << std::endl;
+    
+    for(int i = 0; i < 2 * N + M; i++){
+        for(int j = 0; j < 2 * N + M; j++){
+            std::cout << timeForAllPaths[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
 
     
     //set all points going to the same point as a big number
+    /*for(int i = 0; i < 2 * N + M; i++){
+        timeForAllPaths[i][i] = initial_bestTime;
+        for(int j = 0; j < 2 * N + M; j++){
+            if (timeForAllPaths[i][j] == 0){
+                timeForAllPaths[i][j] = initial_bestTime;
+            }
+        }
+    }*/
+    for(int i = 0; i < 2 * N + M; i++){
+        std::cout << "time: " << timeForAllPaths[i][i] << std::endl;
+    }
     for(int i = 0; i < 2 * N + M; i++){
         timeForAllPaths[i][i] = initial_bestTime;
     }
+    
     
     
     
@@ -132,10 +153,17 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     
     
     //Step 2 and 3 of Algorithm
-    int nextIndex = firstPickupIndex;
-    int currentIndex = startDepotIndex;
+    int nextIndex;
+    int currentIndex = firstPickupIndex;
     
     visitedIndex.insert({firstPickupIndex, true});
+    
+    for (auto it = pickupIndexes.begin(); it != pickupIndexes.end(); it++){
+        if (it->first == deliveries[firstPickupIndex].pickUp){
+            visitedIndex.insert({it->second, true});
+        }
+    }
+    
     
     //another pickup point that has not been visited OR drop-off point which the corresponding index pickup happened
     for(int travelCount = 1; travelCount < 2 * N; travelCount++){
@@ -143,19 +171,20 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         
         std::unordered_map<IntersectionIdx, Node*> intersections;
         
-        if(nextIndex < N){
-            Node* sourceNode = new Node(deliveries[nextIndex].pickUp);
+        if(currentIndex < N){
+            Node* sourceNode = new Node(deliveries[currentIndex].pickUp);
             sourceNode -> bestTime = initial_bestTime;
-            intersections.insert({deliveries[nextIndex].pickUp, sourceNode});
+            intersections.insert({deliveries[currentIndex].pickUp, sourceNode});
         }
         else{
-            Node* sourceNode = new Node(deliveries[nextIndex - N].dropOff);
+            Node* sourceNode = new Node(deliveries[currentIndex - N].dropOff);
             sourceNode -> bestTime = initial_bestTime;
-            intersections.insert({deliveries[nextIndex - N].dropOff, sourceNode});
+            intersections.insert({deliveries[currentIndex - N].dropOff, sourceNode});
         }
         
         
-        currentIndex = nextIndex;
+        //currentIndex = nextIndex;
+        std::vector<int> nextIndexes;
         
         for(int i = 0; i < 2 * N; i++){
             
@@ -171,6 +200,33 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                 nextIndex = i;
             }
         }
+        
+        //std::cout << "shortest time: " << shortestTime << std::endl;
+        
+        for(int i = 0; i < 2 * N; i++){
+            
+            //case for visiting a pickup point that has not been visited
+            if(i < N && visitedIndex.find(i) == visitedIndex.end() && nextIndex < N && deliveries[nextIndex].pickUp == deliveries[i].pickUp){
+                nextIndexes.push_back(i);
+            }
+            
+            if(i < N && visitedIndex.find(i) == visitedIndex.end() && nextIndex >= N && deliveries[nextIndex-N].dropOff == deliveries[i].pickUp){
+                nextIndexes.push_back(i);
+            }
+            
+            //case for visiting a drop-off point which the corresponding index pickup point has been visited
+            if(i >= N && visitedIndex.find(i - N) != visitedIndex.end() && visitedIndex.find(i) == visitedIndex.end() && nextIndex < N && deliveries[nextIndex].pickUp == deliveries[i-N].dropOff){
+                nextIndexes.push_back(i);
+            }
+            if(i >= N && visitedIndex.find(i - N) != visitedIndex.end() && visitedIndex.find(i) == visitedIndex.end() && nextIndex >= N && deliveries[nextIndex-N].dropOff == deliveries[i-N].dropOff){
+                nextIndexes.push_back(i);
+            }
+        }
+        
+        for (int i = 0; i < nextIndexes.size(); i++){
+            visitedIndex.insert({nextIndexes[i], true});
+        }
+        
         
         bool pathFound = false;
 
@@ -210,16 +266,22 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         
         travelRoute.push_back(middlePath);
         
-        visitedIndex.insert({nextIndex, true});
+        
+        //std::cout << currentIndex << std::endl;
+        currentIndex = nextIndex;
       
+    }
+    for (auto it = visitedIndex.begin(); it != visitedIndex.end(); it++){
+        std::cout << it->first << std::endl;
     }
     
     std::cout << "Before Last Depot" << std::endl;
 
     
     //Step 4 of Algorithm
-    currentIndex = nextIndex;
+    //currentIndex = nextIndex;
     
+    //std::cout << currentIndex << std::endl;
     int shortestTimeToDepot = initial_bestTime;
     int lastDepotIndex = 0;
     
@@ -336,9 +398,11 @@ bool multiDestDijkstra(int startIdx, int startID, int numOfImportantIntersection
             auto pickupIt = pickupIndexes.find(currNode->id);
             auto dropoffIt = dropoffIndexes.find(currNode->id);
             auto depotIt = depotIndexes.find(currNode->id);
+            bool checkProcessed = false;
             
             if(pickupIt != pickupIndexes.end() && currNode->processed == false){
-                currNode->processed = true;
+                //currNode->processed = true;
+                checkProcessed = true;
                 
                 //move the path vector into the 3d database
                 std::vector<StreetSegmentIdx> path = traceBack(intersections, currNode->id);
@@ -347,7 +411,8 @@ bool multiDestDijkstra(int startIdx, int startID, int numOfImportantIntersection
                 importantIntersectionCount++;
             }
             if(dropoffIt != dropoffIndexes.end() && currNode->processed == false){
-                currNode->processed = true;
+                //currNode->processed = true;
+                checkProcessed = true;
                 
                 //move the path vector into the 3d database
                 std::vector<StreetSegmentIdx> path = traceBack(intersections, currNode->id);
@@ -356,7 +421,8 @@ bool multiDestDijkstra(int startIdx, int startID, int numOfImportantIntersection
                 importantIntersectionCount++;
             }
             if(depotIt != depotIndexes.end() && currNode->processed == false){
-                currNode->processed = true;
+                //currNode->processed = true;
+                checkProcessed = true;
                 
                 //move the path vector into the 3d database
                 std::vector<StreetSegmentIdx> path = traceBack(intersections, currNode->id);
@@ -364,6 +430,11 @@ bool multiDestDijkstra(int startIdx, int startID, int numOfImportantIntersection
                 pathTimes[startIdx][pickupIndexes.size()+dropoffIndexes.size()+depotIt->second] = time;
                 importantIntersectionCount++;
             }
+            
+            if (checkProcessed){
+                currNode->processed = true;
+            }
+            
             
             //check whether path reached the destination intersection
             if(importantIntersectionCount == numOfImportantIntersections){

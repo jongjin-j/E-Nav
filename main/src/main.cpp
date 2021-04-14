@@ -101,17 +101,22 @@ int main(int argc, char** argv) {
     std::vector<CourierSubPath> result_path;
     float turn_penalty;
     
+    deliveries = {DeliveryInf(122474, 97031), DeliveryInf(71346, 53400), DeliveryInf(50160, 73642), DeliveryInf(122474, 53400), DeliveryInf(52922, 99578), DeliveryInf(122474, 53400), DeliveryInf(122474, 20263), DeliveryInf(71346, 73642), DeliveryInf(119721, 73642)};
+    depots = {11072, 5162, 100304};
+    turn_penalty = 15.000000000;
+    result_path = travelingCourier(deliveries, depots, turn_penalty);
+    
     /*deliveries = {DeliveryInf(23975, 52829), DeliveryInf(28343, 20239), DeliveryInf(100949, 118269)};
     depots = {11317, 1263, 141824};
     turn_penalty = 15.000000000;
     result_path = travelingCourier(deliveries, depots, turn_penalty);
     
     std::vector<CourierSubPath> k = travelingCourier(deliveries, depots, 15);
-    
-    for(int i = 0; i < k.size(); i++){
-        std::cout << k[i].start_intersection << std::endl;
+    */
+    for(int i = 0; i < result_path.size(); i++){
+        std::cout << result_path[i].start_intersection << std::endl;
         //std::cout << k[i].end_intersection << std::endl;
-    }*/
+    }
     
     //Clean-up the map data and related data structures
     std::cout << "Closing map\n";

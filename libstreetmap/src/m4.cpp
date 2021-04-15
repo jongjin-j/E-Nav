@@ -17,6 +17,7 @@
 #include <queue>
 #include <map>
 #include <algorithm>
+#include <chrono>
 
 #define NO_EDGE -1
 //initial time has to be a large number
@@ -32,6 +33,12 @@ std::vector<StreetSegmentIdx> traceBack(std::unordered_map<IntersectionIdx, Node
 
 
 std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, const float turn_penalty){
+    
+    //initialize timer at function call
+    auto startTime = std::chrono::high_resolution_clock::now();
+    //timeout is false until T = 45s
+    bool timeOut = false;
+    
     std::vector<CourierSubPath> finalTravelRoute;
     int bestTime = initial_bestTime;
     int N = deliveries.size();
@@ -118,6 +125,10 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
         }
     }*/
+    
+    //algorithm start?
+    //wrap while loop around two-opt later?
+    while(!timeOut){
     
     std::vector<IntersectionIdx> finalPathIntersections;
     
@@ -367,6 +378,15 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             //finalTravelRoute = travelRoute;
         }
         
+    }
+    //implement two opt
+    //end of algorithm
+    //close bracket for timeOut
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    auto wallClock = std::chrono_duration_cast<std::chrono::seconds>(currentTime - startTime);
+        if(wallClock.count() > 45){
+            timeOut = true;
+        }
     }
     
     

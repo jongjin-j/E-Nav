@@ -457,6 +457,9 @@ bool multiDestDijkstra(int startIdx, int startID, int numOfImportantIntersection
             
             //check whether path reached the destination intersection
             if(importantIntersectionCount == numOfImportantIntersections){
+                for(int i = 0; i < intersections.size(); i++){
+                    delete intersections[i];
+                }
                 return true;
             }
             
@@ -522,9 +525,6 @@ bool multiDestDijkstra(int startIdx, int startID, int numOfImportantIntersection
         }
     }
     
-    for (int i = 0; i < intersections.size(); i++){
-        delete intersections[i];
-    }
     
     return false;
 }

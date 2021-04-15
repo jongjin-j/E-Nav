@@ -34,7 +34,6 @@ std::vector<StreetSegmentIdx> traceBack(std::unordered_map<IntersectionIdx, Node
 std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, const float turn_penalty){
     std::vector<CourierSubPath> finalTravelRoute;
     int bestTime = initial_bestTime;
-    int currentTime = 0;
     int N = deliveries.size();
     int M = depots.size();
     
@@ -120,8 +119,14 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         }
     }*/
     
+    std::vector<IntersectionIdx> finalPathIntersections;
+    
     #pragma omp parallel for
     for(int depotIndex = 2 * N; depotIndex < 2 * N + depots.size(); depotIndex++){
+        
+        std::vector<IntersectionIdx> pathIntersections;
+        double currentTime = 0;
+        
         int shortestTimeFromDepot = initial_bestTime;
         int startDepotIndex = 0;
         int firstPickupIndex = 0;
@@ -135,28 +140,30 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
         }
         
+        pathIntersections.push_back(depots[startDepotIndex]);
+        currentTime += shortestTimeFromDepot;
         
         std::unordered_map<int, bool> visitedIndex;
     
-        std::unordered_map<IntersectionIdx, Node*> initialIntersections;
+        /*std::unordered_map<IntersectionIdx, Node*> initialIntersections;
         Node* startNode = new Node(depots[startDepotIndex]);
         startNode -> bestTime = initial_bestTime;
-        initialIntersections.insert({depots[startDepotIndex], startNode});
+        initialIntersections.insert({depots[startDepotIndex], startNode});*/
 
-        bool initialPathFound = AStarPath(initialIntersections, depots[startDepotIndex], deliveries[firstPickupIndex].pickUp, turn_penalty);
+        //bool initialPathFound = AStarPath(initialIntersections, depots[startDepotIndex], deliveries[firstPickupIndex].pickUp, turn_penalty);
 
         //later use function
-        CourierSubPath firstPath;
+        /*CourierSubPath firstPath;
         firstPath.start_intersection = depots[startDepotIndex];
         firstPath.end_intersection = deliveries[firstPickupIndex].pickUp;
         if(initialPathFound){
             firstPath.subpath = AStarTraceBack(initialIntersections, deliveries[firstPickupIndex].pickUp);
         }
-        travelRoute.push_back(firstPath);
+        travelRoute.push_back(firstPath);*/
 
-        for (int mapSize = 0; mapSize < initialIntersections.size(); mapSize++){
+        /*for (int mapSize = 0; mapSize < initialIntersections.size(); mapSize++){
             delete initialIntersections[mapSize];
-        }
+        }*/
 
         std::cout << "After First Depot" << std::endl;
 
@@ -178,11 +185,18 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
         }
 
+        
+        //push back first pick up index
+        //pathIntersections.push_back(deliveries[firstPickupIndex].pickUp);
+        
+        
+        
+        
         //another pickup point that has not been visited OR drop-off point which the corresponding index pickup happened
         while(travelCount != 2 * N + 1){
-            int shortestTime = initial_bestTime;
+            double shortestTime = initial_bestTime;
 
-            std::unordered_map<IntersectionIdx, Node*> intersections;
+            /*std::unordered_map<IntersectionIdx, Node*> intersections;
 
             if(currentIndex < N){
                 Node* sourceNode = new Node(deliveries[currentIndex].pickUp);
@@ -193,7 +207,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                 Node* sourceNode = new Node(deliveries[currentIndex - N].dropOff);
                 sourceNode -> bestTime = initial_bestTime;
                 intersections.insert({deliveries[currentIndex - N].dropOff, sourceNode});
-            }
+            }*/
 
             std::vector<int> nextIndexes;
 
@@ -238,7 +252,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
 
 
-            bool pathFound = false;
+            /*bool pathFound = false;
 
             if(currentIndex < N && nextIndex < N){
                 pathFound = AStarPath(intersections, deliveries[currentIndex].pickUp, deliveries[nextIndex].pickUp, turn_penalty); 
@@ -251,12 +265,22 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
             if(currentIndex >= N && nextIndex >= N){
                 pathFound = AStarPath(intersections, deliveries[currentIndex - N].dropOff, deliveries[nextIndex - N].dropOff, turn_penalty); 
+            }*/
+            
+            
+            //update path and time
+            if (currentIndex < N){
+                pathIntersections.push_back(deliveries[currentIndex].pickUp);
             }
+            if (currentIndex >= N){
+                pathIntersections.push_back(deliveries[currentIndex-N].dropOff);
+            }
+            currentTime += shortestTime;
 
 
 
             //create CourierSubPath object to insert into vector
-            CourierSubPath middlePath;
+            /*CourierSubPath middlePath;
             if(currentIndex < N){
                 middlePath.start_intersection = deliveries[currentIndex].pickUp;
             }
@@ -274,17 +298,20 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                 middlePath.subpath = AStarTraceBack(intersections, middlePath.end_intersection);
             }
 
-            travelRoute.push_back(middlePath);
+            travelRoute.push_back(middlePath);*/
 
 
             currentIndex = nextIndex;
 
-            for (int i = 0; i < intersections.size(); i++){
+            /*for (int i = 0; i < intersections.size(); i++){
                 delete intersections[i];
-            }
+            }*/
 
         }
 
+        pathIntersections.push_back(deliveries[nextIndex-N].dropOff);
+        
+        
         /*for (auto it = visitedIndex.begin(); it != visitedIndex.end(); it++){
             std::cout << it->first << std::endl;
         }*/
@@ -303,7 +330,11 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
         }
 
-        std::unordered_map<IntersectionIdx, Node*> finalIntersections;
+        
+        pathIntersections.push_back(depots[lastDepotIndex]);
+        currentTime += shortestTimeToDepot;
+        
+        /*std::unordered_map<IntersectionIdx, Node*> finalIntersections;
         Node* lastDropOff = new Node(deliveries[currentIndex - N].dropOff);
         lastDropOff -> bestTime = initial_bestTime;
         finalIntersections.insert({deliveries[currentIndex - N].dropOff, lastDropOff});
@@ -319,21 +350,21 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             lastPath.subpath = AStarTraceBack(finalIntersections, depots[lastDepotIndex]);
         }
 
-        travelRoute.push_back(lastPath);
+        travelRoute.push_back(lastPath);*/
 
-        for (int mapSize = 0; mapSize < finalIntersections.size(); mapSize++){
+        /*for (int mapSize = 0; mapSize < finalIntersections.size(); mapSize++){
             delete finalIntersections[mapSize];
-        }
+        }*/
         
         
-        
-        for(int k = 0; k < travelRoute.size(); k++){
-            currentTime += computePathTravelTime(travelRoute[k].subpath, turn_penalty);
-        }
         
         #pragma omp critical
         if(currentTime < bestTime){
-            finalTravelRoute = travelRoute;
+            //finalPathIntersections.clear();
+            finalPathIntersections = pathIntersections;
+            bestTime = currentTime;
+            
+            //finalTravelRoute = travelRoute;
         }
         
     }
@@ -345,6 +376,27 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     
     std::cout << "After Last Depot" << std::endl;
     
+    for (int i = 0; i < finalPathIntersections.size() - 1; i++){
+        CourierSubPath path;
+        path.start_intersection = finalPathIntersections[i];
+        path.end_intersection = finalPathIntersections[i+1];
+        
+        std::unordered_map<IntersectionIdx, Node*> intersections;
+        Node* lastDropOff = new Node(finalPathIntersections[i]);
+        lastDropOff -> bestTime = initial_bestTime;
+        intersections.insert({finalPathIntersections[i], lastDropOff});
+
+        AStarPath(intersections, finalPathIntersections[i], finalPathIntersections[i+1], turn_penalty);
+        path.subpath = AStarTraceBack(intersections, finalPathIntersections[i+1]);
+        finalTravelRoute.push_back(path);
+        
+        for (int j = 0; j < intersections.size(); j++){
+            delete intersections[j];
+        }
+    }
+    
+    
+        
     //return travelRoute;
     return finalTravelRoute;
 }

@@ -39,9 +39,9 @@ double findPathTravelTime(std::vector<int> intersections, std::vector<std::vecto
 std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, const float turn_penalty){
     
     //initialize timer at function call
-    /*auto startTime = std::chrono::high_resolution_clock::now();
+    auto startTime = std::chrono::high_resolution_clock::now();
     //timeout is false until T = 45s
-    bool timeOut = false;*/
+    bool timeOut = false;
     
     std::vector<CourierSubPath> finalTravelRoute;
     int bestTime = initial_bestTime;
@@ -474,7 +474,11 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     }*/
     
     
-        
+       
+    auto const endTime = std::chrono::high_resolution_clock::now();
+    auto const elapsed = std::chrono::duration<double>(endTime - startTime);
+
+    std::cout << elapsed.count() << std::endl;
     //return travelRoute;
     return finalTravelRoute;
     //}

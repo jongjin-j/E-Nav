@@ -82,7 +82,7 @@ int main(int argc, char** argv) {
 
     std::cout << "Successfully loaded map '" << map_path << "'\n";
     std::cout << "Successfully loaded OSM map '" << map_name << "'\n";
-
+  
     //You can now do something with the map data
     
     //std::vector<StreetSegmentIdx> path = findPathBetweenIntersections(1, 1041, 15);

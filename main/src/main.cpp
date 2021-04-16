@@ -103,8 +103,13 @@ int main(int argc, char** argv) {
     
     
     
-    deliveries = {DeliveryInf(33543, 131865), DeliveryInf(96806, 131865), DeliveryInf(33543, 59623), DeliveryInf(96806, 42871), DeliveryInf(91583, 59623), DeliveryInf(96806, 101696), DeliveryInf(96806, 131865), DeliveryInf(91724, 59623), DeliveryInf(51383, 123952)};
+    /*deliveries = {DeliveryInf(33543, 131865), DeliveryInf(96806, 131865), DeliveryInf(33543, 59623), DeliveryInf(96806, 42871), DeliveryInf(91583, 59623), DeliveryInf(96806, 101696), DeliveryInf(96806, 131865), DeliveryInf(91724, 59623), DeliveryInf(51383, 123952)};
     depots = {14091, 78131, 81358};
+    turn_penalty = 15.000000000;
+    result_path = travelingCourier(deliveries, depots, turn_penalty);*/
+    
+    deliveries = {DeliveryInf(101600, 138295), DeliveryInf(23126, 39080), DeliveryInf(52954, 134045)};
+    depots = {23381, 49737, 60236};
     turn_penalty = 15.000000000;
     result_path = travelingCourier(deliveries, depots, turn_penalty);
         

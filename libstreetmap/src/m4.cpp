@@ -302,22 +302,35 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     
     //we already have bestTime, can compare to this variable
     
+    int pathIndexesSize = finalPathIndexes.size();
     
-    for(int i = 1; i < finalPathIndexes.size() - 2; i++){
-        for(int j = i + 1; j < finalPathIndexes.size() - 1; j++){
+    #pragma omp parallel for
+    for(int i = 1; i < pathIndexesSize - 2; i++){
+        for(int j = i + 1; j < pathIndexesSize - 1; j++){
             ////ERROR FREE
             std::vector<int> indexesOfFirstSegment;
             std::vector<int> indexesOfMidSegment;
             std::vector<int> indexesOfLastSegment;
             
-            std::vector<int>::iterator it = finalPathIndexes.begin();
+            
+            for (int k = 0; k < i; k++){
+                indexesOfFirstSegment.push_back(finalPathIndexes[k]);
+            }
+            for (int n = i; n < j; n++){
+                indexesOfMidSegment.push_back(finalPathIndexes[n]);
+            }
+            for (int l = j; l < finalPathIndexes.size(); l++){
+                indexesOfLastSegment.push_back(finalPathIndexes[l]);
+            }
+            
+            /*std::vector<int>::iterator it = finalPathIndexes.begin();
             
             
             if(i == 1){
                 indexesOfFirstSegment.push_back(finalPathIndexes[0]);
             }
             else{
-                indexesOfFirstSegment.assign(it, it + i - 1);
+                //indexesOfFirstSegment.assign(it, it + i - 1);
             }
             
             if(i == j - 1){
@@ -332,7 +345,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
             else{
                 indexesOfLastSegment.assign(it + j, finalPathIndexes.end());
-            }
+            }*/
             
             ////ERROR FREE
             
@@ -348,9 +361,12 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                     
                     if(pathLegal(path)){
                         double curTime = findPathTravelTime(path, timeForAllPaths);
+                        
+                        #pragma omp critical
                         if(curTime < bestTime){
                             finalPathIndexes = path;
                             bestTime = curTime;
+                            
                         }
                     }
                     
@@ -358,6 +374,10 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
             
         }
+    }
+    
+    for(int j = 0; j < finalPathIndexes.size(); j++){
+        std::cout << finalPathIndexes[j] << std::endl;
     }
     
     int shortestTimeFromDepot = initial_bestTime;

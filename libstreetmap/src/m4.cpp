@@ -95,7 +95,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         multiDestDijkstra(i + 2 * N, depots[i], 2 * N + M, timeForAllPaths, pickupIndexes, dropoffIndexes, depotIndexes, turn_penalty);
     }
     
-    std::cout << "After Dijkstra" << std::endl;
+    //std::cout << "After Dijkstra" << std::endl;
     
     //set all points going to the same point as a big number
     for(int i = 0; i < 2 * N + M; i++){
@@ -137,10 +137,14 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     std::vector<IntersectionIdx> finalPathIntersections;
     std::vector<int> finalPathIndexes;
     
+    
+    double finalTimeFromDepot = initial_bestTime;
+    double finalTimeToDepot = initial_bestTime;
+    
     #pragma omp parallel for
     for(int depotIndex = 2 * N; depotIndex < 2 * N + depots.size(); depotIndex++){
         
-        std::vector<IntersectionIdx> pathIntersections;
+        //std::vector<IntersectionIdx> pathIntersections;
         std::vector<int> pathIndexes;
         double currentTime = 0;
         
@@ -157,12 +161,12 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
         }
         
-        pathIntersections.push_back(depots[startDepotIndex]);
+        //pathIntersections.push_back(depots[startDepotIndex]);
         currentTime += shortestTimeFromDepot;
         
         std::unordered_map<int, bool> visitedIndex;
     
-        std::cout << "After First Depot" << std::endl;
+        //std::cout << "After First Depot" << std::endl;
 
 
 
@@ -233,12 +237,12 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
 
             //update path and time
-            if (currentIndex < N){
+            /*if (currentIndex < N){
                 pathIntersections.push_back(deliveries[currentIndex].pickUp);
             }
             if (currentIndex >= N){
                 pathIntersections.push_back(deliveries[currentIndex-N].dropOff);
-            }
+            }*/
             currentTime += shortestTime;
 
             //pathIndexes.push_back(currentIndex);
@@ -246,7 +250,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             currentIndex = nextIndex;
         }
 
-        pathIntersections.push_back(deliveries[nextIndex-N].dropOff);
+        //pathIntersections.push_back(deliveries[nextIndex-N].dropOff);
         //pathIndexes.push_back(nextIndex);
         
         
@@ -267,20 +271,28 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                 lastDepotIndex = j - 2 * N;
             }
         }
-
+            
         
-        pathIntersections.push_back(depots[lastDepotIndex]);
+        
+        //pathIntersections.push_back(depots[lastDepotIndex]);
         currentTime += shortestTimeToDepot;
         
         
         #pragma omp critical
         if(currentTime < bestTime){
-            finalPathIntersections = pathIntersections;
+            //finalPathIntersections = pathIntersections;
+            finalTimeFromDepot = shortestTimeFromDepot;
+            finalTimeToDepot = shortestTimeToDepot;
             bestTime = currentTime;
             finalPathIndexes = pathIndexes;
         }
         
     }
+    
+    std::cout << "end of greedy" << std::endl;
+    auto endTime = std::chrono::high_resolution_clock::now();
+    auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(endTime-startTime).count();
+    std::cout << elapsedTime << std::endl;
     
     //implement two opt
     //end of algorithm
@@ -296,89 +308,101 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     
     //update the best time - using critical
     
-    for(int j = 0; j < finalPathIndexes.size(); j++){
+    /*for(int j = 0; j < finalPathIndexes.size(); j++){
         std::cout << finalPathIndexes[j] << std::endl;
-    }
+    }*/
     
     //we already have bestTime, can compare to this variable
     
     int pathIndexesSize = finalPathIndexes.size();
     
-    #pragma omp parallel for
-    for(int i = 1; i < pathIndexesSize - 2; i++){
-        for(int j = i + 1; j < pathIndexesSize - 1; j++){
-            ////ERROR FREE
-            std::vector<int> indexesOfFirstSegment;
-            std::vector<int> indexesOfMidSegment;
-            std::vector<int> indexesOfLastSegment;
-            
-            
-            for (int k = 0; k < i; k++){
-                indexesOfFirstSegment.push_back(finalPathIndexes[k]);
-            }
-            for (int n = i; n < j; n++){
-                indexesOfMidSegment.push_back(finalPathIndexes[n]);
-            }
-            for (int l = j; l < finalPathIndexes.size(); l++){
-                indexesOfLastSegment.push_back(finalPathIndexes[l]);
-            }
-            
-            /*std::vector<int>::iterator it = finalPathIndexes.begin();
-            
-            
-            if(i == 1){
-                indexesOfFirstSegment.push_back(finalPathIndexes[0]);
-            }
-            else{
-                //indexesOfFirstSegment.assign(it, it + i - 1);
-            }
-            
-            if(i == j - 1){
-                indexesOfMidSegment.push_back(finalPathIndexes[i]);
-            }
-            else{
-                indexesOfMidSegment.assign(it + i, it + j - 1);
-            }
-            
-            if(j == finalPathIndexes.size() - 2){
-                indexesOfLastSegment.push_back(finalPathIndexes[j]);
-            }
-            else{
-                indexesOfLastSegment.assign(it + j, finalPathIndexes.end());
-            }*/
-            
-            ////ERROR FREE
-            
-            for(int reverse = 0; reverse < 8; reverse++){
-                for(int swap = 0; swap < 6; swap++){
-                    std::vector<int> vec1 = indexesOfFirstSegment;
-                    std::vector<int> vec2 = indexesOfMidSegment;
-                    std::vector<int> vec3 = indexesOfLastSegment;
-                    std::vector<int> path;
-                    
-                    reversePartialVector(vec1, vec2, vec3, reverse);
-                    swapThreeOrder(vec1, vec2, vec3, path, swap);
-                    
-                    if(pathLegal(path)){
-                        double curTime = findPathTravelTime(path, timeForAllPaths);
-                        
-                        #pragma omp critical
-                        if(curTime < bestTime){
-                            finalPathIndexes = path;
-                            bestTime = curTime;
-                            
+    bool endOfTwoOpt = false;
+    
+    while(!timeOut && !endOfTwoOpt){
+        #pragma omp parallel for
+        for(int i = 1; i < pathIndexesSize - 2; i++){
+            for(int j = i + 1; j < pathIndexesSize - 1; j++){
+                ////ERROR FREE
+                std::vector<int> indexesOfFirstSegment;
+                std::vector<int> indexesOfMidSegment;
+                std::vector<int> indexesOfLastSegment;
+
+
+                for (int k = 0; k < i; k++){
+                    indexesOfFirstSegment.push_back(finalPathIndexes[k]);
+                }
+                for (int n = i; n < j; n++){
+                    indexesOfMidSegment.push_back(finalPathIndexes[n]);
+                }
+                for (int l = j; l < finalPathIndexes.size(); l++){
+                    indexesOfLastSegment.push_back(finalPathIndexes[l]);
+                }
+
+                /*std::vector<int>::iterator it = finalPathIndexes.begin();
+
+
+                if(i == 1){
+                    indexesOfFirstSegment.push_back(finalPathIndexes[0]);
+                }
+                else{
+                    //indexesOfFirstSegment.assign(it, it + i - 1);
+                }
+
+                if(i == j - 1){
+                    indexesOfMidSegment.push_back(finalPathIndexes[i]);
+                }
+                else{
+                    indexesOfMidSegment.assign(it + i, it + j - 1);
+                }
+
+                if(j == finalPathIndexes.size() - 2){
+                    indexesOfLastSegment.push_back(finalPathIndexes[j]);
+                }
+                else{
+                    indexesOfLastSegment.assign(it + j, finalPathIndexes.end());
+                }*/
+
+                ////ERROR FREE
+
+                for(int reverse = 0; reverse < 8; reverse++){
+                    for(int swap = 0; swap < 6; swap++){
+                        std::vector<int> vec1 = indexesOfFirstSegment;
+                        std::vector<int> vec2 = indexesOfMidSegment;
+                        std::vector<int> vec3 = indexesOfLastSegment;
+                        std::vector<int> path;
+
+                        reversePartialVector(vec1, vec2, vec3, reverse);
+                        swapThreeOrder(vec1, vec2, vec3, path, swap);
+
+                        if(pathLegal(path)){
+                            double curTime = findPathTravelTime(path, timeForAllPaths);
+
+                            #pragma omp critical
+                            if(curTime < bestTime - finalTimeFromDepot - finalTimeToDepot){
+                                finalPathIndexes = path;
+                                bestTime = curTime;
+                            }
                         }
                     }
-                    
                 }
             }
             
         }
+        endOfTwoOpt = true;
+        
+        auto endTime = std::chrono::high_resolution_clock::now();
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(endTime-startTime).count();
+        std::cout << elapsedTime << std::endl;
+        if (elapsedTime > 30){
+            timeOut = true;
+        }
     }
     
-    for(int j = 0; j < finalPathIndexes.size(); j++){
+    std::cout << "elapsed time: " << std::endl;
+    
+    /*for(int j = 0; j < finalPathIndexes.size(); j++){
         std::cout << finalPathIndexes[j] << std::endl;
-    }
+    }*/
     
     int shortestTimeFromDepot = initial_bestTime;
     int fromDepotIntersection;
@@ -423,7 +447,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     finalRouteIntersections.push_back(toDepotIntersection);
     
    
-    std::cout << "STOP" << std::endl;
+    //std::cout << "STOP" << std::endl;
     
     
     for (int i = 0; i < finalRouteIntersections.size() - 1; i++){
@@ -452,7 +476,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     //corresponding intersection in finalPathIntersections has index + 1
     
     
-    std::cout << "After Last Depot" << std::endl;
+    //std::cout << "After Last Depot" << std::endl;
     
     /*for (int i = 0; i < finalPathIntersections.size() - 1; i++){
         CourierSubPath path;
@@ -475,10 +499,10 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     
     
        
-    auto const endTime = std::chrono::high_resolution_clock::now();
-    auto const elapsed = std::chrono::duration<double>(endTime - startTime);
+    //auto const endTime = std::chrono::high_resolution_clock::now();
+    //auto const elapsed = std::chrono::duration<double>(endTime - startTime);
 
-    std::cout << elapsed.count() << std::endl;
+    //std::cout << elapsed.count() << std::endl;
     //return travelRoute;
     return finalTravelRoute;
     //}
@@ -547,7 +571,7 @@ void swapThreeOrder(std::vector<int>& vec1, std::vector<int>& vec2, std::vector<
             finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
             break;
         default: 
-            std::cout << "Invalid Order Input" << std::endl;
+            //std::cout << "Invalid Order Input" << std::endl;
             break;
     }
 }
@@ -585,7 +609,7 @@ void reversePartialVector(std::vector<int>& vec1, std::vector<int>& vec2, std::v
             std::reverse(vec3.begin(),vec3.end());
             break;
         default: 
-            std::cout << "Invalid Order Input" << std::endl;
+            //std::cout << "Invalid Order Input" << std::endl;
             break;
     }
 }

@@ -334,32 +334,23 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                 indexesOfLastSegment.assign(it + j, finalPathIndexes.end());
             }
             
-            
-            for(int k = 0; k < indexesOfFirstSegment.size(); k++){
-                std::cout << indexesOfFirstSegment[k] << std::endl;
-            }
-            
-            for(int l = 0; l < indexesOfMidSegment.size(); l++){
-                std::cout << indexesOfMidSegment[l] << std::endl;
-            }
-            
             ////ERROR FREE
             
             for(int reverse = 0; reverse < 8; reverse++){
-                std::cout << "after reverse" << std::endl;
                 for(int swap = 0; swap < 6; swap++){
                     std::vector<int> vec1 = indexesOfFirstSegment;
                     std::vector<int> vec2 = indexesOfMidSegment;
                     std::vector<int> vec3 = indexesOfLastSegment;
                     std::vector<int> path;
-                    std::cout << "after swap" << std::endl;
                     
                     reversePartialVector(vec1, vec2, vec3, reverse);
                     swapThreeOrder(vec1, vec2, vec3, path, swap);
                     
                     if(pathLegal(path)){
-                        if(findPathTravelTime(path, timeForAllPaths) < bestTime){
+                        double curTime = findPathTravelTime(path, timeForAllPaths);
+                        if(curTime < bestTime){
                             finalPathIndexes = path;
+                            bestTime = curTime;
                         }
                     }
                     
@@ -369,18 +360,81 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         }
     }
     
-    for(int j = 0; j < finalPathIndexes.size(); j++){
-        std::cout << finalPathIndexes[j] << std::endl;
+    int shortestTimeFromDepot = initial_bestTime;
+    int fromDepotIntersection;
+    
+    
+    
+    
+    for(int j = 2 * N; j < 2 * N + M; j++){
+        if(timeForAllPaths[j][finalPathIndexes[0]] < shortestTimeFromDepot){
+            shortestTimeFromDepot = timeForAllPaths[j][finalPathIndexes[0]];
+            fromDepotIntersection = depots[j - 2 * N];
+        }
     }
     
     
+    
+    int shortestTimeToDepot = initial_bestTime;
+    int toDepotIntersection;
+    int finalIntersection = finalPathIndexes[finalPathIndexes.size() - 1];
+    
+    
+    
+    for(int j = 2 * N; j < 2 * N + M; j++){
+        if(timeForAllPaths[finalIntersection][j] < shortestTimeToDepot){
+            shortestTimeToDepot = timeForAllPaths[finalIntersection][j];
+            toDepotIntersection = depots[j - 2 * N];
+        }
+    }
+    
+    
+    
+    std::vector<IntersectionIdx> finalRouteIntersections;
+    finalRouteIntersections.push_back(fromDepotIntersection);
+    for(int i = 0; i < finalPathIndexes.size(); i++){
+        if(finalPathIndexes[i] < N){
+            finalRouteIntersections.push_back(deliveries[finalPathIndexes[i]].pickUp);
+        }
+        if(finalPathIndexes[i] >= N){
+            finalRouteIntersections.push_back(deliveries[finalPathIndexes[i] - N].dropOff);
+        }
+    }
+    finalRouteIntersections.push_back(toDepotIntersection);
+    
+   
+    std::cout << "STOP" << std::endl;
+    
+    
+    for (int i = 0; i < finalRouteIntersections.size() - 1; i++){
+        
+        if(finalRouteIntersections[i] != finalRouteIntersections[i + 1]){
+            CourierSubPath path;
+            path.start_intersection = finalRouteIntersections[i];
+            path.end_intersection = finalRouteIntersections[i + 1];
+
+            std::unordered_map<IntersectionIdx, Node*> intersections;
+            Node* lastDropOff = new Node(finalRouteIntersections[i]);
+            lastDropOff -> bestTime = initial_bestTime;
+            intersections.insert({finalRouteIntersections[i], lastDropOff});
+
+            AStarPath(intersections, finalRouteIntersections[i], finalRouteIntersections[i + 1], turn_penalty);
+            path.subpath = AStarTraceBack(intersections, finalRouteIntersections[i + 1]);
+            finalTravelRoute.push_back(path);
+
+            for (int j = 0; j < intersections.size(); j++){
+                delete intersections[j];
+            }
+        }
+        
+    }
     
     //corresponding intersection in finalPathIntersections has index + 1
     
     
     std::cout << "After Last Depot" << std::endl;
     
-    for (int i = 0; i < finalPathIntersections.size() - 1; i++){
+    /*for (int i = 0; i < finalPathIntersections.size() - 1; i++){
         CourierSubPath path;
         path.start_intersection = finalPathIntersections[i];
         path.end_intersection = finalPathIntersections[i + 1];
@@ -397,7 +451,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         for (int j = 0; j < intersections.size(); j++){
             delete intersections[j];
         }
-    }
+    }*/
     
     
         
@@ -479,33 +533,32 @@ void swapThreeOrder(std::vector<int>& vec1, std::vector<int>& vec2, std::vector<
 void reversePartialVector(std::vector<int>& vec1, std::vector<int>& vec2, std::vector<int>& vec3, int order){
     switch(order){
         case 0:
-            std::cout << "No change in Order" << std::endl;
             break;
         case 1:
             std::reverse(vec1.begin(),vec1.end());
             break;
         case 2:
-            std::reverse(vec2.begin(),vec1.end());
+            std::reverse(vec2.begin(),vec2.end());
             break;
         case 3:
-            std::reverse(vec3.begin(),vec1.end());
+            std::reverse(vec3.begin(),vec3.end());
             break;
         case 4:
             std::reverse(vec1.begin(),vec1.end());
-            std::reverse(vec2.begin(),vec1.end());
+            std::reverse(vec2.begin(),vec2.end());
             break;
         case 5:
-            std::reverse(vec2.begin(),vec1.end());
-            std::reverse(vec3.begin(),vec1.end());
+            std::reverse(vec2.begin(),vec2.end());
+            std::reverse(vec3.begin(),vec3.end());
             break;
         case 6:
-            std::reverse(vec3.begin(),vec1.end());
+            std::reverse(vec3.begin(),vec3.end());
             std::reverse(vec1.begin(),vec1.end());
             break;
         case 7:
             std::reverse(vec1.begin(),vec1.end());
-            std::reverse(vec2.begin(),vec1.end());
-            std::reverse(vec3.begin(),vec1.end());
+            std::reverse(vec2.begin(),vec2.end());
+            std::reverse(vec3.begin(),vec3.end());
             break;
         default: 
             std::cout << "Invalid Order Input" << std::endl;

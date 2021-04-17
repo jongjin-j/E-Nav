@@ -95,7 +95,11 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         multiDestDijkstra(i + 2 * N, depots[i], 2 * N + M, timeForAllPaths, pickupIndexes, dropoffIndexes, depotIndexes, turn_penalty);
     }
     
+    
     //std::cout << "After Dijkstra" << std::endl;
+    //auto endTime1 = std::chrono::high_resolution_clock::now();
+    //auto elapsedTime1 = std::chrono::duration_cast<std::chrono::seconds>(endTime1-startTime).count();
+    //std::cout << elapsedTime1 << std::endl;
     
     //set all points going to the same point as a big number
     for(int i = 0; i < 2 * N + M; i++){
@@ -289,10 +293,10 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         
     }
     
-    std::cout << "end of greedy" << std::endl;
-    auto endTime = std::chrono::high_resolution_clock::now();
-    auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(endTime-startTime).count();
-    std::cout << elapsedTime << std::endl;
+    //std::cout << "end of greedy" << std::endl;
+    //auto endTime2 = std::chrono::high_resolution_clock::now();
+    //auto elapsedTime2 = std::chrono::duration_cast<std::chrono::seconds>(endTime2-startTime).count();
+    //std::cout << elapsedTime2 << std::endl;
     
     //implement two opt
     //end of algorithm
@@ -321,84 +325,69 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     while(!timeOut && !endOfTwoOpt){
         #pragma omp parallel for
         for(int i = 1; i < pathIndexesSize - 2; i++){
-            for(int j = i + 1; j < pathIndexesSize - 1; j++){
-                ////ERROR FREE
-                std::vector<int> indexesOfFirstSegment;
-                std::vector<int> indexesOfMidSegment;
-                std::vector<int> indexesOfLastSegment;
+            if (!timeOut){
+                for(int j = i + 1; j < pathIndexesSize - 1; j++){
+                    ////ERROR FREE
+                    std::vector<int> indexesOfFirstSegment;
+                    std::vector<int> indexesOfMidSegment;
+                    std::vector<int> indexesOfLastSegment;
+
+                    indexesOfFirstSegment.resize(i);
+                    indexesOfMidSegment.resize(j-i);
+                    indexesOfLastSegment.resize(pathIndexesSize-j);
 
 
-                for (int k = 0; k < i; k++){
-                    indexesOfFirstSegment.push_back(finalPathIndexes[k]);
-                }
-                for (int n = i; n < j; n++){
-                    indexesOfMidSegment.push_back(finalPathIndexes[n]);
-                }
-                for (int l = j; l < finalPathIndexes.size(); l++){
-                    indexesOfLastSegment.push_back(finalPathIndexes[l]);
-                }
 
-                /*std::vector<int>::iterator it = finalPathIndexes.begin();
+                    for (int k = 0; k < i; k++){
+                        indexesOfFirstSegment[k] = finalPathIndexes[k];
+                    }
+                    for (int n = 0; n < j-i; n++){
+                        indexesOfMidSegment[n] = finalPathIndexes[n+i];
+                    }
+                    for (int l = 0; l < pathIndexesSize-j; l++){
+                        indexesOfLastSegment[l] = finalPathIndexes[l+j];
+                    }
 
 
-                if(i == 1){
-                    indexesOfFirstSegment.push_back(finalPathIndexes[0]);
-                }
-                else{
-                    //indexesOfFirstSegment.assign(it, it + i - 1);
-                }
 
-                if(i == j - 1){
-                    indexesOfMidSegment.push_back(finalPathIndexes[i]);
-                }
-                else{
-                    indexesOfMidSegment.assign(it + i, it + j - 1);
-                }
+                    for(int reverse = 0; reverse < 8; reverse++){
+                        for(int swap = 0; swap < 6; swap++){
+                            std::vector<int> vec1 = indexesOfFirstSegment;
+                            std::vector<int> vec2 = indexesOfMidSegment;
+                            std::vector<int> vec3 = indexesOfLastSegment;
+                            std::vector<int> path;
 
-                if(j == finalPathIndexes.size() - 2){
-                    indexesOfLastSegment.push_back(finalPathIndexes[j]);
-                }
-                else{
-                    indexesOfLastSegment.assign(it + j, finalPathIndexes.end());
-                }*/
+                            reversePartialVector(vec1, vec2, vec3, reverse);
+                            swapThreeOrder(vec1, vec2, vec3, path, swap);
 
-                ////ERROR FREE
+                            if(pathLegal(path)){
+                                double curTime = findPathTravelTime(path, timeForAllPaths);
 
-                for(int reverse = 0; reverse < 8; reverse++){
-                    for(int swap = 0; swap < 6; swap++){
-                        std::vector<int> vec1 = indexesOfFirstSegment;
-                        std::vector<int> vec2 = indexesOfMidSegment;
-                        std::vector<int> vec3 = indexesOfLastSegment;
-                        std::vector<int> path;
-
-                        reversePartialVector(vec1, vec2, vec3, reverse);
-                        swapThreeOrder(vec1, vec2, vec3, path, swap);
-
-                        if(pathLegal(path)){
-                            double curTime = findPathTravelTime(path, timeForAllPaths);
-
-                            #pragma omp critical
-                            if(curTime < bestTime - finalTimeFromDepot - finalTimeToDepot){
-                                finalPathIndexes = path;
-                                bestTime = curTime;
+                                #pragma omp critical
+                                if(curTime < bestTime /*- finalTimeFromDepot - finalTimeToDepot*/){
+                                    finalPathIndexes = path;
+                                    bestTime = curTime;
+                                }
                             }
                         }
                     }
                 }
             }
             
+            auto endTime = std::chrono::high_resolution_clock::now();
+            auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(endTime-startTime).count();
+            //std::cout << elapsedTime << std::endl;
+            if (elapsedTime > 43.5){
+                timeOut = true;
+                //break;
+            }
         }
         endOfTwoOpt = true;
         
-        auto endTime = std::chrono::high_resolution_clock::now();
-        auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(endTime-startTime).count();
-        std::cout << elapsedTime << std::endl;
-        if (elapsedTime > 30){
-            timeOut = true;
-        }
+        
     }
     
-    std::cout << "elapsed time: " << std::endl;
+    //std::cout << "elapsed time: " << std::endl;
     
     /*for(int j = 0; j < finalPathIndexes.size(); j++){
         std::cout << finalPathIndexes[j] << std::endl;
@@ -688,13 +677,14 @@ bool multiDestDijkstra(int startIdx, int startID, int numOfImportantIntersection
                 checkProcessed = true;
                 
                 //move the path vector into the 3d database
-                std::vector<StreetSegmentIdx> path = traceBack(intersections, currNode->id);
-                double time = computePathTravelTime(path, timePenalty);
+                //std::vector<StreetSegmentIdx> path = traceBack(intersections, currNode->id);
+                //double time = computePathTravelTime(path, timePenalty);
+                //double time = currNode->bestTime;
                 //pathTimes[startIdx][pickupIt->second] = time;
                 
                 std::pair<map_iterator, map_iterator> result = pickupIndexes.equal_range(currNode->id);
                 for (map_iterator map_it = result.first; map_it != result.second; map_it++){
-                    pathTimes[startIdx][map_it->second] = time;
+                    pathTimes[startIdx][map_it->second] = currNode->bestTime;
                     importantIntersectionCount++;
                 }
                     
@@ -704,13 +694,13 @@ bool multiDestDijkstra(int startIdx, int startID, int numOfImportantIntersection
                 checkProcessed = true;
                 
                 //move the path vector into the 3d database
-                std::vector<StreetSegmentIdx> path = traceBack(intersections, currNode->id);
-                double time = computePathTravelTime(path, timePenalty);
+                //std::vector<StreetSegmentIdx> path = traceBack(intersections, currNode->id);
+                //double time = computePathTravelTime(path, timePenalty);
                 //pathTimes[startIdx][pickupIndexes.size()+dropoffIt->second] = time;
                 
                 std::pair<map_iterator, map_iterator> result = dropoffIndexes.equal_range(currNode->id);
                 for (map_iterator map_it = result.first; map_it != result.second; map_it++){
-                    pathTimes[startIdx][pickupIndexes.size()+map_it->second] = time;
+                    pathTimes[startIdx][pickupIndexes.size()+map_it->second] = currNode->bestTime;
                     importantIntersectionCount++;
                 }
                 
@@ -721,13 +711,13 @@ bool multiDestDijkstra(int startIdx, int startID, int numOfImportantIntersection
                 //checkProcessed = true;
                 
                 //move the path vector into the 3d database
-                std::vector<StreetSegmentIdx> path = traceBack(intersections, currNode->id);
-                double time = computePathTravelTime(path, timePenalty);
+                //std::vector<StreetSegmentIdx> path = traceBack(intersections, currNode->id);
+                //double time = computePathTravelTime(path, timePenalty);
                 //pathTimes[startIdx][pickupIndexes.size()+dropoffIndexes.size()+depotIt->second] = time;
                 
                 std::pair<map_iterator, map_iterator> result = depotIndexes.equal_range(currNode->id);
                 for (map_iterator map_it = result.first; map_it != result.second; map_it++){
-                    pathTimes[startIdx][pickupIndexes.size()+dropoffIndexes.size()+map_it->second] = time;
+                    pathTimes[startIdx][pickupIndexes.size()+dropoffIndexes.size()+map_it->second] = currNode->bestTime;
                     importantIntersectionCount++;
                 }
                 

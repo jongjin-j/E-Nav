@@ -324,9 +324,9 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     
     while(!timeOut && !endOfTwoOpt){
         #pragma omp parallel for
-        for(int i = 1; i < pathIndexesSize - 2; i++){
+        for(int i = 1; i < pathIndexesSize - 1; i++){
             if (!timeOut){
-                for(int j = i + 1; j < pathIndexesSize - 1; j++){
+                for(int j = i + 1; j < pathIndexesSize; j++){
                     ////ERROR FREE
                     std::vector<int> indexesOfFirstSegment;
                     std::vector<int> indexesOfMidSegment;
@@ -383,8 +383,6 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
         }
         endOfTwoOpt = true;
-        
-        
     }
     
     //std::cout << "elapsed time: " << std::endl;
@@ -392,6 +390,25 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     /*for(int j = 0; j < finalPathIndexes.size(); j++){
         std::cout << finalPathIndexes[j] << std::endl;
     }*/
+    
+    
+    
+    
+    
+    //3-opt
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     int shortestTimeFromDepot = initial_bestTime;
     int fromDepotIntersection;

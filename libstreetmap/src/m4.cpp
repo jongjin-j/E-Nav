@@ -37,7 +37,8 @@ bool pathLegal(std::vector<int> allPathIndex);
 void swapThreeOrder(std::vector<int>& vec1, std::vector<int>& vec2, std::vector<int>& vec3, std::vector<int>& finalPath, int order);
 void reversePartialVector(std::vector<int>& vec1, std::vector<int>& vec2, std::vector<int>& vec3, int order);
 double findPathTravelTime(std::vector<int> intersections, std::vector<std::vector<double>> timeForPaths);
-
+void swapFourOrder(std::vector<int>& vec1, std::vector<int>& vec2, std::vector<int>& vec3, std::vector<int>& vec4, std::vector<int>& finalPath, int order);
+void reversePartialVector3(std::vector<int>& vec1, std::vector<int>& vec2, std::vector<int>& vec3, std::vector<int>& vec4, int order);
 
 std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, const float turn_penalty){
     
@@ -152,13 +153,13 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     double finalTimeToDepot = initial_bestTime;
     
     #pragma omp parallel for
-    for(int depotIndex = 2 * N; depotIndex < 2 * N + depots.size(); depotIndex++){
+    for(int pickUpIndex = 0; pickUpIndex < N; pickUpIndex++){
         
         //std::vector<IntersectionIdx> pathIntersections;
         std::vector<int> pathIndexes;
         double currentTime = 0;
         
-        int shortestTimeFromDepot = initial_bestTime;
+        /*int shortestTimeFromDepot = initial_bestTime;
         int startDepotIndex = 0;
         int firstPickupIndex = 0;
         std::vector<CourierSubPath> travelRoute;
@@ -172,7 +173,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         }
         
         //pathIntersections.push_back(depots[startDepotIndex]);
-        currentTime += shortestTimeFromDepot;
+        currentTime += shortestTimeFromDepot;*/
         
         std::unordered_map<int, bool> visitedIndex;
     
@@ -182,17 +183,17 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
 
 
         //Step 2 and 3 of Algorithm
-        int nextIndex = firstPickupIndex;
-        int currentIndex = firstPickupIndex;
+        int nextIndex = pickUpIndex;
+        int currentIndex = pickUpIndex;
 
-        visitedIndex.insert({firstPickupIndex, true});
-        pathIndexes.push_back(firstPickupIndex);
+        visitedIndex.insert({pickUpIndex, true});
+        pathIndexes.push_back(pickUpIndex);
         
 
         int travelCount = 1;
 
         for (auto it = pickupIndexes.begin(); it != pickupIndexes.end(); it++){
-            if (it->first == deliveries[firstPickupIndex].pickUp){
+            if (it->first == deliveries[pickUpIndex].pickUp){
                 visitedIndex.insert({it->second, true});
                 travelCount++;
             }
@@ -272,7 +273,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
 
         //Step 4 of Algorithm
 
-        int shortestTimeToDepot = initial_bestTime;
+        /*int shortestTimeToDepot = initial_bestTime;
         int lastDepotIndex = 0;
 
         for(int j = 2 * N; j < 2 * N + M; j++){
@@ -280,19 +281,19 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                 shortestTimeToDepot = timeForAllPaths[currentIndex][j];
                 lastDepotIndex = j - 2 * N;
             }
-        }
+        }*/
             
         
         
         //pathIntersections.push_back(depots[lastDepotIndex]);
-        currentTime += shortestTimeToDepot;
+        //currentTime += shortestTimeToDepot;
         
         
         #pragma omp critical
         if(currentTime < bestTime){
             //finalPathIntersections = pathIntersections;
-            finalTimeFromDepot = shortestTimeFromDepot;
-            finalTimeToDepot = shortestTimeToDepot;
+            //finalTimeFromDepot = shortestTimeFromDepot;
+            //finalTimeToDepot = shortestTimeToDepot;
             bestTime = currentTime;
             finalPathIndexes = pathIndexes;
         }
@@ -329,8 +330,8 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     bool endOfTwoOpt = false;
     
     
-    //double T = 300000;
-    //int x = 185;
+    //double T = 300;
+    //int x = 15000;
     double currBestTime = initial_bestTime;
     
     
@@ -378,8 +379,8 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                             if(pathLegal(path)){
                                 double curTime = findPathTravelTime(path, timeForAllPaths);
                                    
-                                //double random = (rand()%100);
-                                //double randNum = random/100;
+                                double random = (rand()%100);
+                                double randNum = random/100;
                                 double timeDiff = curTime - bestTime;
                                 //#pragma omp critical
                                 if(timeDiff < 0 /*|| randNum < exp(-1 * timeDiff / T)*/){
@@ -388,11 +389,11 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                                 }
                                 
                                 //reduce T /////////////////////////////////////
-                                /*auto currTime = std::chrono::high_resolution_clock::now();
-                                auto elapsedTime = std::chrono::duration_cast<std::chrono::duration<double>>(currTime-startTime).count();
-                                T = T - (T/x)*((elapsedTime) / 100);
+                                //auto currTime = std::chrono::high_resolution_clock::now();
+                                //auto elapsedTime = std::chrono::duration_cast<std::chrono::duration<double>>(currTime-startTime).count();
+                                //T = T - (2*T/x)*((43.5 - elapsedTime) / 100);
                                 //std::cout << "time: " << elapsedTime << std::endl;
-                                std::cout << "Temp: " << T << " " << bestTime << " " << elapsedTime << std::endl;*/
+                                //std::cout << "Temp: " << T << " " << bestTime << " " << elapsedTime << std::endl;
                             }
                         }
                     }
@@ -423,7 +424,85 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     
     
     //3-opt
+    bool endOfThreeOpt = false;
+    double currBestTimeThreeOpt = initial_bestTime;
     
+    while(!timeOut && !endOfThreeOpt){
+        currBestTimeThreeOpt = bestTime;
+        //std::cout << "count 3: " << bestTime << std::endl;
+        #pragma omp parallel for
+        for(int i = 1; i < pathIndexesSize - 2; i++){
+            for(int j = i + 1; j < pathIndexesSize - 1; j++){
+                if (!timeOut){
+                    for(int k = j + 1; k < pathIndexesSize; k++){
+                        ////ERROR FREE
+                        std::vector<int> indexesOfFirstSegment;
+                        std::vector<int> indexesOfSecondSegment;
+                        std::vector<int> indexesOfThirdSegment;
+                        std::vector<int> indexesOfLastSegment;
+
+                        indexesOfFirstSegment.resize(i);
+                        indexesOfSecondSegment.resize(j-i);
+                        indexesOfThirdSegment.resize(k-j);
+                        indexesOfLastSegment.resize(pathIndexesSize-k);
+
+
+
+                        for (int m = 0; m < i; m++){
+                            indexesOfFirstSegment[m] = finalPathIndexes[m];
+                        }
+                        for (int n = 0; n < j-i; n++){
+                            indexesOfSecondSegment[n] = finalPathIndexes[n+i];
+                        }
+                        for (int l = 0; l < k-j; l++){
+                            indexesOfThirdSegment[l] = finalPathIndexes[l+j];
+                        }
+                        for (int w = 0; w < pathIndexesSize-k; w++){
+                            indexesOfLastSegment[w] = finalPathIndexes[w+k];
+                        }
+
+
+                        for(int reverse = 0; reverse < 16; reverse++){
+                            for(int swap = 0; swap < 24; swap++){
+                                std::vector<int> vec1 = indexesOfFirstSegment;
+                                std::vector<int> vec2 = indexesOfSecondSegment;
+                                std::vector<int> vec3 = indexesOfThirdSegment;
+                                std::vector<int> vec4 = indexesOfLastSegment;
+                                std::vector<int> path;
+
+                                reversePartialVector3(vec1, vec2, vec3, vec4, reverse);
+                                swapFourOrder(vec1, vec2, vec3, vec4, path, swap);
+
+                                #pragma omp critical
+                                if(pathLegal(path)){
+                                    double curTime = findPathTravelTime(path, timeForAllPaths);
+
+
+                                    double timeDiff = curTime - bestTime;
+                                    //#pragma omp critical
+                                    if(timeDiff < 0){
+                                        finalPathIndexes = path;
+                                        bestTime = curTime;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                auto endTime3 = std::chrono::high_resolution_clock::now();
+                auto elapsedTime3 = std::chrono::duration_cast<std::chrono::seconds>(endTime3-startTime).count();
+                //std::cout << elapsedTime << std::endl;
+                if (elapsedTime3 > 45){
+                    timeOut = true;
+                    //break;
+                }
+            }
+        }
+        if (currBestTimeThreeOpt == bestTime){
+            endOfThreeOpt = true;
+        }
+    }
+
     
     
     
@@ -610,6 +689,158 @@ void swapThreeOrder(std::vector<int>& vec1, std::vector<int>& vec2, std::vector<
     }
 }
 
+void swapFourOrder(std::vector<int>& vec1, std::vector<int>& vec2, std::vector<int>& vec3, std::vector<int>& vec4, std::vector<int>& finalPath, int order){
+    switch(order){
+        case 0:
+            finalPath = vec1;
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            break;
+        case 1:
+            finalPath = vec1;
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            break;
+        case 2:
+            finalPath = vec1;
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            break;
+        case 3:
+            finalPath = vec1;
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            break;
+        case 4:
+            finalPath = vec1;
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            break;
+        case 5:
+            finalPath = vec1;
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            break;
+        case 6:
+            finalPath = vec2;
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            break;
+        case 7:
+            finalPath = vec2;
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            break;
+        case 8:
+            finalPath = vec2;
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            break;
+        case 9:
+            finalPath = vec2;
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            break;
+        case 10:
+            finalPath = vec2;
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            break;
+        case 11:
+            finalPath = vec2;
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            break;
+        case 12:
+            finalPath = vec3;
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            break;
+        case 13:
+            finalPath = vec3;
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            break;
+        case 14:
+            finalPath = vec3;
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            break;
+        case 15:
+            finalPath = vec3;
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            break;
+        case 16:
+            finalPath = vec3;
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            break;
+        case 17:
+            finalPath = vec3;
+            finalPath.insert(std::end(finalPath), std::begin(vec4), std::end(vec4));
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            break;
+        case 18:
+            finalPath = vec4;
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            break;
+        case 19:
+            finalPath = vec4;
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            break;
+        case 20:
+            finalPath = vec4;
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            break;
+        case 21:
+            finalPath = vec4;
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            break;
+        case 22:
+            finalPath = vec4;
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            break;
+        case 23:
+            finalPath = vec4;
+            finalPath.insert(std::end(finalPath), std::begin(vec3), std::end(vec3));
+            finalPath.insert(std::end(finalPath), std::begin(vec2), std::end(vec2));
+            finalPath.insert(std::end(finalPath), std::begin(vec1), std::end(vec1));
+            break;
+        default: 
+            //std::cout << "Invalid Order Input" << std::endl;
+            break;
+    }
+}
+
 
 
 void reversePartialVector(std::vector<int>& vec1, std::vector<int>& vec2, std::vector<int>& vec3, int order){
@@ -641,6 +872,78 @@ void reversePartialVector(std::vector<int>& vec1, std::vector<int>& vec2, std::v
             std::reverse(vec1.begin(),vec1.end());
             std::reverse(vec2.begin(),vec2.end());
             std::reverse(vec3.begin(),vec3.end());
+            break;
+        default: 
+            //std::cout << "Invalid Order Input" << std::endl;
+            break;
+    }
+}
+
+void reversePartialVector3(std::vector<int>& vec1, std::vector<int>& vec2, std::vector<int>& vec3, std::vector<int>& vec4, int order){
+    switch(order){
+        case 0:
+            break;
+        case 1:
+            std::reverse(vec1.begin(),vec1.end());
+            break;
+        case 2:
+            std::reverse(vec2.begin(),vec2.end());
+            break;
+        case 3:
+            std::reverse(vec3.begin(),vec3.end());
+            break;
+        case 4:
+            std::reverse(vec1.begin(),vec1.end());
+            std::reverse(vec2.begin(),vec2.end());
+            break;
+        case 5:
+            std::reverse(vec2.begin(),vec2.end());
+            std::reverse(vec3.begin(),vec3.end());
+            break;
+        case 6:
+            std::reverse(vec3.begin(),vec3.end());
+            std::reverse(vec1.begin(),vec1.end());
+            break;
+        case 7:
+            std::reverse(vec1.begin(),vec1.end());
+            std::reverse(vec2.begin(),vec2.end());
+            std::reverse(vec3.begin(),vec3.end());
+            break;
+        case 8:
+            std::reverse(vec4.begin(),vec4.end());
+            break;
+        case 9:
+            std::reverse(vec1.begin(),vec1.end());
+            std::reverse(vec4.begin(),vec4.end());
+            break;
+        case 10:
+            std::reverse(vec2.begin(),vec2.end());
+            std::reverse(vec4.begin(),vec4.end());
+            break;
+        case 11:
+            std::reverse(vec3.begin(),vec3.end());
+            std::reverse(vec4.begin(),vec4.end());
+            break;
+        case 12:
+            std::reverse(vec1.begin(),vec1.end());
+            std::reverse(vec2.begin(),vec2.end());
+            std::reverse(vec4.begin(),vec4.end());
+            break;
+        case 13:
+            std::reverse(vec2.begin(),vec2.end());
+            std::reverse(vec3.begin(),vec3.end());
+            std::reverse(vec4.begin(),vec4.end());
+            break;
+        case 14:
+            std::reverse(vec3.begin(),vec3.end());
+            std::reverse(vec1.begin(),vec1.end());
+            std::reverse(vec4.begin(),vec4.end());
+            break;
+        case 15:
+            std::reverse(vec1.begin(),vec1.end());
+            std::reverse(vec2.begin(),vec2.end());
+            std::reverse(vec3.begin(),vec3.end());
+            std::reverse(vec4.begin(),vec4.end());
             break;
         default: 
             //std::cout << "Invalid Order Input" << std::endl;

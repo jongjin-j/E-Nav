@@ -18,6 +18,9 @@
 #include <map>
 #include <algorithm>
 #include <chrono>
+#include <stdlib.h>
+#include <time.h>
+
 
 #define NO_EDGE -1
 //initial time has to be a large number
@@ -37,6 +40,9 @@ double findPathTravelTime(std::vector<int> intersections, std::vector<std::vecto
 
 
 std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& deliveries, const std::vector<int>& depots, const float turn_penalty){
+    
+    srand(time(NULL));
+    
     
     //initialize timer at function call
     auto startTime = std::chrono::high_resolution_clock::now();
@@ -322,7 +328,15 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     
     bool endOfTwoOpt = false;
     
+    
+    //double T = 300000;
+    //int x = 185;
+    double currBestTime = initial_bestTime;
+    
+    
     while(!timeOut && !endOfTwoOpt){
+        currBestTime = bestTime;
+        //std::cout << "count " << bestTime << std::endl;
         #pragma omp parallel for
         for(int i = 1; i < pathIndexesSize - 1; i++){
             if (!timeOut){
@@ -359,15 +373,26 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
 
                             reversePartialVector(vec1, vec2, vec3, reverse);
                             swapThreeOrder(vec1, vec2, vec3, path, swap);
-
+                            
+                            #pragma omp critical
                             if(pathLegal(path)){
                                 double curTime = findPathTravelTime(path, timeForAllPaths);
-
-                                #pragma omp critical
-                                if(curTime < bestTime /*- finalTimeFromDepot - finalTimeToDepot*/){
+                                   
+                                //double random = (rand()%100);
+                                //double randNum = random/100;
+                                double timeDiff = curTime - bestTime;
+                                //#pragma omp critical
+                                if(timeDiff < 0 /*|| randNum < exp(-1 * timeDiff / T)*/){
                                     finalPathIndexes = path;
                                     bestTime = curTime;
                                 }
+                                
+                                //reduce T /////////////////////////////////////
+                                /*auto currTime = std::chrono::high_resolution_clock::now();
+                                auto elapsedTime = std::chrono::duration_cast<std::chrono::duration<double>>(currTime-startTime).count();
+                                T = T - (T/x)*((elapsedTime) / 100);
+                                //std::cout << "time: " << elapsedTime << std::endl;
+                                std::cout << "Temp: " << T << " " << bestTime << " " << elapsedTime << std::endl;*/
                             }
                         }
                     }
@@ -375,14 +400,16 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
             
             auto endTime = std::chrono::high_resolution_clock::now();
-            auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(endTime-startTime).count();
+            auto elapsedTime2 = std::chrono::duration_cast<std::chrono::seconds>(endTime-startTime).count();
             //std::cout << elapsedTime << std::endl;
-            if (elapsedTime > 43.5){
+            if (elapsedTime2 > 43.5){
                 timeOut = true;
                 //break;
             }
         }
-        endOfTwoOpt = true;
+        if (currBestTime == bestTime){
+            endOfTwoOpt = true;
+        }
     }
     
     //std::cout << "elapsed time: " << std::endl;
@@ -524,6 +551,7 @@ double findPathTravelTime(std::vector<int> intersections, std::vector<std::vecto
     
     return totalTime;
 }
+
 
 
 bool pathLegal(std::vector<int> allPathIndex){

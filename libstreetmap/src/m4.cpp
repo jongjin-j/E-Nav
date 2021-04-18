@@ -339,6 +339,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         currBestTime = bestTime;
         //std::cout << "count " << bestTime << std::endl;
         #pragma omp parallel for
+        //bool timeOutLocal = false;
         for(int i = 1; i < pathIndexesSize - 1; i++){
             if (!timeOut){
                 for(int j = i + 1; j < pathIndexesSize; j++){
@@ -402,9 +403,10 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                     }
                     auto endTime = std::chrono::high_resolution_clock::now();
                     auto elapsedTime2 = std::chrono::duration_cast<std::chrono::duration<double>>(endTime-startTime).count();
-                    //std::cout << elapsedTime << std::endl;
-                    //#pragma omp critical
-                    if (elapsedTime2 > 43.5){
+                    //std::cout << "elapsedTime: " << elapsedTime2 << std::endl;
+                    #pragma omp critical
+                    if (elapsedTime2 > 42){
+                        //std::cout << "timeout" << std::endl;
                         timeOut = true;
                         //break;
                     }
@@ -412,6 +414,15 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
             }
             if (currBestTime == bestTime){
                 endOfTwoOpt = true;
+            }
+            auto endTime = std::chrono::high_resolution_clock::now();
+            auto elapsedTime2 = std::chrono::duration_cast<std::chrono::duration<double>>(endTime-startTime).count();
+            //std::cout << "elapsedTime: " << elapsedTime2 << std::endl;
+            #pragma omp critical
+            if (elapsedTime2 > 42){
+                //std::cout << "timeout" << std::endl;
+                timeOut = true;
+                //break;
             }
         }
     }
@@ -428,9 +439,9 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         timeOut = true;
     }*/
     //timeOut = true;
-    if (timeOut){
-        std::cout << "timeout" << std::endl;
-    }
+    /*if (timeOut){
+        std::cout << "timeout2" << std::endl;
+    }*/
     
     
     
@@ -505,7 +516,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                             auto endTime3 = std::chrono::high_resolution_clock::now();
                             auto elapsedTime3 = std::chrono::duration_cast<std::chrono::seconds>(endTime3-startTime).count();
                             //std::cout << elapsedTime << std::endl;
-                            if (elapsedTime3 > 45){
+                            if (elapsedTime3 > 44){
                                 timeOut = true;
                                 break;
                             }

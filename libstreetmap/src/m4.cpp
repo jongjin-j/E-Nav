@@ -346,94 +346,83 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         for(int i = 1; i < pathIndexesSize - 1; i++){
             if (!timeOut){
                 for(int j = i + 1; j < pathIndexesSize; j++){
-                    if (!timeOut){
-                    
-                        ////ERROR FREE
-                        std::vector<int> indexesOfFirstSegment;
-                        std::vector<int> indexesOfMidSegment;
-                        std::vector<int> indexesOfLastSegment;
+                    ////ERROR FREE
+                    std::vector<int> indexesOfFirstSegment;
+                    std::vector<int> indexesOfMidSegment;
+                    std::vector<int> indexesOfLastSegment;
 
-                        indexesOfFirstSegment.resize(i);
-                        indexesOfMidSegment.resize(j-i);
-                        indexesOfLastSegment.resize(pathIndexesSize-j);
+                    indexesOfFirstSegment.resize(i);
+                    indexesOfMidSegment.resize(j-i);
+                    indexesOfLastSegment.resize(pathIndexesSize-j);
 
 
 
-                        for (int k = 0; k < i; k++){
-                            indexesOfFirstSegment[k] = finalPathIndexes[k];
-                        }
-                        for (int n = 0; n < j-i; n++){
-                            indexesOfMidSegment[n] = finalPathIndexes[n+i];
-                        }
-                        for (int l = 0; l < pathIndexesSize-j; l++){
-                            indexesOfLastSegment[l] = finalPathIndexes[l+j];
-                        }
+                    for (int k = 0; k < i; k++){
+                        indexesOfFirstSegment[k] = finalPathIndexes[k];
+                    }
+                    for (int n = 0; n < j-i; n++){
+                        indexesOfMidSegment[n] = finalPathIndexes[n+i];
+                    }
+                    for (int l = 0; l < pathIndexesSize-j; l++){
+                        indexesOfLastSegment[l] = finalPathIndexes[l+j];
+                    }
 
 
 
-                        for(int reverse = 0; reverse < 8; reverse++){
-                            for(int swap = 0; swap < 6; swap++){
-                                std::vector<int> vec1 = indexesOfFirstSegment;
-                                std::vector<int> vec2 = indexesOfMidSegment;
-                                std::vector<int> vec3 = indexesOfLastSegment;
-                                std::vector<int> path;
+                    for(int reverse = 0; reverse < 8; reverse++){
+                        for(int swap = 0; swap < 6; swap++){
+                            std::vector<int> vec1 = indexesOfFirstSegment;
+                            std::vector<int> vec2 = indexesOfMidSegment;
+                            std::vector<int> vec3 = indexesOfLastSegment;
+                            std::vector<int> path;
 
-                                reversePartialVector(vec1, vec2, vec3, reverse);
-                                swapThreeOrder(vec1, vec2, vec3, path, swap);
-
-                                #pragma omp critical
-                                if(pathLegal(path)){
-                                    double curTime = findPathTravelTime(path, timeForAllPaths);
-
-                                    //double random = (rand()%100);
-                                    //double randNum = random/100;
-                                    double timeDiff = curTime - bestTime;
-                                    //#pragma omp critical
-                                    if(timeDiff < 0 /*|| randNum < exp(-1 * timeDiff / T)*/){
-                                        finalPathIndexes = path;
-                                        bestTime = curTime;
-                                    }
-
-                                    //reduce T /////////////////////////////////////
-                                    //auto currTime = std::chrono::high_resolution_clock::now();
-                                    //auto elapsedTime = std::chrono::duration_cast<std::chrono::duration<double>>(currTime-startTime).count();
-                                    //T = T - (2*T/x)*((43.5 - elapsedTime) / 100);
-                                    //std::cout << "time: " << elapsedTime << std::endl;
-                                    //std::cout << "Temp: " << T << " " << bestTime << " " << elapsedTime << std::endl;
+                            reversePartialVector(vec1, vec2, vec3, reverse);
+                            swapThreeOrder(vec1, vec2, vec3, path, swap);
+                            
+                            #pragma omp critical
+                            if(pathLegal(path)){
+                                double curTime = findPathTravelTime(path, timeForAllPaths);
+                                   
+                                double random = (rand()%100);
+                                double randNum = random/100;
+                                double timeDiff = curTime - bestTime;
+                                //#pragma omp critical
+                                if(timeDiff < 0 /*|| randNum < exp(-1 * timeDiff / T)*/){
+                                    finalPathIndexes = path;
+                                    bestTime = curTime;
                                 }
+                                
+                                //reduce T /////////////////////////////////////
+                                //auto currTime = std::chrono::high_resolution_clock::now();
+                                //auto elapsedTime = std::chrono::duration_cast<std::chrono::duration<double>>(currTime-startTime).count();
+                                //T = T - (2*T/x)*((43.5 - elapsedTime) / 100);
+                                //std::cout << "time: " << elapsedTime << std::endl;
+                                //std::cout << "Temp: " << T << " " << bestTime << " " << elapsedTime << std::endl;
                             }
                         }
                     }
-                    auto endTime = std::chrono::high_resolution_clock::now();
-                    auto elapsedTime2 = std::chrono::duration_cast<std::chrono::seconds>(endTime-startTime).count();
-                    //std::cout << elapsedTime2 << std::endl;
-                    if (elapsedTime2 > timeConstraint){
-                        timeOut = true;
-                        break;
-                    }
                 }
             }
-            if (currBestTime == bestTime){
-                endOfTwoOpt = true;
+            
+            auto endTime = std::chrono::high_resolution_clock::now();
+            auto elapsedTime2 = std::chrono::duration_cast<std::chrono::seconds>(endTime-startTime).count();
+            //std::cout << elapsedTime << std::endl;
+            if (elapsedTime2 > 43.5){
+                timeOut = true;
+                //break;
             }
+        }
+        if (currBestTime == bestTime){
+            endOfTwoOpt = true;
         }
     }
     
+    //std::cout << "elapsed time: " << std::endl;
     
-        
     /*for(int j = 0; j < finalPathIndexes.size(); j++){
         std::cout << finalPathIndexes[j] << std::endl;
     }*/
     
-    /*auto endTwoOptTime = std::chrono::high_resolution_clock::now();
-    auto elapsedTwoOptTime = std::chrono::duration_cast<std::chrono::double>(endTwoOptTime-startTime).count();
-    if (elapsedTwoOptTime > 43.5){
-        timeOut = true;
-    }*/
-    //timeOut = true;
-    /*if (timeOut){
-        std::cout << "timeout2" << std::endl;
-    }*/
     
     
     
@@ -447,78 +436,74 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
         //std::cout << "count 3: " << bestTime << std::endl;
         #pragma omp parallel for
         for(int i = 1; i < pathIndexesSize - 2; i++){
-            if (!timeOut){
-                for(int j = i + 1; j < pathIndexesSize - 1; j++){
-                    if (!timeOut){
-                        for(int k = j + 1; k < pathIndexesSize; k++){
-                            if (!timeOut){
-                                ////ERROR FREE
-                                std::vector<int> indexesOfFirstSegment;
-                                std::vector<int> indexesOfSecondSegment;
-                                std::vector<int> indexesOfThirdSegment;
-                                std::vector<int> indexesOfLastSegment;
+            for(int j = i + 1; j < pathIndexesSize - 1; j++){
+                if (!timeOut){
+                    for(int k = j + 1; k < pathIndexesSize; k++){
+                        ////ERROR FREE
+                        std::vector<int> indexesOfFirstSegment;
+                        std::vector<int> indexesOfSecondSegment;
+                        std::vector<int> indexesOfThirdSegment;
+                        std::vector<int> indexesOfLastSegment;
 
-                                indexesOfFirstSegment.resize(i);
-                                indexesOfSecondSegment.resize(j-i);
-                                indexesOfThirdSegment.resize(k-j);
-                                indexesOfLastSegment.resize(pathIndexesSize-k);
+                        indexesOfFirstSegment.resize(i);
+                        indexesOfSecondSegment.resize(j-i);
+                        indexesOfThirdSegment.resize(k-j);
+                        indexesOfLastSegment.resize(pathIndexesSize-k);
 
 
 
-                                for (int m = 0; m < i; m++){
-                                    indexesOfFirstSegment[m] = finalPathIndexes[m];
-                                }
-                                for (int n = 0; n < j-i; n++){
-                                    indexesOfSecondSegment[n] = finalPathIndexes[n+i];
-                                }
-                                for (int l = 0; l < k-j; l++){
-                                    indexesOfThirdSegment[l] = finalPathIndexes[l+j];
-                                }
-                                for (int w = 0; w < pathIndexesSize-k; w++){
-                                    indexesOfLastSegment[w] = finalPathIndexes[w+k];
-                                }
+                        for (int m = 0; m < i; m++){
+                            indexesOfFirstSegment[m] = finalPathIndexes[m];
+                        }
+                        for (int n = 0; n < j-i; n++){
+                            indexesOfSecondSegment[n] = finalPathIndexes[n+i];
+                        }
+                        for (int l = 0; l < k-j; l++){
+                            indexesOfThirdSegment[l] = finalPathIndexes[l+j];
+                        }
+                        for (int w = 0; w < pathIndexesSize-k; w++){
+                            indexesOfLastSegment[w] = finalPathIndexes[w+k];
+                        }
 
 
-                                for(int reverse = 0; reverse < 16; reverse++){
-                                    for(int swap = 0; swap < 24; swap++){
-                                        std::vector<int> vec1 = indexesOfFirstSegment;
-                                        std::vector<int> vec2 = indexesOfSecondSegment;
-                                        std::vector<int> vec3 = indexesOfThirdSegment;
-                                        std::vector<int> vec4 = indexesOfLastSegment;
-                                        std::vector<int> path;
+                        for(int reverse = 0; reverse < 16; reverse++){
+                            for(int swap = 0; swap < 24; swap++){
+                                std::vector<int> vec1 = indexesOfFirstSegment;
+                                std::vector<int> vec2 = indexesOfSecondSegment;
+                                std::vector<int> vec3 = indexesOfThirdSegment;
+                                std::vector<int> vec4 = indexesOfLastSegment;
+                                std::vector<int> path;
 
-                                        reversePartialVector3(vec1, vec2, vec3, vec4, reverse);
-                                        swapFourOrder(vec1, vec2, vec3, vec4, path, swap);
+                                reversePartialVector3(vec1, vec2, vec3, vec4, reverse);
+                                swapFourOrder(vec1, vec2, vec3, vec4, path, swap);
 
-                                        #pragma omp critical
-                                        if(pathLegal(path)){
-                                            double curTime = findPathTravelTime(path, timeForAllPaths);
+                                #pragma omp critical
+                                if(pathLegal(path)){
+                                    double curTime = findPathTravelTime(path, timeForAllPaths);
 
 
-                                            double timeDiff = curTime - bestTime;
-                                            //#pragma omp critical
-                                            if(timeDiff < 0){
-                                                finalPathIndexes = path;
-                                                bestTime = curTime;
-                                            }
-                                        }
+                                    double timeDiff = curTime - bestTime;
+                                    //#pragma omp critical
+                                    if(timeDiff < 0){
+                                        finalPathIndexes = path;
+                                        bestTime = curTime;
                                     }
                                 }
-                            }
-                            auto endTime3 = std::chrono::high_resolution_clock::now();
-                            auto elapsedTime3 = std::chrono::duration_cast<std::chrono::seconds>(endTime3-startTime).count();
-                            //std::cout << elapsedTime3 << std::endl;
-                            if (elapsedTime3 > timeConstraint){
-                                timeOut = true;
-                                break;
                             }
                         }
                     }
                 }
+                auto endTime3 = std::chrono::high_resolution_clock::now();
+                auto elapsedTime3 = std::chrono::duration_cast<std::chrono::seconds>(endTime3-startTime).count();
+                //std::cout << elapsedTime << std::endl;
+                if (elapsedTime3 > 44){
+                    timeOut = true;
+                    //break;
+                }
             }
-            if (currBestTimeThreeOpt == bestTime){
-                endOfThreeOpt = true;
-            }
+        }
+        if (currBestTimeThreeOpt == bestTime){
+            endOfThreeOpt = true;
         }
     }
 

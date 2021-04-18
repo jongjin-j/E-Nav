@@ -496,7 +496,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                 auto endTime3 = std::chrono::high_resolution_clock::now();
                 auto elapsedTime3 = std::chrono::duration_cast<std::chrono::seconds>(endTime3-startTime).count();
                 //std::cout << elapsedTime << std::endl;
-                if (elapsedTime3 > 44){
+                if (elapsedTime3 > 43.5){
                     timeOut = true;
                     //break;
                 }

@@ -512,9 +512,9 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                     }
                 }
             }
-        }
-        if (currBestTimeThreeOpt == bestTime){
-            endOfThreeOpt = true;
+            if (currBestTimeThreeOpt == bestTime){
+                endOfThreeOpt = true;
+            }
         }
     }
 

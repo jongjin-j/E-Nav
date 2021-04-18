@@ -54,6 +54,10 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
     int bestTime = initial_bestTime;
     int N = deliveries.size();
     int M = depots.size();
+    double timeConstraint = 43.5;
+    if (N < 15){
+        timeConstraint = 10;
+    }
     
     //database for all path times
     std::vector<std::vector<double>> timeForAllPaths;
@@ -403,7 +407,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                     auto endTime = std::chrono::high_resolution_clock::now();
                     auto elapsedTime2 = std::chrono::duration_cast<std::chrono::seconds>(endTime-startTime).count();
                     //std::cout << elapsedTime2 << std::endl;
-                    if (elapsedTime2 > 43.5){
+                    if (elapsedTime2 > timeConstraint){
                         timeOut = true;
                         break;
                     }
@@ -504,7 +508,7 @@ std::vector<CourierSubPath> travelingCourier(const std::vector<DeliveryInf>& del
                             auto endTime3 = std::chrono::high_resolution_clock::now();
                             auto elapsedTime3 = std::chrono::duration_cast<std::chrono::seconds>(endTime3-startTime).count();
                             //std::cout << elapsedTime3 << std::endl;
-                            if (elapsedTime3 > 44){
+                            if (elapsedTime3 > timeConstraint){
                                 timeOut = true;
                                 break;
                             }
